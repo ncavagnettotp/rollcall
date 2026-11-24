@@ -102,10 +102,13 @@ With recommendations, covering at least the Open Questions below plus:
 - Vehicles as their own records or as text on the set.
 - Which PDF fields to pre-fill.
 
-### Phase 3 — Write the follow-up changes, in build order
+### Phase 3 — Spec and build, one change at a time
 
-Each gets proposal, specs, design and tasks; passes `openspec validate`; is reviewed by the owner
-before building.
+Decided 2026-11-23 by the owner: write one change, build it, then write the next. Phases 1 and 2
+come first because they fix the decisions every change depends on; after that, each change is
+specified with the real code of the earlier changes in hand.
+
+Order:
 
 1. `add-platform-foundation`
 2. `add-accounts`
@@ -114,15 +117,19 @@ before building.
 5. `add-dashboard`
 6. `add-operations`
 
+Cycle for each change:
+
+1. **Spec:** write proposal, specs, design and tasks; check against the archived specs of earlier
+   changes and the Review focus list; `openspec validate <name>` passes; owner reviews.
+2. **Build:** implement its tasks test-first; verify in a running Docker stack (several browser
+   sessions at once where relevant).
+3. **Sign-off:** owner follows the change's "What to try" list.
+4. **Archive:** `openspec archive <name>`, which merges its specs into `openspec/specs/`. Only
+   then does the next change start.
+
 Because staff only start after everything is built, HTTPS, backups and the host choice stay in
 `add-operations`. Before go-live, `add-operations` must be finished and the full stack rehearsed.
-
-### Phase 4 — Build loop
-
-For each change in order: implement test-first, verify in a running Docker stack (several browser
-sessions at once where relevant), owner sign-off with the "What to try" list, `openspec archive`.
-The next change starts after the previous one is archived. This planning change is archived with
-`--skip-specs` once Phase 3 is complete.
+This planning change is archived with `--skip-specs` after the last change is archived.
 
 ## Open Questions
 
