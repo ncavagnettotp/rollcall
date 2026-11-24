@@ -1,0 +1,180 @@
+const {chromium} = require('C:/Users/ndcav/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const {pathToFileURL} = require('node:url');
+const path = require('node:path');
+const fs = require('node:fs');
+const assert = require('node:assert/strict');
+(async () => {
+  const browser = await chromium.launch({headless:true, channel:'msedge'});
+  const page = await browser.newPage({viewport:{width:1584,height:992},deviceScaleFactor:1});
+  const errors=[];
+  page.on('pageerror',e=>errors.push(e.message));
+  try {
+    await page.goto(pathToFileURL(path.resolve('docs/rollcall/design-study.html')).href);
+    await page.evaluate(()=>document.fonts.ready);
+    assert.equal(await page.evaluate(()=>document.fonts.check('20px Nunito')),true);
+    fs.mkdirSync('output/rollcall-design-study',{recursive:true});
+    assert.equal(await page.getByRole('tab',{name:'Vehicles (2)'}).getAttribute('aria-selected'),'true');
+    assert.equal(await page.locator('#vehicles-panel .vehicle-group').count(),2);
+    assert.equal(await page.locator('#vehicles-panel summary .pill').count(),0);
+    assert.equal(await page.locator('.customer-tab-icon').count(),3);
+    assert.equal(await page.getByRole('button',{name:'Copy email: riley.bennett@example.com'}).count(),1);
+    assert.equal(await page.getByRole('link',{name:'Phone: (312) 555-0148'}).count(),1);
+    assert.equal(await page.locator('#vehicles-panel > .profile-heading-line').count(),0);
+    assert.equal(await page.locator('#stored-panel .set-type-icons [aria-label="Tire and wheel set"]').count(),2);
+    assert.equal(await page.locator('#stored-panel .set-type-icons [aria-label="Tire-only set"]').count(),2);
+    assert.equal(await page.evaluate(()=>(setTypeIcons('wheels').match(/<img/g)||[]).length===1 && setTypeIcons('wheels').includes('Wheel-only set')),true);
+    await page.getByRole('tab',{name:'Unassigned (1)'}).click();
+    await page.waitForTimeout(50);
+    const sliding=await page.locator('[data-slot="tabs-indicator"]').evaluate(e=>({
+      running:e.getAnimations().some(a=>a.playState==='running'),
+      duration:getComputedStyle(e).transitionDuration,
+      slot:e.getAttribute('data-slot'),
+    }));
+    assert.equal(sliding.slot,'tabs-indicator');
+    assert.equal(sliding.running,true,'HeroUI indicator should animate during tab change');
+    assert.equal(await page.locator('#unassigned-panel [data-set]').count(),1);
+    await page.getByRole('tab',{name:'Unassigned (1)'}).focus();await page.keyboard.press('ArrowRight');
+    assert.equal(await page.getByRole('tab',{name:'All Stored Sets (4)'}).getAttribute('aria-selected'),'true');
+    await page.getByRole('tab',{name:'Vehicles (2)'}).click();
+    await page.waitForTimeout(300);
+    const settled=await page.locator('[data-slot="tabs-indicator"]').boundingBox();
+    const selectedBounds=await page.getByRole('tab',{name:'Vehicles (2)'}).boundingBox();
+    assert(Math.abs(settled.x-selectedBounds.x)<2,'indicator settles beneath selected tab');
+    await page.screenshot({path:'output/rollcall-design-study/customer-desktop.png',fullPage:true});
+    if (await page.locator('[data-screen="dashboard"]').count()) {
+      await page.locator('[data-screen="dashboard"]').first().click();
+    await page.waitForFunction(()=>!document.querySelector(".workspace[data-entering],.screen-leaving"));
+      await page.screenshot({path:'output/rollcall-design-study/dashboard-desktop.png',fullPage:true});
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+    }
+    for (const width of [1584,1486,1280,1024]) {
+      await page.setViewportSize({width,height:992});
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,`desktop ${width} overflow`);
+      assert.equal(await page.evaluate(()=>{
+        const label=document.querySelector('.attention-label');
+        const range=document.createRange(); range.selectNodeContents(label);
+        return range.getBoundingClientRect().right<=document.querySelector('.nav-badge').getBoundingClientRect().left;
+      }),true,`attention label overlaps badge at ${width}`);
+    }
+    await page.setViewportSize({width:1584,height:992});
+    await page.locator('.nav [data-screen="profile"]').click();
+    await page.waitForFunction(()=>!document.querySelector(".workspace[data-entering],.screen-leaving"));
+    await page.getByRole('tab',{name:'Vehicles (2)'}).click();
+    await page.locator('#vehicles-panel .vehicle-group').first().locator('[data-slot="accordion-trigger"]').click();
+    await page.waitForTimeout(350);
+    const iconEdges=await page.locator('#vehicles-panel .set-type-box').first().evaluate(box=>{
+      return [...box.querySelectorAll('img')].map((img,i)=>{
+        const r=img.getBoundingClientRect();const scale=getComputedStyle(img).objectFit==='cover'?Math.max(r.width/img.naturalWidth,r.height/img.naturalHeight):Math.min(r.width/img.naturalWidth,r.height/img.naturalHeight);
+        const bounds=i===0?[24,113]:[23,177];const offset=(r.height-img.naturalHeight*scale)/2;
+        return {top:r.top+offset+bounds[0]*scale,bottom:r.top+offset+bounds[1]*scale};
+      });
+    });
+    assert(Math.abs(iconEdges[0].top-iconEdges[1].top)<1,'icon artwork top alignment');
+    assert(Math.abs(iconEdges[0].bottom-iconEdges[1].bottom)<1,'icon artwork bottom alignment');
+    assert.equal(await page.locator('#vehicles-panel .set-type-box').first().locator('img').count(),2);
+    await page.screenshot({path:'output/rollcall-design-study/vehicle-set-icons-desktop.png',fullPage:true});
+    await page.locator('#vehicles-panel [data-set="RC-105"]').click();
+    await page.waitForFunction(()=>!document.querySelector(".workspace[data-entering],.screen-leaving"));
+    await page.getByRole('heading',{name:'Nokian Hakkapeliitta',exact:true}).waitFor();
+    await page.locator('#detail [data-screen="profile"]').click();
+    await page.waitForFunction(()=>!document.querySelector(".workspace[data-entering],.screen-leaving"));
+    assert.equal(await page.getByRole('tab',{name:'Vehicles (2)'}).getAttribute('aria-selected'),'true');
+    await page.locator('.app-utilities [data-screen="settings"]').click();
+    await page.waitForFunction(()=>!document.querySelector(".workspace[data-entering],.screen-leaving"));
+    await page.locator('#locations').check();
+    await page.locator('.nav [data-screen="profile"]').click();
+    await page.waitForFunction(()=>!document.querySelector(".workspace[data-entering],.screen-leaving"));
+    await page.getByRole('tab',{name:'All Stored Sets (4)'}).click();
+    await page.locator('#stored-panel [data-set="RC-104"]').click();
+    await page.waitForFunction(()=>!document.querySelector(".workspace[data-entering],.screen-leaving"));
+    assert.equal(await page.locator('[data-accessory]').count(),3);
+    assert.equal(await page.locator('#detail-customer,#detail-dates').count(),0);
+    assert.equal(await page.locator('#detail-due time').innerText(),'05/01/2027');
+    assert.equal(await page.locator('#breadcrumb').isVisible(),true);
+    assert.deepEqual(await page.locator('.accessory-art').first().evaluate(e=>({width:e.getBoundingClientRect().width,height:Math.round(e.getBoundingClientRect().height*10)/10})),{width:36,height:40.2});
+    assert.equal(await page.locator('#accessory-editor').count(),0);
+    assert.equal(await page.locator('.accessory-name,.accessory-state').count(),0);
+    const ring=page.locator('[data-accessory="centering_rings"]');
+    assert.equal(await ring.getAttribute('aria-pressed'),'false');
+    await ring.click(); await page.waitForTimeout(230);
+    assert.equal(await ring.getAttribute('aria-pressed'),'true');
+    await ring.click(); await page.waitForTimeout(230);
+    assert.equal(await ring.getAttribute('aria-pressed'),'false');
+    assert.equal(await ring.locator('.accessory-art').evaluate(e=>getComputedStyle(e).filter),'grayscale(1)');
+    const lugs=page.locator('[data-accessory="lug_nuts"]');
+    await lugs.focus();await page.keyboard.press('Space');
+    assert.equal(await lugs.getAttribute('aria-pressed'),'false');
+    await page.keyboard.press('Enter');
+    assert.equal(await lugs.getAttribute('aria-pressed'),'true');
+    assert.equal(await page.locator('.notes-dot').isVisible(),true);
+    assert.equal(await page.locator('#view-notes').evaluate(e=>e.classList.contains('has-notes')),true);
+    await page.locator('#view-notes').click();
+    assert.equal(await page.locator('#set-note-text').inputValue(),'Inspect tire wear before next installation.');
+    await page.screenshot({path:'output/rollcall-design-study/set-details-desktop.png',fullPage:true});
+    await page.locator('#detail [data-screen="profile"]').click();
+    await page.waitForFunction(()=>!document.querySelector(".workspace[data-entering],.screen-leaving"));
+    await page.locator('#stored-panel [data-set="RC-105"]').click();
+    await page.waitForFunction(()=>!document.querySelector(".workspace[data-entering],.screen-leaving"));
+    assert.equal(await page.locator('.notes-dot').isVisible(),false);
+    assert.equal(await page.locator('#view-notes').evaluate(e=>e.classList.contains('has-notes')),false);
+    assert.equal(await page.locator('#set-note-text').inputValue(),'');
+    await page.locator('#set-note-text').fill('Sample note for Nokian set');
+    await page.locator('#save-notes').click();
+    assert.equal(await page.locator('.notes-dot').isVisible(),true);
+    await page.locator('#detail [data-screen="profile"]').click();
+    await page.waitForFunction(()=>!document.querySelector(".workspace[data-entering],.screen-leaving"));
+    await page.locator('#stored-panel [data-set="RC-104"]').click();
+    await page.waitForFunction(()=>!document.querySelector(".workspace[data-entering],.screen-leaving"));
+    assert.equal(await page.locator('#set-note-text').inputValue(),'Inspect tire wear before next installation.');
+    assert.equal(await page.locator('#detail select').count(),0);
+    assert.equal(await page.locator('#assign-vehicle').evaluate(e=>e.closest('#detail-vehicle')!==null),true);
+    await page.getByRole('button',{name:'Reassign vehicle',exact:true}).click();
+    await page.screenshot({path:'output/rollcall-design-study/vehicle-picker-desktop.png',fullPage:true});
+    await page.locator('#vehicle-picker input[value="2024 Subaru Outback"]').check();
+    await page.locator('#vehicle-picker').getByRole('button',{name:'Cancel',exact:true}).click();
+    assert.equal(await page.locator('#assigned-vehicle-name').innerText(),'2021 Audi Q5');
+    await page.getByRole('button',{name:'Reassign vehicle',exact:true}).click();
+    await page.locator('#vehicle-picker input[value="2024 Subaru Outback"]').check();
+    await page.locator('#confirm-vehicle').click();
+    assert.equal(await page.locator('#assigned-vehicle-name').innerText(),'2024 Subaru Outback');
+    assert.equal(await page.locator('#set-note-text').inputValue(),'Inspect tire wear before next installation.');
+    await page.locator('#detail [data-screen="profile"]').click();
+    await page.waitForFunction(()=>!document.querySelector(".workspace[data-entering],.screen-leaving"));
+    await page.locator('#stored-panel [data-set="RC-110"]').click();
+    await page.waitForFunction(()=>!document.querySelector(".workspace[data-entering],.screen-leaving"));
+    await page.getByRole('button',{name:'Assign Vehicle',exact:true}).click();
+    await page.locator('#vehicle-picker input[value="2021 Audi Q5"]').check();
+    await page.locator('#confirm-vehicle').click();
+    assert.equal(await page.locator('#assigned-vehicle-name').innerText(),'2021 Audi Q5');
+    await page.locator('[data-profile-key="unassigned-tab"][aria-label="Unassigned (0)"]').waitFor({state:'attached'});
+    await page.locator('#detail [data-screen="profile"]').click();
+    await page.waitForFunction(()=>!document.querySelector(".workspace[data-entering],.screen-leaving"));
+    await page.screenshot({path:'output/rollcall-design-study/customer-locations-desktop.png',fullPage:true});
+    for (const width of [390,320]) {
+      await page.setViewportSize({width,height:844});
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,`customer ${width} overflow`);
+      await page.screenshot({path:`output/rollcall-design-study/customer-${width}.png`,fullPage:true});
+      await page.locator('#stored-panel [data-set="RC-104"]').click();
+    await page.waitForFunction(()=>!document.querySelector(".workspace[data-entering],.screen-leaving"));
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,`details ${width} overflow`);
+      await page.screenshot({path:`output/rollcall-design-study/set-details-${width}.png`,fullPage:true});
+      await page.getByRole('button',{name:'Reassign vehicle',exact:true}).click();
+      assert.equal(await page.evaluate(()=>document.getElementById('vehicle-picker').getBoundingClientRect().right<=innerWidth),true);
+      await page.screenshot({path:`output/rollcall-design-study/vehicle-picker-${width}.png`,fullPage:true});
+      await page.locator('#vehicle-picker').getByRole('button',{name:'Cancel',exact:true}).click();
+      await page.locator('#detail [data-screen="profile"]').click();
+    await page.waitForFunction(()=>!document.querySelector(".workspace[data-entering],.screen-leaving"));
+      if(await page.locator('[data-screen="dashboard"]').count()) {
+        await page.locator('[data-screen="dashboard"]').first().click();
+    await page.waitForFunction(()=>!document.querySelector(".workspace[data-entering],.screen-leaving"));
+        const overflowing=await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(e=>!e.closest('[hidden]')&&e.getBoundingClientRect().right>innerWidth+1).map(e=>({tag:e.tagName,class:e.className,right:e.getBoundingClientRect().right,width:e.getBoundingClientRect().width})));
+        assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,`dashboard ${width} overflow: ${JSON.stringify(overflowing)}`);
+        await page.screenshot({path:`output/rollcall-design-study/dashboard-${width}.png`,fullPage:true});
+        await page.locator('.nav [data-screen="profile"]').click();
+    await page.waitForFunction(()=>!document.querySelector(".workspace[data-entering],.screen-leaving"));
+      }
+    }
+    assert.deepEqual(errors,[]);
+    console.log('PASS: real Edge screenshots at 1584/390/320, no horizontal overflow, profile tabs, vehicle expansion, named-set details, preserved tab, app-wide location toggle, no page errors. Fictional preview only.');
+  } finally { await browser.close(); }
+})().catch(e=>{console.error(e);process.exitCode=1;});

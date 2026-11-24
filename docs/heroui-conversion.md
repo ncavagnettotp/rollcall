@@ -1,0 +1,15 @@
+# HeroUI foundation conversion — November 10, 2026
+
+User explicitly requested conversion now rather than incremental future migration. Preserve accepted Stage 2 behavior, current dark dashboard/category colors, visible inline save feedback, focus/scroll on review opening, and local-only backend. No business-rule/schema/API changes.
+
+Use official HeroUI v3 React components and styles, exact pinned release verified against published peer requirements. Convert all library-covered controls: Button, Input/TextField/TextArea, Select/ListBox, Form, Disclosure, Link, Card, Alert and Fieldset where appropriate. File upload must use HeroUI Input if it supports file inputs; otherwise use React Aria FileTrigger composing HeroUI Button only after documenting an official capability gap. Avoid raw interactive JSX replacements and bespoke lookalike primitives. Native semantic page structure, lists, headings, evidence definition lists, and domain icons are permitted.
+
+Style imports: tailwindcss first, @heroui/styles second. Enable HeroUI dark theme per current docs. Remove conflicting custom widget CSS, keep page layout and category/theme colors. No broad new visual redesign.
+
+Verification: source/import audit after migration; pin peer dependencies as necessary; Vitest behavior tests updated only for genuine widget interaction differences (no HeroUI mocks); build; real browser upload, edit, select via actual popovers/keyboard, accessories disclosures, save/reload/reopen, original link, failure/conflict feedback and desktop/mobile layout. Independently review library usage and regressions. Preserve source-only checkpoint excluding customer data. No raw custom controls accepted as 'compliant' just because package is installed.
+
+Completed implementation: pinned React/styles3.2.7; App uses Alert, Button, Card, Description, SearchField. DocumentReview uses Alert, Button, Card, Description, Disclosure, Fieldset, Form, Input, Label, Link, ListBox, Select, TextArea, TextField. No raw standard widget JSX remains, including file input. Only semantic structure, source evidence lists, SVG domain icons, page layout, category colors, and documented theme-token overrides are project-specific.
+
+Automated audit: frontend/scripts/audit-ui-library.mjs parses real production source with pinned @babel/parser, verifies imports/pins/style ordering, and rejects raw controls and standard-widget lookalikes. Includes self-test fixtures. npm build invokes it before Vite. It is not a general semantic proof against every possible hand-built widget; independent source/CSS review remains mandatory.
+
+Regression findings: old native-select/disclosure assumptions in browser scripts changed to actual HeroUI popup/button interactions. Taller library save alerts initially moved outside the viewport; the existing real-browser viewport check failed, then passed after scroll-nearest feedback visibility handling. Stale saved confirmation after another edit reproduced in a test and fixed by clearing success on edits. Expanded audit coverage from JSX-only to production JS/JSX/TS/TSX after independent reviewer feedback.

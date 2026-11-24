@@ -1,0 +1,10 @@
+{
+  "name": "rollcall-desktop",
+  "productName": "Rollcall",
+  "version": "0.1.1",
+  "private": true,
+  "main": "main.cjs",
+  "config": {
+    "electronVersion": "45.4.1"
+  }
+}

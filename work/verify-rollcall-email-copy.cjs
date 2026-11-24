@@ -1,0 +1,4 @@
+const {chromium}=require('C:/Users/ndcav/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const {pathToFileURL}=require('node:url');const path=require('node:path');const assert=require('node:assert/strict');
+(async()=>{const browser=await chromium.launch({headless:true,channel:'msedge'});try{const page=await browser.newPage({permissions:['clipboard-read','clipboard-write']});await page.goto(pathToFileURL(path.resolve('docs/rollcall/interaction-preview.html')).href);await page.bringToFront();await page.locator('#copy-customer-email').click();await page.waitForFunction(()=>document.querySelector('#email-copy-status').textContent==='Email copied');const email=await page.evaluate(()=>navigator.clipboard.readText());assert.equal(email,'riley.bennett@example.com');console.log('PASS: actual clipboard contains the customer email after clicking.');}finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1});
+

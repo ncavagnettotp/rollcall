@@ -1,0 +1,32 @@
+/* Keep the original labeled sidebar on the left. Minimum layout: 6 × 4 CSS inches. */
+body,body.correction-responsive-layout{min-width:576px;min-height:384px;--sidebar:248px}
+body>.shell{grid-template-columns:248px minmax(0,1fr);min-width:576px;min-height:max(100dvh,384px)}
+body .shell>aside,body.correction-responsive-layout>.shell>aside{
+ position:sticky;top:0;align-self:start;display:flex;flex-direction:column;
+ width:248px;height:max(100dvh,384px);min-height:384px;min-width:0;overflow:hidden;padding:28px 16px 24px;
+}
+.sidebar-scroll{
+ display:flex;flex-direction:column;flex:1;min-height:0;min-width:0;
+ overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scroll-padding-block:20px;
+ scrollbar-width:none;padding:4px 0;--sidebar-fade-top:0px;--sidebar-fade-bottom:0px;
+ mask-image:linear-gradient(to bottom,transparent,#000 var(--sidebar-fade-top),#000 calc(100% - var(--sidebar-fade-bottom)),transparent);
+}
+.sidebar-scroll::-webkit-scrollbar{display:none}
+.sidebar-scroll>.brand,.sidebar-scroll>.nav,.sidebar-scroll>.app-utilities,.sidebar-scroll>.sidebar-caption{flex-shrink:0}
+body .sidebar-scroll>.brand{display:block;width:240px;max-width:100%;height:70px;margin:0 0 32px 10px;transform:scale(.86)}
+body .sidebar-scroll>.brand img{transform:none;left:-35px;top:-21px}
+body .sidebar-scroll>.nav{display:grid;grid-template-columns:1fr;gap:8px;flex-wrap:nowrap}
+body .sidebar-scroll .nav button,body .sidebar-scroll .app-utilities button{
+ display:flex;position:relative;justify-content:flex-start;width:100%;min-height:52px;height:auto;padding:12px 16px;gap:14px;border-radius:12px;font-size:18px;
+}
+body .sidebar-scroll .nav button:has(.attention-label){padding:12px 16px;gap:14px}
+body .sidebar-scroll .nav button>span,body .sidebar-scroll .app-utilities button>span{display:inline}
+body .sidebar-scroll .nav button .attention-label{font-size:16px}
+body .sidebar-scroll .nav button .nav-badge{display:grid;position:absolute;right:8px;min-width:23px;height:23px;font-size:13px}
+body .sidebar-scroll .nav button svg{width:24px;height:24px;flex:0 0 24px}
+body .sidebar-scroll>.app-utilities{margin-top:32px;padding-top:24px;border-top:1px solid #ffffff12}
+body .sidebar-scroll .app-utilities button{font-size:16px}
+body .sidebar-scroll .app-utilities svg{width:22px;height:22px;flex:0 0 22px}
+body .sidebar-scroll>.sidebar-caption{display:block;margin:auto 0 7px;padding:40px 16px 0;font-size:14px}
+body.correction-responsive-layout>.shell{height:max(100dvh,384px);min-height:384px;min-width:576px;grid-template-columns:248px minmax(0,1fr)}
+@media(max-width:575px),(max-height:383px){body,body.correction-responsive-layout{overflow:auto}}

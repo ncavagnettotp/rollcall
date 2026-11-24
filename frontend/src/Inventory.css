@@ -1,0 +1,402 @@
+.rollcall-main[data-screen="inventory"] .rollcall-header {
+  min-height: 116px;
+  padding-inline: 40px;
+}
+.rollcall-main[data-screen="inventory"] .rollcall-header h1 { font-size: 34px; overflow-wrap: anywhere; }
+.rollcall-main[data-screen="inventory"] .rollcall-workspace { padding: 28px 40px; }
+.inventory-page, .inventory-detail { display: grid; gap: 16px; min-width: 0; }
+.rollcall-card.inventory-search { padding: 14px; background: #f8f9fd; }
+.inventory-search [data-slot="search-field-group"] {
+  min-height: 46px; background: #e8ebf5; border: 1px solid #dbe0ee; border-radius: 13px;
+}
+.inventory-search input { min-width: 0; font-size: 16px; }
+.inventory-tabs { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; min-width: 0; }
+.inventory-tabs .tabs__list-container, .inventory-tabs [role="tabpanel"] { min-width: 0; padding: 0; }
+.inventory-tabs .tabs__list-container { background: transparent; border-radius: 0; }
+.inventory-tabs [role="tablist"] {
+  display: flex; width: max-content; min-width: 100%; justify-content: flex-start;
+  gap: clamp(8px, 2vw, 26px); padding: 0; border: 0; border-bottom: 1px solid #dce0eb;
+  border-radius: 0; background: transparent; scrollbar-width: thin;
+}
+.inventory-tabs [role="tab"] {
+  flex: none; display: flex; align-items: center; gap: 7px; width: auto; min-height: 48px; font-size: 16px;
+  padding: 8px 12px; border-radius: 0;
+  background: transparent; color: #2c365c; white-space: nowrap;
+}
+.inventory-tabs [role="tab"][aria-selected="true"] { color: #111218; background: transparent; font-weight: 800; }
+.inventory-tabs [role="tab"] > .tabs__indicator {
+  top: auto; bottom: 0; height: 3px; border-radius: 999px;
+  background: #ff8900; box-shadow: none; z-index: 0;
+}
+.rollcall-card.inventory-results { padding: 16px; gap: 14px; background: #f8f9fd; container: inventory-results / inline-size; }
+.rollcall-card.inventory-results h2 { font-size: 25px; }
+.inventory-customer-results { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; gap: 16px; }
+.inventory-customer-results[data-selected="true"] { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); }
+.inventory-priority {
+  display: grid; grid-template-rows: auto minmax(0, 1fr); max-height: min(490px, calc(52dvh / var(--rollcall-zoom, 1)));
+  min-width: 0; border: 1px solid #dce2ee; border-radius: 12px; overflow: hidden; background: white;
+}
+.inventory-priority > header {
+  display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap;
+  gap: 3px 8px; padding: 8px 11px; background: #292e32; color: white;
+}
+.inventory-results .inventory-priority > header h2 { font-size: clamp(17px, 1.7cqi, 24px); font-weight: 850; }
+.inventory-priority > header span { font-size: 12px; color: #e0e5ee; }
+.inventory-priority-list { overflow: hidden auto; overscroll-behavior-y: contain; min-height: 0; padding: 4px 6px; }
+.inventory-priority-group + .inventory-priority-group { margin-top: 4px; }
+.inventory-priority-group h4 { padding: 3px 6px; background: #eff2f8; border-radius: 4px; color: #546177; font-size: 12px; font-weight: 850; }
+.inventory-priority-list li + li { border-top: 1px solid #e9edf4; }
+.inventory-priority-list li:nth-child(even) { background: #f8f9fc; }
+.inventory-priority-list .inventory-priority-row {
+  justify-content: flex-start; flex-wrap: wrap; gap: 2px 6px; width: 100%; min-height: 40px; height: auto;
+  padding: 5px 7px; border-radius: 5px; text-align: left; white-space: normal; color: #151923;
+  font-size: clamp(14px, 1.4cqi, 19px);
+}
+.inventory-priority-row strong { font-weight: 850; overflow-wrap: anywhere; }
+.inventory-priority-row[aria-expanded="true"] { background: #fff1df; box-shadow: inset 3px 0 #ff8900; }
+.inventory-priority-row .inventory-status { font-size: 11px; border-radius: 5px; padding: 2px 5px; }
+.inventory-priority-row time { color: #58667b; font-size: 12px; white-space: nowrap; }
+.inventory-priority-dot { width: 7px; height: 7px; flex: none; border-radius: 50%; background: #3474bb; }
+.inventory-priority-dot[data-status="Due soon"] { background: #ce7a14; }
+.inventory-priority-dot[data-status="Overdue"] { background: #c63b4e; }
+.inventory-priority-dot[data-status="Date unknown"] { background: #677488; }
+.inventory-priority-chevron { color: #687488; font-size: 18px; line-height: 1; }
+.rollcall-card.inventory-customer-preview {
+  position: sticky; top: 0; padding: 14px; border-radius: 13px; box-shadow: none;
+  max-height: min(490px, calc(52dvh / var(--rollcall-zoom, 1))); overflow: hidden;
+}
+.inventory-customer-preview > header { display: flex; align-items: center; justify-content: space-between; flex: none; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.inventory-customer-preview h3 { font-size: clamp(20px, 2.2cqi, 30px); line-height: 1.2; font-weight: 850; }
+.inventory-customer-preview p { color: #626a7d; font-size: clamp(13px, 1.4cqi, 18px); }
+.inventory-customer-preview .inventory-open-profile {
+  min-height: 40px; background: #fff0dc; border: 1px solid #f4cd9d; color: #814500;
+  font-size: clamp(14px, 1.3cqi, 17px);
+}
+.inventory-customer-preview .inventory-open-profile:hover { background: #ffe2bc; }
+.inventory-preview-scroll { min-height: 0; overflow: hidden auto; overscroll-behavior-y: contain; }
+.inventory-preview-scroll h4 { font-size: clamp(14px, 1.35cqi, 18px); color: #354258; font-weight: 800; margin-bottom: 4px; }
+.inventory-preview-vehicle { border-top: 1px solid #e4e8f0; }
+.inventory-preview-vehicle .disclosure__trigger {
+  display: grid; grid-template-columns: 32px minmax(0,1fr) auto 17px; align-items: center;
+  gap: 8px; width: 100%; min-height: 46px; padding: 4px 6px; text-align: left; border-radius: 7px;
+  color: #111218; font-size: clamp(14px, 1.5cqi, 19px); font-weight: 800;
+}
+.inventory-preview-vehicle .disclosure__trigger[aria-expanded="true"] { background: #fff3e5; box-shadow: inset 3px 0 #ff8900; }
+.inventory-preview-vehicle .inventory-vehicle-tile { width: 32px; height: 31px; border-radius: 8px; }
+.inventory-preview-vehicle .disclosure__body { padding: 0 0 3px 12px; }
+.inventory-preview-vehicle .inventory-preview-set {
+  display: grid; grid-template-columns: minmax(0,1fr) auto 10px; align-items: center; gap: 6px;
+  width: 100%; height: auto; min-height: 48px; padding: 6px; border-bottom: 1px solid #edf0f6;
+  border-radius: 5px; color: #111218; text-align: left;
+  font-size: clamp(14px, 1.4cqi, 18px);
+}
+.inventory-preview-set-name { display: grid; min-width: 0; white-space: normal; overflow-wrap: anywhere; line-height: 1.25; }
+.inventory-preview-set-name small { color: #626a7d; }
+.inventory-set-type {
+  display: inline-flex; align-items: center; gap: 3px; padding: 3px 5px;
+  border: 1px solid #e2e6ef; background: #f7f8fb; border-radius: 6px;
+  color: #465268; font-size: clamp(11px, 1.05cqi, 14px); white-space: nowrap;
+}
+.inventory-set-type > span { display: flex; }
+.inventory-set-type .inventory-set-icons { display: inline-flex; min-width: 0; gap: 1px; }
+.inventory-set-type img { width: 14px; height: 16px; filter: grayscale(1) contrast(1.8); mix-blend-mode: multiply; }
+
+.inventory-set-enter { display: grid; gap: 24px; }
+@media (prefers-reduced-motion: no-preference) {
+  .inventory-customer-preview, .inventory-set-enter { animation: inventory-detail-in 240ms cubic-bezier(.16,1,.3,1) both; }
+  @keyframes inventory-detail-in { from { opacity: 0; transform: translateY(7px); } }
+}
+.inventory-set-icons { display: inline-grid; grid-template-columns: repeat(2, 22px); gap: 4px; min-width: 48px; }
+.inventory-set-icons img { width: 22px; height: 25px; object-fit: contain; }
+.inventory-set-icons .inventory-wheel { grid-column: 2; }
+.inventory-status, .inventory-count {
+  display: inline-block; border-radius: 999px; padding: 2px 8px;
+  background: #e8ebf4; color: #475166; white-space: nowrap; font-weight: 750;
+}
+.inventory-count, .inventory-total { font-size: 13px; }
+.inventory-status[data-status="Current"] { background: #d5e6ff; color: #004abe; }
+.inventory-status[data-status="Due soon"] { background: #ffebc0; color: #9a3d00; }
+.inventory-status[data-status="Overdue"] { background: #ffdade; color: #a61a29; }
+.rollcall-main[data-screen="inventory"] .rollcall-header[data-customer-profile] {
+  justify-content: space-between; gap: 16px; padding-block: 20px; min-height: 120px;
+}
+.rollcall-main[data-screen="inventory"] .rollcall-header[data-set-contact] {
+  justify-content: space-between; gap: 16px;
+}
+.inventory-profile-back { margin-bottom: 8px; }
+.inventory-contact { position: relative; display: grid; gap: 5px; min-width: 0; }
+.inventory-contact :is(a, button) {
+  display: flex; align-items: center; justify-content: flex-start; gap: 10px;
+  min-height: 26px; height: auto; padding: 0; color: #626a7d; font: inherit; font-size: 14px; white-space: normal;
+}
+.inventory-contact button span { min-width: 0; overflow-wrap: anywhere; }
+.inventory-contact .inventory-profile-icon { color: #7b8798; }
+.inventory-contact-feedback { position: absolute; top: 100%; font-size: 12px; color: #626a7d; }
+.inventory-muted, .inventory-history span, .inventory-set-meta { color: #626a7d; }
+.rollcall-workspace[data-customer-profile] { overflow: clip; scrollbar-gutter: auto; }
+.inventory-profile { height: 100%; grid-template-rows: minmax(0, 1fr); }
+.inventory-profile:is([data-profile-tab="vehicles"], [data-profile-tab="unassigned"]) {
+  display: flex; flex-direction: column;
+}
+.inventory-profile[data-profile-tab="unassigned"] > .inventory-profile-card {
+  flex: 0 0 auto; max-height: 100%;
+}
+.inventory-profile:has(> .inventory-history) > .inventory-profile-card {
+  flex: 0 0 auto; max-height: calc((100% - 16px) * .66);
+}
+.rollcall-card.inventory-profile-card { overflow: hidden; padding: 0; border-radius: 24px; box-shadow: none; }
+.inventory-profile-tabs { flex: 1; min-height: 0; grid-template-rows: auto minmax(0, 1fr); gap: 0; }
+.inventory-profile-tabs .tabs__list-container {
+  background: linear-gradient(to top, #ebedf4 0 1px, #b6bccb 1px 3px, #ebedf4 3px);
+}
+.inventory-tabs.inventory-profile-tabs .tabs__list-container > :is(.tabs__list-container__scroll-prev, .tabs__list-container__scroll-next) { display: none; }
+.inventory-profile-tabs [role="tablist"] { padding-inline: clamp(18px, 4.5vw, 71px); gap: 12px; border: 0; }
+.inventory-profile-tabs [role="tab"] {
+  min-height: 88px; border: 0; padding: 10px 20px 4px; gap: 10px;
+  color: #626a7d; font-size: 22px; font-weight: 800;
+}
+.inventory-profile-tabs [role="tab"][aria-selected="true"] { color: #ff8900; }
+.inventory-profile-tabs [role="tab"] > .tabs__indicator { height: 4px; }
+.inventory-tab-label { display: inline-flex; align-items: center; gap: 8px; }
+.inventory-tab-label .inventory-count { padding: 0 6px; font-size: 11px; background: #e0e4ee; }
+.inventory-profile-icon { display: inline-block; width: 18px; height: 18px; flex: none; }
+.inventory-car-icon {
+  width: 26px; background: currentColor;
+  mask: url("../../docs/rollcall/assets/vehicle-car-mask.svg") center / contain no-repeat;
+}
+.inventory-stack-icon { height: 23px; background: currentColor; mask-position: center; mask-repeat: no-repeat; mask-size: contain; }
+.inventory-profile-tabs [role="tabpanel"] {
+  min-height: 0; overflow: hidden auto; overscroll-behavior-y: contain;
+  padding: 25px 28px 24px;
+}
+.inventory-vehicle { border-top: 1px solid #e1e4ee; }
+.inventory-vehicle .disclosure__trigger {
+  display: flex; align-items: center; width: 100%; min-height: 74px; padding: 0; gap: 14px; border-radius: 8px;
+  color: #111218; font-size: 19px; font-weight: 800; text-align: left;
+}
+.inventory-vehicle .disclosure__trigger[aria-expanded="true"] { background: #f4f5fa; }
+.inventory-vehicle .disclosure__indicator { margin-left: auto; color: #7c899f; }
+.inventory-vehicle-tile, .inventory-unassigned-icon {
+  display: grid; place-items: center; flex: none; width: 38px; height: 38px;
+  border-radius: 12px; background: #edf0f7; color: #788598;
+}
+.inventory-vehicle .disclosure__body { padding: 0 0 0 66px; }
+.inventory-facts img { width: 34px; height: 34px; object-fit: contain; }
+.inventory-profile-sets li { padding: 20px 0; border-top: 1px solid #e1e4ee; }
+.inventory-profile-set-line { display: flex; align-items: center; gap: 16px; }
+.inventory-profile-set-line > button {
+  display: block; min-width: 0; flex: 1; overflow: hidden; white-space: nowrap;
+  text-align: left; padding-inline: 0; color: #111218; font-size: 19px; font-weight: 750;
+  mask-image: linear-gradient(to right, black calc(100% - 12px), transparent);
+}
+.inventory-vehicle .inventory-profile-set-line > button { font-weight: 600; }
+.inventory-profile-set-line > button:hover { color: #9e5500; }
+.inventory-profile-set-line > button:focus-visible { mask-image: none; }
+.inventory-profile-icon-box {
+  display: grid; place-items: center; flex: none; padding: 3px 8px;
+  border: 1px solid #e1e4ee; background: #f8f9fb; border-radius: 9px;
+}
+.inventory-profile-icon-box .inventory-set-icons { grid-template-columns: repeat(2, 44px); gap: 0; }
+.inventory-profile-icon-box img { width: 44px; height: 42px; filter: grayscale(1) contrast(1.8); mix-blend-mode: multiply; }
+.inventory-profile-due { flex: 0 0 147px; color: #626a7d; font-size: 14px; text-align: right; }
+.inventory-profile-sets .inventory-muted { margin-top: 10px; font-size: 18px; }
+.inventory-profile-sets[data-mode="stored"] li { padding-block: 23px; }
+.inventory-profile-sets[data-mode="unassigned"] .inventory-muted { display: none; }
+.rollcall-card.inventory-history {
+  display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0;
+  gap: 8px; padding: 16px 0 0; overflow: hidden; box-shadow: none;
+}
+.rollcall-card.inventory-history h2 { padding-inline: 28px; font-size: 19px; }
+.inventory-history-content {
+  min-height: 0; overflow: hidden auto; overscroll-behavior-y: contain;
+  padding: 0 28px 12px;
+}
+.inventory-history li {
+  position: relative; display: grid; grid-template-columns: 112px minmax(0, 1fr);
+  gap: 20px; padding: 12px 0 12px 22px; font-size: 14px; line-height: 1.6;
+}
+.inventory-history time { color: #354258; font-weight: 750; }
+.inventory-history li::before {
+  content: ""; position: absolute; left: 0; top: 21px; width: 6px; height: 6px;
+  border-radius: 50%; background: #a9b1c0; box-shadow: 0 0 0 4px #f3f5f9;
+}
+.inventory-history li:not(:last-child)::after {
+  content: ""; position: absolute; left: 2.5px; top: 30px; bottom: -13px; width: 1px; background: #e5e9f1;
+}
+.inventory-set-detail { gap: 24px; }
+.inventory-set-breadcrumb { color: #727d92; font-size: 14px; }
+.inventory-set-breadcrumb button { height: auto; padding: 0; color: inherit; font-size: inherit; }
+.inventory-set-detail .rollcall-card { border-radius: 16px; box-shadow: none; }
+.rollcall-card.inventory-set-header { flex-direction: row; align-items: center; flex-wrap: wrap; gap: 28px; padding: 24px 28px; }
+.inventory-set-identity { position: relative; flex: 1; min-width: 160px; padding-left: 20px; overflow-wrap: anywhere; }
+.inventory-set-identity::before { content: ""; position: absolute; inset: 4px auto 4px 0; width: 5px; background: #ff8900; border-radius: 6px; }
+.inventory-set-detail :is(.inventory-set-identity, .inventory-note-heading) h2 { font-size: 28px; }
+.inventory-set-identity p { margin-top: 5px; color: #7b8191; font-size: 20px; font-weight: 650; line-height: 1.3; }
+.inventory-set-meta, .inventory-set-date, .inventory-set-tools { display: flex; align-items: center; }
+.inventory-set-meta { gap: 22px; flex-wrap: wrap; padding-inline: 24px; border-inline: 1px solid #e5e8ef; }
+.inventory-set-date { gap: 8px; color: #626a7d; font-size: 15px; }
+.inventory-set-date :is(time, strong) { color: #354258; font-weight: 800; }
+.inventory-set-date svg, .inventory-set-pdf svg { width: 22px; height: 23px; flex: none; }
+.inventory-set-pill { padding: 4px 10px; border-radius: 8px; background: #eaedf1; color: #536077; font-size: 12px; font-weight: 750; }
+.inventory-set-tools { gap: 16px; flex-wrap: wrap; }
+.inventory-set-tools .inventory-set-pdf {
+  display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-height: 44px;
+  padding-inline: 16px; border: 1px solid #dc2028; border-radius: 10px;
+  background: linear-gradient(#f33138, #df1923); color: white; font-weight: 800;
+}
+.inventory-set-tools .inventory-set-reassign {
+  min-height: 40px; border: 1px solid #d9bcff; border-radius: 7px; background: #f0e7ff; color: #6434a4; font-size: 13px;
+}
+.inventory-detail-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px; }
+.inventory-detail-grid > .rollcall-card { padding: 28px; }
+.inventory-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: center; gap: 16px; }
+.inventory-facts > div { min-width: 0; background: #f3f4f9; border-radius: 15px; }
+.inventory-fact-block {
+  position: relative; display: grid; align-content: center; gap: 6px; grid-column: 1 / -1;
+  min-height: 102px; padding: 20px 20px 20px 98px;
+}
+.inventory-fact-small { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 18px 20px; }
+.inventory-facts dt { color: #6c7586; font-size: 14px; font-weight: 650; }
+.inventory-facts dd { color: #202631; font-size: 21px; font-weight: 750; line-height: 1.35; overflow-wrap: anywhere; }
+.inventory-fact-icon {
+  position: absolute; left: 20px; top: 50%; transform: translateY(-50%); display: grid; place-items: center;
+  width: 60px; height: 60px; color: #495361; border-radius: 14px; background: #e8ebf1;
+}
+.inventory-fact-icon .inventory-car-icon { width: 48px; height: 34px; transform: scaleX(-1); }
+.inventory-fact-icon img { width: 52px; height: 52px; object-fit: contain; mix-blend-mode: multiply; filter: grayscale(1) contrast(1.8); }
+.inventory-facts .inventory-accessories { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.inventory-accessories .inventory-accessory-toggle {
+  width: 44px; min-width: 44px; height: 44px; padding: 2px; border-radius: 12px;
+  border: 0; background: transparent; box-shadow: none;
+}
+.inventory-accessories .inventory-accessory-toggle:is(:hover, :active, [data-hovered], [data-pressed]) {
+  background: transparent; box-shadow: none;
+}
+.inventory-accessories .inventory-accessory-toggle:focus-visible { outline: 2px solid #a65400; outline-offset: 1px; }
+.inventory-accessory-error { width: 100%; color: #a61a29; font-size: 13px; }
+.inventory-accessory {
+  width: 36px; height: 40.2px; background: url("../../docs/rollcall/assets/accessories.png") -.75px 0 / 37.5px 120.6px no-repeat;
+  mix-blend-mode: multiply;
+}
+.inventory-accessory[data-kind="center_caps"] { background-position-y: -40.2px; }
+.inventory-accessory[data-kind="centering_rings"] { background-position-y: -80.4px; }
+.inventory-accessory:not([data-state="Yes"]) { filter: grayscale(1); opacity: .36; }
+@media (prefers-reduced-motion: no-preference) {
+  .inventory-accessories .inventory-accessory-toggle { transition: transform 150ms ease; }
+  .inventory-accessories .inventory-accessory-toggle:is(:active, [data-pressed="true"]) { transform: scale(.94); }
+  .inventory-accessory { transition: filter 200ms ease, opacity 200ms ease; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .inventory-accessories .inventory-accessory-toggle { transition: none; }
+  .inventory-accessories .inventory-accessory-toggle:is(:active, [data-pressed="true"]) { transform: none; }
+}
+.inventory-location input {
+  width: 110px; max-width: 100%; min-height: 42px; padding: 8px 12px;
+  border: 1px solid #cbd1de; border-radius: 9px; background: white; box-shadow: none; color: #111218; font-size: 16px; font-weight: 500;
+}
+.inventory-set-facts { gap: 24px; }
+.inventory-set-detail .inventory-set-outline {
+  align-self: flex-start; min-height: 44px; padding-inline: 18px;
+  border: 1px solid #d6dce8; border-radius: 10px; background: white; color: #202631;
+}
+.inventory-set-detail .inventory-set-remove { color: #d92833; }
+.inventory-notes { gap: 18px; }
+.inventory-note-heading { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+.inventory-note-icon { position: relative; display: inline-flex; color: #9aa1af; }
+.inventory-note-icon svg { width: 25px; height: 27px; }
+.inventory-note-icon[data-has-notes="true"] { color: #f58b00; }
+.inventory-note-icon[data-has-notes="true"]::after {
+  content: ""; position: absolute; top: -4px; right: -3px; width: 10px; height: 10px;
+  border: 2px solid white; border-radius: 50%; background: #ff8900;
+}
+.inventory-notes textarea {
+  display: block; width: 100%; min-height: 180px; resize: vertical; padding: 16px;
+  border: 1px solid #cbd1de; border-radius: 12px; background: #f9f9fb; box-shadow: none; font-size: 17px; line-height: 1.5;
+}
+@container rollcall (max-width: 1250px) {
+  .rollcall-card.inventory-set-header { gap: 20px; }
+  .inventory-set-meta { border-right: 0; padding-right: 0; }
+  .inventory-detail-grid > .rollcall-card { padding: 22px; }
+  .inventory-fact-block { padding-left: 82px; padding-right: 16px; }
+  .inventory-fact-icon { left: 16px; width: 50px; height: 50px; }
+  .inventory-fact-icon .inventory-car-icon { width: 40px; height: 30px; }
+  .inventory-fact-icon img { width: 44px; height: 44px; }
+  .inventory-facts dd { font-size: 19px; }
+  .inventory-fact-small { padding: 16px; }
+}
+@container rollcall (max-width: 950px) {
+  .inventory-detail-grid { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .inventory-set-meta { padding: 0; border: 0; }
+  .inventory-notes textarea { min-height: 150px; }
+}
+@container rollcall (max-width: 1000px) {
+  .rollcall-main[data-screen="inventory"] .rollcall-header { min-height: 58px; padding-inline: 12px; }
+  .rollcall-main[data-screen="inventory"] .rollcall-header h1 { font-size: 24px; }
+  .rollcall-main[data-screen="inventory"] .rollcall-workspace { padding: 12px 8px 24px; }
+  .inventory-profile-due { display: none; }
+  .inventory-profile-sets .inventory-muted { font-size: 14px; }
+  .inventory-profile-sets[data-mode="unassigned"] .inventory-muted { display: block; }
+  .inventory-profile-tabs [role="tab"] { font-size: 18px; }
+  .inventory-profile-set-line > button { min-height: 44px; font-size: 17px; }
+  .inventory-profile-icon-box { padding: 2px 4px; }
+  .inventory-profile-icon-box .inventory-set-icons { grid-template-columns: repeat(2, 28px); }
+  .inventory-profile-icon-box img { width: 28px; height: 30px; }
+  .inventory-vehicle .disclosure__trigger { min-height: 52px; font-size: 17px; }
+  .inventory-history li { grid-template-columns: 1fr; gap: 2px; }
+}
+@container rollcall (max-width: 700px) {
+  .rollcall-card.inventory-search, .rollcall-card.inventory-results { padding: 10px; }
+
+
+  .rollcall-card.inventory-results h2 { font-size: 20px; }
+
+  .rollcall-main[data-screen="inventory"] .rollcall-header[data-customer-profile] {
+    flex-direction: column; align-items: flex-start; min-height: 0; gap: 8px; padding: 12px 12px 16px;
+  }
+  .rollcall-main[data-screen="inventory"] .rollcall-header[data-set-contact] {
+    flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 12px 16px;
+  }
+  .inventory-contact :is(a, button) { font-size: 13px; }
+  .rollcall-card.inventory-profile-card { border-radius: 20px; }
+  .inventory-profile-tabs [role="tablist"] { padding-inline: 12px; gap: 0; }
+  .inventory-profile-tabs [role="tab"] { flex-direction: column; justify-content: center; min-height: 102px; gap: 6px; }
+  .inventory-profile-tabs [role="tabpanel"] { padding: 16px 12px; }
+  .inventory-profile:has(> .inventory-history) {
+    gap: 10px;
+  }
+  .inventory-profile:has(> .inventory-history) > .inventory-profile-card {
+    max-height: calc((100% - 10px) * .6);
+  }
+  .rollcall-card.inventory-history { padding-top: 10px; gap: 4px; }
+  .rollcall-card.inventory-history h2, .inventory-history-content { padding-inline: 12px; }
+  .inventory-profile-set-line { gap: 8px; }
+  .inventory-profile-sets li, .inventory-profile-sets[data-mode="stored"] li { padding: 14px 0; }
+  .inventory-vehicle .disclosure__body { padding-inline: 0; }
+  .inventory-vehicle .disclosure__trigger { gap: 8px; }
+  .inventory-vehicle-tile, .inventory-unassigned-icon { width: 30px; height: 30px; }
+  .inventory-history li { grid-template-columns: minmax(0, 1fr); }
+  .rollcall-main[data-screen="inventory"] .rollcall-header:has(.inventory-set-breadcrumb) { min-height: 78px; }
+  .inventory-set-breadcrumb { font-size: 12px; }
+  .rollcall-card.inventory-set-header { padding: 20px; gap: 18px; }
+  .inventory-set-identity { flex-basis: 100%; min-width: 0; }
+  .inventory-set-detail :is(.inventory-set-identity, .inventory-note-heading) h2 { font-size: 25px; }
+  .inventory-set-identity p { font-size: 18px; }
+  .inventory-set-meta { gap: 16px; }
+  .inventory-set-date { font-size: 14px; }
+  .inventory-set-tools { gap: 12px; }
+  .inventory-detail-grid > .rollcall-card { padding: 20px 16px; }
+}
+@container inventory-results (max-width: 710px) {
+  .inventory-customer-results[data-selected="true"] { grid-template-columns: minmax(0, 1fr); }
+  .rollcall-card.inventory-customer-preview {
+    grid-row: 1; position: static; max-height: min(420px, calc(58dvh / var(--rollcall-zoom, 1)));
+  }
+}
+@container inventory-results (max-width: 380px) {
+  .inventory-priority-list .inventory-priority-row { min-height: 44px; }
+}
+@container rollcall (max-width: 360px) {
+  .inventory-facts { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .inventory-fact-block { padding-left: 76px; }
+  .inventory-facts dd { font-size: 18px; }
+}

@@ -1,0 +1,19 @@
+# Rollcall design study
+
+Accepted by the user on November 11, 2026. Both design-study.html and interaction-preview.html now use this visual treatment with fictional data and the existing preview interactions; it does not change production code.
+
+Design principles: a neutral canvas and white surfaces establish figure/ground separation; a consistent 4/8px spacing rhythm groups related information; weight and size create hierarchy before color; restrained orange marks active navigation, selection counts and notes. Purple continues to identify vehicle reassignment. Nunito and the saved tire, wheel and accessory assets preserve brand continuity.
+
+The centered HeroUI tab component and its sliding indicator remain. Customer names lead the page; vehicle groups lead the inventory; descriptions and right-aligned due dates form a repeatable scan pattern. Supporting history receives less visual weight. Controls retain keyboard focus and reduced-motion support.
+
+The previous preview is preserved as interaction-preview-before-design-study.html. No additional skills or dependencies were needed. Styles now live in preview.css, with local shared font, image and tab bundle references. Continue edits in the main preview. The one-time study generator is retired.
+
+Latest customer-profile refinement: removed per-vehicle set-count badges; centered blue rounded HeroUI tabs now reuse the car, unassigned-car and tire summary icons. Header summary counts were replaced with fictional phone/email links. Counts remain in the tabs and update after sample reassignment. Edge checks passed at desktop and 390/320px phone widths.
+
+Motion update: replaced native vehicle details with actual HeroUI Accordion components, using the installed v3 panel-height and expanded-state animation pattern. Screen navigation uses directional CSS slide/fade transitions following HeroUI's documented custom-animation approach; there is no separate HeroUI page-router transition component. Forward detail entry slides from the right and return reverses direction. Sidebar stays fixed; rapid switching cleans up outgoing inert snapshots. Accessory toggles fade and press gently. Reduced-motion disables these effects. Verified actual running accordion/page animations, reverse navigation, rapid switching, reduced motion, and existing desktop/mobile workflows.
+
+Navigation motion refinement: the sidebar is an explicit foreground stacking layer above incoming/outgoing screens. The orange navigation selection now slides between Dashboard and Inventory instead of switching background colors. Its bounds follow navigation layout changes and are clipped during resize. Reduced motion skips the slide. Focused Edge checks verify the running highlight transition and sidebar stacking order.
+
+Implemented the accepted side-by-side set-details image in the standalone interactive preview: separate summary bar, vertical orange accent, muted size under the set name, due/status, red PDF action and purple reassignment. Facts and notes now occupy adjacent cards on desktop and stack on mobile. Location is a compact manual input that updates only the current sample set on change/blur; app-wide visibility setting remains. Notes indicator beside Notes is passive and reflects saved notes, with no click action. Accessory toggles and vehicle picker are retained. PDF and Remove retain clearly fictional preview feedback; no production data or backend changed. Location visibility defaults on so the new field can be reviewed.
+
+Accepted icon-led set facts implemented: Vehicle and Wheels use the established saved car silhouette and wheel-replacement.png, centered in light-gray rounded icon tiles. Muted labels sit above values; Accessories and compact Location occupy adjacent smaller groups. Existing notes, assignment, PDF/Remove preview feedback and animations remain.

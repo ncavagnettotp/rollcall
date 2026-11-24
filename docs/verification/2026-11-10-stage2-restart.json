@@ -1,0 +1,18 @@
+{
+  "scope": "isolated test cluster only; configured database not restarted",
+  "utc_started": "2026-11-11T04:33:22.252300+00:00",
+  "port": 55432,
+  "checks": [
+    "dedicated cluster initialized and started manually on loopback",
+    "existing persistence probe write/read succeeded",
+    "Stage 2 original PDF and corrected review saved before restart",
+    "stopped cluster: database readiness 503 and API liveness 200",
+    "cluster restarted: durable marker read and database readiness 200",
+    "Stage 2 original bytes, extracted evidence, corrected review and revision survived database restart",
+    "full backend suite including real PostgreSQL integration passed",
+    "dedicated cluster is stopped; installed service untouched"
+  ],
+  "result": "PASS",
+  "server_version": 180006,
+  "utc_finished": "2026-11-11T04:33:47.161232+00:00"
+}

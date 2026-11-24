@@ -1,0 +1,26 @@
+/* Approved underline tab design shared by the main mockup and comparison preview. */
+#customer-tabs{position:relative;background:#ebedf4;border-color:var(--border);box-shadow:none}
+#customer-tabs .tabs__list-container{background:transparent}
+#customer-tabs .customer-heroui-tabs{position:relative;z-index:1}
+/* Center the two-pixel guide beneath the four-pixel orange indicator. */
+#customer-tabs::after{
+ content:'';position:absolute;left:0;right:0;bottom:1px;height:2px;
+ background:#b6bccb;pointer-events:none;z-index:0;
+}
+#customer-tabs [role=tab][aria-selected=true]{color:var(--orange);text-shadow:none;background:transparent}
+#customer-tabs [role=tab][aria-selected=true] .customer-tab-icon{color:var(--orange);filter:none}
+#customer-tabs [role=tab][aria-selected=true] .tab-count{background:#e9ecf3;color:var(--muted)}
+#customer-tabs [role=tab]:focus-visible{outline:2px solid var(--orange);outline-offset:-2px;border-radius:6px}
+#customer-tabs .tabs__indicator{
+ top:auto;
+ bottom:calc(-1 * var(--tab-bridge-depth));
+ height:4px;
+ border-radius:999px;
+ background:var(--orange);
+ box-shadow:none;
+}
+#customer-tabs .tabs__indicator::before,#customer-tabs .tabs__indicator::after,#customer-tabs .tab-panel-join{display:none}
+
+/* Labels lead the hierarchy above 19px desktop / 17px compact vehicle rows. */
+#customer-tabs [role=tab]{font-size:22px}
+@media(max-width:760px){#customer-tabs [role=tab]{font-size:20px}}
