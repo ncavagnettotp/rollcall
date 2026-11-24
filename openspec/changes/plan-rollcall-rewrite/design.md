@@ -9,8 +9,8 @@ central workflow was never built. v1 only ever held synthetic data, so there is 
 
 Useful v1 knowledge to re-adopt deliberately (summarized in Phase 0, step 3):
 
-- Protractor PDF layout and quirks: `legacy/PROTRACTOR_INVOICE_PDF_HANDOFF.md`,
-  `legacy/backend/app/document_parser.py`.
+- Protractor PDF layout and quirks: `legacy/backend/app/document_parser.py` and its tests
+  (`legacy/PROTRACTOR_INVOICE_PDF_HANDOFF.md` is an unrelated bulk-export side project).
 - Tire size formats: metric `225/55R17` ↔ `2255517`; flotation `35x12.50R20` ↔ `35125020`.
 - Accessories (lug nuts, center caps, centering rings) as unknown/yes/no, never defaulting to no.
 - Content-addressed PDF archive with atomic writes; version-checked saves:

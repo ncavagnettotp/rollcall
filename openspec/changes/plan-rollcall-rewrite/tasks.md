@@ -38,9 +38,9 @@ when writing the owning change):
 
 ## 2. v1 lessons
 
-- [ ] 2.1 Write `openspec/changes/plan-rollcall-rewrite/v1-lessons.md` (two pages at most) covering:
+- [x] 2.1 Write `openspec/changes/plan-rollcall-rewrite/v1-lessons.md` (two pages at most) covering:
   Protractor PDF layout and which labels hold which fields (from
-  `legacy/PROTRACTOR_INVOICE_PDF_HANDOFF.md` and `legacy/backend/app/document_parser.py`); tire size
+  `legacy/backend/app/document_parser.py` and its tests); tire size
   formats (`225/55R17` ↔ `2255517`, `35x12.50R20` ↔ `35125020`); accessories as unknown/yes/no;
   the archive and version-checked save patterns in `legacy/backend/app/document_store.py`; the backup
   approach in `legacy/backend/backup_rollcall.py`; and what went wrong in v1 (scope growth, page
