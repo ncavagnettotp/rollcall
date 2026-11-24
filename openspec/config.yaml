@@ -1,0 +1,39 @@
+schema: spec-driven
+
+# Project context: constraints that every OpenSpec artifact must respect.
+context: |
+  Rollcall tracks customers' stored tire sets at one auto shop. It is a ground-up rewrite.
+  legacy/ holds the first version for reference only: read it for lessons, never import or copy it wholesale.
+
+  Product shape
+  - A CRUD app: customers and their tire sets (tire size, tread depth and related data),
+    a small dashboard of stats (e.g. sets in shop, sets in shop too long), admin user management.
+  - Keep pages few. Adding a page needs a stated reason.
+  - Uploading a Protractor PDF only PRE-FILLS the add/edit form. Staff review and press Save.
+    The app never applies inventory changes from a PDF on its own.
+  - User accounts. The first account on a fresh install becomes admin. Admins create accounts,
+    promote/demote admins, reset passwords and deactivate users. The last admin cannot be removed.
+  - Every change records who made it and when. History is append-only.
+
+  Technical constraints
+  - Server: Python FastAPI rendering HTML with Jinja2 templates; htmx (vendored, no CDN) for
+    partial page updates; plain CSS and JavaScript. No React and no frontend build step.
+  - PostgreSQL. Runs with Docker Compose. Shop LAN only, no internet exposure; served over HTTPS.
+  - Many staff use it at once: every editable record has a version number, stale saves are
+    rejected with a clear "changed by someone else" message, multi-step changes use one transaction.
+  - Original PDFs and the database are stored on persistent volumes and backed up together.
+  - Real Protractor PDFs contain customer data: never commit them. Tests use synthetic PDFs.
+
+  Out of scope
+  - Automatic inventory changes from PDFs, storage-period billing/renewal rules, payments,
+    scheduling, OCR, desktop/Electron clients, remote access.
+
+rules:
+  proposal:
+    - State what is out of scope for the change.
+  specs:
+    - Any requirement that edits a record includes a scenario for two users saving the same record.
+    - Any requirement that changes data includes a scenario showing the change in history with the user's name.
+  tasks:
+    - Write tests before implementation for each behavior.
+    - End with a short "What to try" checklist the shop owner can follow in a browser.

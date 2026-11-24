@@ -1,0 +1,25 @@
+.env
+**/.env
+.venv/
+node_modules/
+dist/
+__pycache__/
+.pytest_cache/
+output/isolated-postgres/
+output/desktop-rehearsal/
+checkpoints/
+tmp/pdfs/
+tmp/desktop-proof/
+tmp/electron-45.4.1/
+sample-invoices/
+backend/data/
+backend/archive/
+output/stage2-private/
+
+# Local workspace, generated output, and invoice imagery
+/.obsidian/
+/output/
+/tmp/
+/docs/rollcall/assets/sample-pdf/
+/docs/verification/2026-11-10-protractor-sample-review.md
+/docs/verification/2026-11-10-stage2-api.json
