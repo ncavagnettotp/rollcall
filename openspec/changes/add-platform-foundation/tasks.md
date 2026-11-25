@@ -34,7 +34,7 @@ see it fail, implement, see it pass.
   migration's insert ran once); a recorded version missing from the folder raises the "newer
   version of Rollcall" error; a file name that doesn't match `NNNN_name.sql` is rejected. Verify:
   the tests fail.
-- [ ] 3.2 Implement `rollcall/db.py` (pool creation with first-connection retry for up to 60 s;
+- [x] 3.2 Implement `rollcall/db.py` (pool creation with first-connection retry for up to 60 s;
   `transaction()` context manager) and `rollcall/migrate.py` (`apply_migrations(conn, folder)`,
   advisory lock per design). Verify: `tests/test_migrate.py` passes, plus a test that the retry gives
   up with a clear error after the configured time (use a short timeout in the test).

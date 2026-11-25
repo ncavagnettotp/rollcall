@@ -9,7 +9,7 @@ import threading
 import psycopg
 import pytest
 
-from rollcall.migrate import MigrationError, apply_migrations
+from rollcall.migrate import MIGRATIONS_DIR, MigrationError, apply_migrations, find_migrations
 
 CREATE_LOG = (
     "CREATE TABLE log (id serial PRIMARY KEY, n int NOT NULL);\nINSERT INTO log (n) VALUES (1);"
@@ -190,3 +190,7 @@ def test_two_runners_at_once_apply_each_migration_exactly_once(empty_database_ur
     with psycopg.connect(empty_database_url) as check:
         assert check.execute("SELECT count(*) FROM runs").fetchone()[0] == 1
         assert check.execute("SELECT count(*) FROM schema_migrations").fetchone()[0] == 1
+
+
+def test_the_apps_own_migration_files_are_valid():
+    find_migrations(MIGRATIONS_DIR)  # raises MigrationError on a bad or duplicate name
