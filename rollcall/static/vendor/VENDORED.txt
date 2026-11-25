@@ -1,0 +1,6 @@
+# Third-party files copied into Rollcall so pages never load anything from the internet.
+# One line per file: file name, version, SHA-256, source. tests/test_assets.py checks each hash.
+# To update: download the new release from the source, verify its npm integrity hash, replace the
+# file (new versioned name), update this line and the reference in templates/base.html.
+htmx-2.0.11.min.js  2.0.11  d6fdc75f204e6bdefa99b69bf1e6d4ac69b8a364f77929f45c13476b4000f717  https://registry.npmjs.org/htmx.org/-/htmx.org-2.0.11.tgz (dist/htmx.min.js, 0BSD)
+pico-2.1.1.min.css  2.1.1   fbc9a63fc9fc9f72d12fd7fc9806e11fa9f77ae4f9cad146b27003a1119ba3db  https://registry.npmjs.org/@picocss/pico/-/pico-2.1.1.tgz (css/pico.min.css, MIT)

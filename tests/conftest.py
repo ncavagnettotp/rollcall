@@ -63,3 +63,28 @@ def empty_database_url():
 def db(database_url):
     with psycopg.connect(database_url, autocommit=True) as conn:
         yield conn
+
+
+@pytest.fixture
+def settings(database_url, tmp_path):
+    from rollcall.config import load_settings
+
+    return load_settings(
+        {
+            "DATABASE_URL": database_url,
+            "SECRET_KEY": "test-secret-" + "x" * 32,
+            "SHOP_TIMEZONE": "America/Chicago",
+            "DATA_DIR": str(tmp_path / "data"),
+        }
+    )
+
+
+@pytest.fixture
+def client(settings):
+    """A browser stand-in talking to a fully started app (pool open, migrations applied)."""
+    from fastapi.testclient import TestClient
+
+    from rollcall.main import create_app
+
+    with TestClient(create_app(settings)) as test_client:
+        yield test_client

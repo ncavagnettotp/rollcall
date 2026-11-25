@@ -41,7 +41,7 @@ see it fail, implement, see it pass.
 
 ## 4. Page frame, assets and security headers
 
-- [ ] 4.1 Vendor htmx 2.0.x (`htmx-<version>.min.js`) and Pico CSS 2.x (`pico-<version>.min.css`)
+- [x] 4.1 Vendor htmx 2.0.x (`htmx-<version>.min.js`) and Pico CSS 2.x (`pico-<version>.min.css`)
   into `rollcall/static/vendor/` from their official releases, recording each version, source URL
   and SHA-256 in `VENDORED.txt`. Write `tests/test_assets.py`: each file's SHA-256 matches
   `VENDORED.txt`; `/static/app.css`, `/static/app.js` and both vendored files return 200 with
