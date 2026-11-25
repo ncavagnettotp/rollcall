@@ -5,7 +5,7 @@ see it fail, implement, see it pass.
 
 ## 1. Project and test tooling
 
-- [ ] 1.1 Create `pyproject.toml` (Python 3.13; FastAPI, Uvicorn, Jinja2, psycopg[binary] +
+- [x] 1.1 Create `pyproject.toml` (Python 3.13; FastAPI, Uvicorn, Jinja2, psycopg[binary] +
   psycopg-pool; dev: pytest, httpx, ruff) and `uv.lock` with `uv lock`; add the `rollcall/` and
   `tests/` packages; extend `.gitignore` for `.ruff_cache/`. Verify: `uv sync` succeeds and
   `uv run python -c "import rollcall"` exits 0.

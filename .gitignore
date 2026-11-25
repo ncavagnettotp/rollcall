@@ -8,3 +8,4 @@ node_modules/
 /tmp/
 # Real Protractor PDFs contain customer data: keep them local only.
 /samples/private/
+.ruff_cache/
