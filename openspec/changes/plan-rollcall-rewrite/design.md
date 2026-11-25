@@ -78,6 +78,7 @@ migrating v1 data.
 | Storage location | On; optional free text on each stay; current location shown while checked in | Owner (Q9) |
 | Search | One box: customer name, phone, tire size (digits only), brand, vehicle, VIN, plate, RO, location. Filters: in shop, out, too long, archived. Archived hidden by default | Owner (Q10) |
 | Mockups | Pages are designed as the app's own templates in a `/mockups` gallery with invented data, before the features behind them are built. A UI design discovery phase comes first: two or three distinct designs of one sample page, adjusted until the owner is happy; only then are the other pages mocked up in that design | Owner (2026-11-25) |
+| Light and dark mode | Every page has both, part of the approved design. Pages follow the device's setting unless staff pick Light or Dark with a switch in the header, remembered per browser | Owner (2026-11-25) |
 | Go-live | Staff start using the app only after every change is built | Owner |
 | Branch | Work on `rewrite`; merge when the rewrite replaces v1 | Assistant call |
 

@@ -107,12 +107,41 @@ happy.
 
 ### Requirement: One approved design
 Once the owner approves a design, it SHALL become the app's only design, written down as a short
-list of design rules, and the other designs SHALL be removed.
+list of design rules covering its light and its dark mode, and the other designs SHALL be removed.
 
 #### Scenario: After the choice
 - **GIVEN** the owner has approved a design
 - **WHEN** any page is shown, in the gallery or for real
 - **THEN** it uses the approved design, and no switch between designs remains
+
+### Requirement: Light and dark mode
+Every page SHALL have a light mode and a dark mode, both part of the approved design. The page
+frame SHALL offer a Light / Dark / Device switch whose choice is remembered in that browser;
+Device, the default, follows the device's own setting. In both modes text SHALL keep a contrast
+of at least 4.5:1 with its background, and large text, icons and borders at least 3:1.
+
+#### Scenario: Following the device
+- **GIVEN** the switch is on Device, as it is until someone changes it
+- **WHEN** a page is opened on a phone or PC set to dark mode
+- **THEN** the page is shown in its dark mode, with the same layout and content as in light mode
+
+#### Scenario: Choosing a mode
+- **WHEN** a staff member picks Dark in the switch
+- **THEN** the page they were on is shown again in dark mode, and every later page in that
+  browser opens in dark mode, without first flashing light, until another mode is picked
+
+#### Scenario: Reviewing both modes in the gallery
+- **WHEN** the owner picks Light or Dark on a gallery page
+- **THEN** that state is shown in the chosen mode, so both modes can be reviewed on one device
+
+#### Scenario: Readable in both modes
+- **WHEN** any gallery state is shown in either mode
+- **THEN** all text, pills and status colors meet the contrast limits, and no status is shown by
+  color alone
+
+#### Scenario: The switch stays inside Rollcall
+- **WHEN** the switch is sent with a return address outside Rollcall
+- **THEN** the browser is sent to the start page instead
 
 ### Requirement: Owner sign-off per page
 A page's mockup SHALL count as approved only after the owner has signed it off in the gallery.

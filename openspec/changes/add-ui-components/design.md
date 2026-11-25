@@ -19,6 +19,7 @@ real templates.
 - The design is found on one page (the tire set page) in a discovery phase, before any other
   page is drawn.
 - Tests that keep every gallery state renderable for the rest of the project.
+- A light and a dark mode for every page, chosen per browser, following the device by default.
 
 **Non-Goals:**
 
@@ -96,11 +97,18 @@ available for comparison until the owner approves one. Starting points, refined 
 - **C, cards and high contrast:** always light, bold status colors, each tire as a card with its
   position, DOT code and tread, suited to a bright shop floor and to phones.
 
+Revisions so far: **D**, B's layout with soft cards, icon tiles, tinted outlined pills and orange
+primary buttons, after a reference picture the owner supplied, is the owner's choice so far
+(2026-11-25); the owner found A and C unattractive. **E**, D in an owner-supplied colour palette,
+was tried and withdrawn at the owner's request. D is so far always light; its dark mode is added
+under decision 9.
+
 When the owner approves a design, its template becomes `templates/pages/tire_set.html`, its
-stylesheet is merged into `static/app.css`, its components move to `templates/components/`, and
-every other candidate, the `?design=` switch and the discovery folders are deleted. The design
-rules (layout pattern, colors, spacing, type sizes, how forms, tables, buttons and badges look)
-are written at the top of `app.css` and in this design under "Approved design".
+stylesheet, with its light and dark colour tokens, is merged into `static/app.css`, its components
+move to `templates/components/`, and every other candidate, the `?design=` switch and the
+discovery folders are deleted. The design rules (layout pattern, colors in both modes, spacing,
+type sizes, how forms, tables, buttons and badges look) are written at the top of `app.css` and in
+this design under "Approved design".
 
 ### 7. PDF beside the form
 
@@ -122,7 +130,34 @@ present; every `href`/`src`/`action` points at a gallery state, `/static/...` or
 every `input`, `select` and `textarea` has a label; no `style` attributes and no inline scripts.
 Plus: gallery off → 404; `MOCKUPS` validation in `test_config.py`; a dataclass missing a value
 fails to render with a message naming it; the PDF response carries `frame-ancestors 'self'` while
-pages keep `'none'`. The 360-pixel check is done in a real browser, by the builder and by the owner.
+pages keep `'none'`; the light/dark switch (decision 9). The 360-pixel check and both modes are
+checked in a real browser, by the builder and by the owner. Form targets in the gallery may also
+be `/theme`, the switch.
+
+### 9. Light and dark mode
+
+- **Colour tokens.** Every colour in `app.css` is a custom property. Light values are the
+  default; dark values apply under `@media (prefers-color-scheme: dark)` when no mode is forced,
+  and under `[data-theme="dark"]`; `[data-theme="light"]` forces light. Components use tokens
+  only, so one set of rules serves both modes. Pico's own light and dark themes follow the same
+  `data-theme` attribute, so plain elements switch with them.
+- **The switch.** In the frame's header, a small form with three buttons (Light, Dark, Device)
+  posts to `POST /theme` with `mode` and `next` (the current address). The route accepts only
+  `light`, `dark` or `device`; it stores the choice in a cookie (`rollcall_theme`, one year,
+  `HttpOnly`, `SameSite=Lax`; Device deletes it) and answers 303 to `next` when that is a path
+  inside Rollcall (one leading `/`), else to `/`. `base.html` reads the cookie and writes
+  `data-theme` on `<html>` (nothing for Device), so the page is drawn in the chosen mode from the
+  first paint, with no JavaScript. The current choice is marked (`aria-pressed`).
+- **Per browser, not per account.** Staff accounts do not exist yet, and it is only a display
+  preference. On a shared shop PC the last choice stays until someone changes it. It can move to
+  the staff account later. No CSRF token: a forged post could only flip a colour scheme; if
+  `add-accounts` protects all forms, this one is included.
+- **Gallery.** The gallery uses the same switch, so the owner reviews both modes on one device.
+- **Contrast.** The builder computes the contrast of every text/background token pair in both
+  modes (a small script, no new dependency) against the limits in the spec. Status pills always
+  carry a word, so colour is never the only signal.
+- **The chosen design's dark mode** is added to that design in place, keeping the light look the
+  owner approved, then reviewed by the owner before the design becomes the real one.
 
 ## Risks / Trade-offs
 
@@ -138,6 +173,10 @@ pages keep `'none'`. The 360-pixel check is done in a real browser, by the build
   find them before a person does.
 - [Embedded PDFs differ by browser] → Checked in the shop's browser during sign-off; the link
   fallback always works.
+- [Dark mode doubles what must be reviewed] → One set of rules over colour tokens; the builder
+  screenshots every state in both modes; the owner reviews dark once the light look is approved.
+- [A shared shop PC keeps one person's mode] → It is only a display preference and anyone can
+  switch it back; it can move to staff accounts later.
 
 ## Migration Plan
 
@@ -145,4 +184,5 @@ No data changes. Production `.env` leaves `MOCKUPS` unset. Rollback is reverting
 
 ## Approved design
 
-To be filled in when the owner approves a design at the end of discovery.
+To be filled in when the owner approves a design at the end of discovery, with its rules for
+both the light and the dark mode.

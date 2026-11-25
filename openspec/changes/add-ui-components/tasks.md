@@ -31,26 +31,39 @@ test, see it fail, implement, see it pass. Sample data is always invented; nothi
   filled from a PDF with the invoice beside it; check-in step (RO, location, tread per tire);
   staggered set with five tires and very long text; form errors; save conflict; archived. Write
   the tests first (each state renders, the states link to each other). Verify: tests pass.
-- [ ] 2.2 Build designs A, B and C of the tire set page (design.md decision 6), each with its own
+- [x] 2.2 Build designs A, B and C of the tire set page (design.md decision 6), each with its own
   template, stylesheet and components, with the `?design=` switch in the banner. Verify:
   `scripts/test.sh` passes for every design and state; every state of every design checked by the
   builder in a browser at 360 px and desktop width with nothing scrolling sideways.
-- [ ] 2.3 Owner compares the designs in the gallery, on a desktop and a phone, then picks one,
+- [x] 2.3 Owner compares the designs in the gallery, on a desktop and a phone, then picks one,
   asks for changes or asks for a mix. Each revision is added as a new design next to the others.
-  Repeat until the owner says they are happy. Verify: owner names the approved design.
-- [ ] 2.4 Make the approved design the real one: its template becomes
+  Repeat until the owner says they are happy with the look. Verify: owner names the approved
+  design. Done 2026-11-25: design D (light look), see design.md decision 6.
+- [ ] 2.4 Write tests for the light/dark switch (design.md decision 9): `POST /theme` with
+  `light`, `dark` or `device` sets or clears the cookie and answers 303 to `next`; other modes are
+  refused; a `next` outside Rollcall leads to `/`; a page rendered with the cookie carries that
+  `data-theme`, without it none; the switch is in the header of real and gallery pages with the
+  current mode marked. Then build the switch, and give the approved design a dark mode built from
+  colour tokens, its light look unchanged. Verify: tests pass; every state checked by the builder
+  in a browser in light and dark at 360 px and desktop width; every text/background token pair
+  measured within the spec's contrast limits.
+- [ ] 2.5 Owner reviews the dark mode in the gallery with the switch, on a desktop and a phone,
+  asking for changes until happy. Verify: owner approves the dark mode.
+- [ ] 2.6 Make the approved design the real one: its template becomes
   `templates/pages/tire_set.html`, its components move to `templates/components/`, its stylesheet
-  is merged into `static/app.css`; delete the other designs, the switch and the discovery folders;
-  write the design rules at the top of `app.css` and under "Approved design" in design.md.
-  Verify: tests pass; `git grep -i discovery rollcall/` is empty; the page looks the same as the
-  approved design.
-- [ ] 2.5 Owner signs off the tire set page in its final place. Verify: owner confirms.
+  with its light and dark tokens is merged into `static/app.css`; delete the other designs, the
+  design switch and the discovery folders; write the design rules for both modes at the top of
+  `app.css` and under "Approved design" in design.md. Verify: tests pass;
+  `git grep -i discovery rollcall/` is empty; the page looks the same as the approved design in
+  both modes.
+- [ ] 2.7 Owner signs off the tire set page in its final place, in light and dark mode. Verify:
+  owner confirms.
 
-## 3. Phase 2: mock up the other pages (one at a time, only after 2.5)
+## 3. Phase 2: mock up the other pages (one at a time, only after 2.7)
 
 For each page, in the approved design and reusing its components: data shape in
 `rollcall/views/`, sample states in the registry and tests first; then any new components and the
-page template; builder checks it at 360 px and desktop width;
+page template; builder checks it at 360 px and desktop width, in light and dark mode;
 owner reviews in the gallery, revisions, sign-off. Page contents follow
 `plan-rollcall-rewrite/design.md`.
 
@@ -71,7 +84,8 @@ owner reviews in the gallery, revisions, sign-off. Page contents follow
 ## 4. Wrap-up
 
 - [ ] 4.1 Full check: `scripts/test.sh` passes; every gallery state checked in a browser at 360
-  px; `openspec validate add-ui-components --strict` passes. Verify: all commands pass.
+  px in light and dark mode; `openspec validate add-ui-components --strict` passes. Verify: all
+  commands pass.
 
 ## 5. What to try (shop owner, in a browser)
 
@@ -82,7 +96,10 @@ owner reviews in the gallery, revisions, sign-off. Page contents follow
      It looks like the design you approved in discovery, with no design switch left.
   4. Open the "filled from a PDF" state on a desktop: the sample invoice is beside the form.
   5. Open the gallery on a phone at http://<this PC's IP>:8080/mockups. Nothing scrolls sideways.
-  6. Remove `MOCKUPS=on` from `.env`, run `docker compose up -d`, open `/mockups`: "Page not
+  6. Use the Light / Dark / Device switch in the header: the page turns dark or light at once,
+     the next page opens the same way, and everything stays readable. Pick Device and set the
+     phone to dark mode: Rollcall follows it.
+  7. Remove `MOCKUPS=on` from `.env`, run `docker compose up -d`, open `/mockups`: "Page not
      found".
 
 ## Workflow follow-up

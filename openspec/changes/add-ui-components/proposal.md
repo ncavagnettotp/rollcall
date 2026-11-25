@@ -30,6 +30,9 @@ one sample page. Only once the owner is happy with that design are the other pag
   changes or a mix of them, and the design is adjusted until the owner is happy with it. That
   design becomes the app's only design, written down as short design rules; the other mockups are
   removed.
+- **Light and dark mode:** the approved design has both. Pages follow the device's setting
+  unless a staff member picks Light or Dark with a switch in the header, remembered in that
+  browser. The owner reviews both modes in the gallery before the design becomes the real one.
 - **Phase 2, the other pages, only after discovery is finished:** customer view, search, dashboard, sign-in (with first-admin setup)
   and admin settings, one at a time, each signed off by the owner in the gallery.
 - **Tests** render every gallery entry and fail on a missing value, a dead link, an unlabeled
@@ -41,12 +44,13 @@ one sample page. Only once the owner is happy with that design are the other pag
 ### New Capabilities
 
 - `ui-components`: the mockup gallery, the rule that pages are built only from shared components
-  and receive a fixed shape of data, and the approved style.
+  and receive a fixed shape of data, and the approved style in light and dark mode.
 
 ### Modified Capabilities
 
 None. The page frame (`platform`) stays as specified: its navigation still lists only pages that
 exist. The gallery shows the frame with sample navigation and a sample signed-in staff member.
+The light/dark switch the frame gains is specified in `ui-components`.
 
 ## Out of scope
 
@@ -66,7 +70,8 @@ exist. The gallery shows the frame with sample navigation and a sample signed-in
   shapes), `rollcall/mockups/` (sample data, gallery routes, a synthetic sample invoice PDF).
 - Changed: `rollcall/config.py` and `.env.example` (`MOCKUPS` setting), `rollcall/web.py`
   (templates fail on missing values; PDF responses may be shown inside Rollcall's own pages),
-  `rollcall/templates/base.html` (header can show the signed-in staff member),
+  `rollcall/templates/base.html` (header can show the signed-in staff member and the light/dark
+  switch), a small `POST /theme` route that remembers the chosen mode,
   `rollcall/static/app.css` (the chosen style).
 - Planning: `plan-rollcall-rewrite/tasks.md` and `design.md` (new step 5.2, template decisions).
 - No new dependencies.
