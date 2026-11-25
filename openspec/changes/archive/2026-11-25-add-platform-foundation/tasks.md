@@ -93,7 +93,7 @@ see it fail, implement, see it pass.
 
 ## 7. What to try (shop owner, in a browser)
 
-- [ ] 7.1 Owner sign-off:
+- [x] 7.1 Owner sign-off:
   1. Run `cp .env.example .env`, fill in the two passwords, then run
      `docker compose up -d`.
   2. Open http://localhost:8080. You should see the Rollcall header and "Rollcall is running".

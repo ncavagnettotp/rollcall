@@ -76,7 +76,7 @@ build it test-first from its own tasks.md; owner signs off with its "What to try
 `openspec archive <name>`. Verify: the change appears under `openspec/changes/archive/` and its
 specs under `openspec/specs/`. Do not start the next task until the previous one is archived.
 
-- [ ] 5.1 `add-platform-foundation`: Docker Compose (app + PostgreSQL), configuration, health check,
+- [x] 5.1 `add-platform-foundation`: Docker Compose (app + PostgreSQL), configuration, health check,
   database migrations, base page layout, vendored htmx, styling conventions, test setup.
 - [ ] 5.2 `add-accounts`: first-admin bootstrap, sign-in/out, sessions, admin user management
   (create with temporary password, reset, promote/demote, deactivate), last-admin protection.
