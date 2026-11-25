@@ -35,6 +35,7 @@ ALL_GALLERY_URLS = ["/mockups", *PAGE_URLS, *STATE_URLS, *DESIGN_STATE_URLS, *CO
 DESIGN_LETTERS = [design.letter for design in samples.DESIGNS]
 BANNER = "Mockup: sample data"
 SAMPLE_INVOICE_URL = "/mockups/sample-invoice.pdf"
+THEME_SWITCH = "/theme"  # the light/dark switch in the header posts here (tests/test_theme.py)
 REPO_DIR = Path(__file__).parent.parent
 
 
@@ -184,7 +185,7 @@ def test_gallery_page_renders_with_the_banner(gallery, url):
 
 @pytest.mark.parametrize("url", ALL_GALLERY_URLS)
 def test_gallery_page_has_no_dead_links(gallery, url):
-    for target in set(parse(gallery.get(url).text).targets):
+    for target in set(parse(gallery.get(url).text).targets) - {THEME_SWITCH}:
         parts = urlsplit(target)
         assert not parts.scheme and not parts.netloc, f"{url} links outside Rollcall: {target}"
         assert parts.path.startswith(("/mockups", "/static/")), (
@@ -427,6 +428,22 @@ def test_index_links_to_each_design(gallery):
     targets = parse(gallery.get("/mockups").text).targets
     for letter in DESIGN_LETTERS:
         assert f"/mockups/pages/tire-set/checked-in?design={letter}" in targets
+
+
+def test_gallery_pages_have_the_light_dark_switch_returning_to_the_same_state(gallery):
+    html = gallery.get("/mockups/pages/tire-set/edit?design=d").text
+    assert 'action="/theme"' in html
+    assert 'name="next" value="/mockups/pages/tire-set/edit?design=d"' in html
+
+
+def test_approved_design_is_drawn_in_the_chosen_mode(gallery):
+    gallery.cookies.clear()
+    try:
+        gallery.post("/theme", data={"mode": "dark", "next": "/"}, follow_redirects=False)
+        html = gallery.get("/mockups/pages/tire-set/checked-in?design=d").text
+        assert re.search(r'<html[^>]*data-theme="dark"', html)
+    finally:
+        gallery.cookies.clear()
 
 
 # --- the sample invoice (spec: Sample PDF beside the form) -------------------------------------

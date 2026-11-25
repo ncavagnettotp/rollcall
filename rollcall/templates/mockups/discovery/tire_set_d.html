@@ -1,12 +1,11 @@
 {#- Tire set page, design D: design B's compact workshop layout (two columns on a desktop, big
     check in / check out buttons, the check-in step opening in place) with soft cards, icon tiles,
     tinted pills and orange primary buttons, after the owner's reference picture.
-    Always light. UI design discovery, task 2.3 (first revision). -#}
+    Light and dark mode from colour tokens (task 2.4). UI design discovery, task 2.3. -#}
 {% extends "base.html" %}
 {% from "components/field.html" import field %}
 {% import "mockups/discovery/components_d.html" as ui %}
 
-{% block html_attributes %} data-theme="light"{% endblock %}
 {% block head %}<link rel="stylesheet" href="/static/mockups/discovery-d.css">{% endblock %}
 {% block title %}{{ page.title }}{% endblock %}
 

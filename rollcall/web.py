@@ -68,6 +68,18 @@ def format_shop_time(moment: datetime, shop_timezone: ZoneInfo) -> str:
     return f"{local.month}/{local.day}/{local.year} {hour}:{local.minute:02d} {half}"
 
 
+# The light/dark switch (add-ui-components design.md decision 9): the choice lives in this cookie,
+# and the frame writes it on <html> as data-theme. No cookie means "follow the device".
+THEME_COOKIE = "rollcall_theme"
+THEME_MODES = ("light", "dark")
+
+
+def theme_of(request: Request) -> str | None:
+    """The mode this browser chose, or None to follow the device. Anything else is ignored."""
+    value = request.cookies.get(THEME_COOKIE)
+    return value if value in THEME_MODES else None
+
+
 def format_shop_date(day: date) -> str:
     """A calendar date as the shop's invoices write it: 3/2/2026."""
     return f"{day.month}/{day.day}/{day.year}"
@@ -81,6 +93,7 @@ def make_templates(shop_timezone: ZoneInfo, nav_items: list[NavItem]) -> Jinja2T
     templates.env.filters["shop_time"] = partial(format_shop_time, shop_timezone=shop_timezone)
     templates.env.filters["shop_date"] = format_shop_date
     templates.env.globals["assets"] = ASSETS
+    templates.env.globals["theme_of"] = theme_of
     templates.env.globals["nav_items"] = nav_items
     # Optional frame values; a page may pass its own. None means not shown.
     templates.env.globals["signed_in"] = None  # views.frame.SignedInStaff

@@ -39,7 +39,7 @@ test, see it fail, implement, see it pass. Sample data is always invented; nothi
   asks for changes or asks for a mix. Each revision is added as a new design next to the others.
   Repeat until the owner says they are happy with the look. Verify: owner names the approved
   design. Done 2026-11-25: design D (light look), see design.md decision 6.
-- [ ] 2.4 Write tests for the light/dark switch (design.md decision 9): `POST /theme` with
+- [x] 2.4 Write tests for the light/dark switch (design.md decision 9): `POST /theme` with
   `light`, `dark` or `device` sets or clears the cookie and answers 303 to `next`; other modes are
   refused; a `next` outside Rollcall leads to `/`; a page rendered with the cookie carries that
   `data-theme`, without it none; the switch is in the header of real and gallery pages with the
@@ -47,8 +47,9 @@ test, see it fail, implement, see it pass. Sample data is always invented; nothi
   colour tokens, its light look unchanged. Verify: tests pass; every state checked by the builder
   in a browser in light and dark at 360 px and desktop width; every text/background token pair
   measured within the spec's contrast limits.
-- [ ] 2.5 Owner reviews the dark mode in the gallery with the switch, on a desktop and a phone,
-  asking for changes until happy. Verify: owner approves the dark mode.
+- [x] 2.5 Owner reviews the dark mode in the gallery with the switch, on a desktop and a phone,
+  asking for changes until happy. Verify: owner approves the dark mode. Done 2026-11-25: design D's
+  dark mode approved as built in 2.4.
 - [ ] 2.6 Make the approved design the real one: its template becomes
   `templates/pages/tire_set.html`, its components move to `templates/components/`, its stylesheet
   with its light and dark tokens is merged into `static/app.css`; delete the other designs, the

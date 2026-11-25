@@ -19,7 +19,7 @@ from rollcall.config import ConfigError, Settings, load_settings
 from rollcall.db import create_pool
 from rollcall.migrate import apply_migrations
 from rollcall.mockups import routes as mockup_routes
-from rollcall.pages import start
+from rollcall.pages import start, theme
 
 log = logging.getLogger("rollcall")
 
@@ -75,6 +75,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.mount("/static", StaticFiles(directory=web.STATIC_DIR), name="static")
     app.include_router(health.router)
     app.include_router(start.router)
+    app.include_router(theme.router)
     if settings.mockups:
         app.include_router(mockup_routes.router)
     return app

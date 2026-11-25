@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"{% block html_attributes %}{% endblock %}>
+<html lang="en"{% block html_attributes %}{% if theme_of(request) %} data-theme="{{ theme_of(request) }}"{% endif %}{% endblock %}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -40,6 +40,18 @@
         {% for item in nav_items %}
         <li><a href="{{ item.url }}"{% if item.is_current(request.url.path) %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
         {% endfor %}
+        <li class="theme-switch">
+          {#- Light / Dark / Device (add-ui-components design.md decision 9). -#}
+          <form method="post" action="/theme">
+            <input type="hidden" name="next" value="{{ request.url.path }}{% if request.url.query %}?{{ request.url.query }}{% endif %}">
+            <div role="group" aria-label="Colour mode">
+              {%- set chosen = theme_of(request) or "device" %}
+              {%- for value, label in (("light", "Light"), ("dark", "Dark"), ("device", "Device")) %}
+              <button type="submit" name="mode" value="{{ value }}" aria-pressed="{{ 'true' if value == chosen else 'false' }}">{{ label }}</button>
+              {%- endfor %}
+            </div>
+          </form>
+        </li>
         {% if signed_in %}
         <li class="signed-in">
           <form method="post" action="{{ signed_in.sign_out_url }}">
