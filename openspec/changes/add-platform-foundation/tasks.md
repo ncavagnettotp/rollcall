@@ -87,7 +87,7 @@ see it fail, implement, see it pass.
   second start. Then stop `db`: `/health` → 503. Start `db`: `/health` → 200 with no app restart.
   Verify: record the commands and outputs in the task's commit message. Remove the throwaway
   migration and reset the volume (`docker compose down -v`).
-- [ ] 6.3 Concurrency check: with the stack up, send 50 parallel requests to `/` and `/health`
+- [x] 6.3 Concurrency check: with the stack up, send 50 parallel requests to `/` and `/health`
   (`seq 50 | xargs -P50 -I{} curl -s -o /dev/null -w "%{http_code}\n" localhost:8080/`). Verify: all
   return 200 and the app log has no errors.
 
