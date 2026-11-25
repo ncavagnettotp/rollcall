@@ -50,7 +50,7 @@ when writing the owning change):
 
 ## 3. Capability map
 
-- [ ] 3.1 Present the eight capabilities from proposal.md to the owner, with the pages each one
+- [x] 3.1 Present the eight capabilities from proposal.md to the owner, with the pages each one
   owns (sign-in, dashboard, tire list/search, customer view with its tire sets, tire set form with
   PDF review, admin settings). Record any merge/split in proposal.md. Verify: owner confirms;
   `openspec validate plan-rollcall-rewrite` passes.
