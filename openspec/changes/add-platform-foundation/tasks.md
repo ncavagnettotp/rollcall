@@ -9,7 +9,7 @@ see it fail, implement, see it pass.
   psycopg-pool; dev: pytest, httpx, ruff) and `uv.lock` with `uv lock`; add the `rollcall/` and
   `tests/` packages; extend `.gitignore` for `.ruff_cache/`. Verify: `uv sync` succeeds and
   `uv run python -c "import rollcall"` exits 0.
-- [ ] 1.2 Add `compose.test.yaml` (PostgreSQL 18 on tmpfs, `127.0.0.1:55432`), `tests/conftest.py`
+- [x] 1.2 Add `compose.test.yaml` (PostgreSQL 18 on tmpfs, `127.0.0.1:55432`), `tests/conftest.py`
   with a session fixture that creates and drops a uniquely named database, and `scripts/test.sh`
   (starts the test db if needed, then `ruff check`, `ruff format --check`, `pytest`). Verify:
   `scripts/test.sh` passes with one smoke test that runs `SELECT 1` in the fixture database.

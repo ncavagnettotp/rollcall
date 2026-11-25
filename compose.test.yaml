@@ -1,0 +1,18 @@
+# Throwaway PostgreSQL for the test suite. Data lives in memory (tmpfs) and is gone when the
+# container stops. Used by scripts/test.sh; never used by the running app.
+name: rollcall-test
+
+services:
+  test-db:
+    image: postgres:18.7
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "127.0.0.1:55432:5432"
+    tmpfs:
+      - /var/lib/postgresql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
