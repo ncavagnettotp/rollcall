@@ -1,0 +1,72 @@
+"""The Rollcall application: settings, startup checks, database, pages.
+
+Run with: uvicorn rollcall.main:create_app --factory
+"""
+
+import logging
+import os
+import sys
+from contextlib import asynccontextmanager
+from pathlib import Path
+
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+
+from rollcall import web
+from rollcall.config import ConfigError, Settings, load_settings
+from rollcall.db import create_pool
+from rollcall.migrate import apply_migrations
+from rollcall.pages import start
+
+log = logging.getLogger("rollcall")
+
+
+class StartupError(Exception):
+    """Something the app needs before serving pages is missing."""
+
+
+def ensure_data_dir(path: Path) -> None:
+    """Create the data folder if needed and prove the app can write to it."""
+    try:
+        path.mkdir(parents=True, exist_ok=True)
+        probe = path / ".write-test"
+        probe.write_text("ok")
+        probe.unlink()
+    except OSError as error:
+        raise StartupError(f"DATA_DIR {path} is not a writable folder ({error.strerror})") from None
+
+
+def create_app(settings: Settings | None = None) -> FastAPI:
+    if settings is None:
+        try:
+            settings = load_settings(os.environ)
+        except ConfigError as error:
+            sys.exit(str(error))  # prints the problems and exits with status 1
+
+    logging.basicConfig(
+        level=settings.log_level, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
+    )
+
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        ensure_data_dir(settings.data_dir)
+        pool = create_pool(settings.database_url, settings.db_pool_size)
+        try:
+            with pool.connection() as conn:
+                applied = apply_migrations(conn)
+            if applied:
+                log.info("Applied migrations: %s", ", ".join(f"{v:04d}" for v in applied))
+            app.state.pool = pool
+            yield
+        finally:
+            pool.close()
+
+    app = FastAPI(
+        title="Rollcall", lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None
+    )
+    app.state.settings = settings
+    app.state.templates = web.make_templates(settings.shop_timezone, nav_items=[start.NAV_ITEM])
+    app.add_middleware(web.SecurityHeaders)
+    app.mount("/static", StaticFiles(directory=web.STATIC_DIR), name="static")
+    app.include_router(start.router)
+    return app

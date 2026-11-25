@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  {# htmx would otherwise inject an inline <style>, which the content security policy blocks. #}
+  <meta name="htmx-config" content='{"includeIndicatorStyles": false}'>
+  <title>{% block title %}{% endblock %} · Rollcall</title>
+  <link rel="stylesheet" href="{{ assets.pico_css }}">
+  <link rel="stylesheet" href="{{ assets.app_css }}">
+  <script src="{{ assets.htmx_js }}" defer></script>
+  <script src="{{ assets.app_js }}" defer></script>
+</head>
+<body>
+  <header class="container">
+    <nav>
+      <ul>
+        <li><a href="/" class="brand"><strong>Rollcall</strong></a></li>
+      </ul>
+      <ul>
+        {% for item in nav_items %}
+        <li><a href="{{ item.url }}"{% if request.url.path == item.url %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
+        {% endfor %}
+      </ul>
+    </nav>
+  </header>
+  <main class="container">
+    <div id="messages" aria-live="polite">{% block messages %}{% endblock %}</div>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

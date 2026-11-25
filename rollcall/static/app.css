@@ -1,0 +1,44 @@
+/* Rollcall styles on top of Pico CSS (static/vendor/pico-*.min.css).
+   Pico styles plain HTML; this file holds only Pico variable overrides and what is specific to
+   Rollcall. Mobile-first: base rules are for phones, the one media query widens for desktops. */
+
+:root {
+  --rollcall-in: #2e7d32;      /* tire set checked in */
+  --rollcall-out: #6b7280;     /* tire set checked out */
+  --rollcall-late: #b45309;    /* in the shop too long */
+}
+
+/* The app name in the header reads as a name, not a link. */
+header nav .brand {
+  text-decoration: none;
+}
+
+/* Status badges: <span class="badge in">In shop</span> */
+.badge {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+.badge.in { background: var(--rollcall-in); }
+.badge.out { background: var(--rollcall-out); }
+.badge.late { background: var(--rollcall-late); }
+
+/* Messages shown above the page content (success and errors). */
+#messages:empty {
+  display: none;
+}
+
+/* Long words (VINs, PDF names) never push the page sideways on a phone. */
+main {
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 768px) {
+  .badge {
+    font-size: 0.85rem;
+  }
+}

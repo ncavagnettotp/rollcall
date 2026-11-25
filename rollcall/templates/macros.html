@@ -1,0 +1,36 @@
+{#- Shared building blocks so every form and table looks and behaves the same.
+    Pico styles the plain elements; aria-invalid turns a field red. -#}
+
+{% macro field(name, label, value="", type="text", error=None, required=False, hint=None) -%}
+<label for="f-{{ name }}">{{ label }}
+  <input id="f-{{ name }}" name="{{ name }}" type="{{ type }}" value="{{ value if value is not none else '' }}"
+    {%- if required %} required{% endif %}
+    {%- if error %} aria-invalid="true" aria-describedby="e-{{ name }}"{% endif %}>
+  {%- if error %}
+  <small id="e-{{ name }}">{{ error }}</small>
+  {%- elif hint %}
+  <small>{{ hint }}</small>
+  {%- endif %}
+</label>
+{%- endmacro %}
+
+{% macro button(label, kind="primary", type="submit") -%}
+<button type="{{ type }}"{% if kind != "primary" %} class="{{ kind }}"{% endif %}>{{ label }}</button>
+{%- endmacro %}
+
+{% macro table(headers, rows, empty="Nothing here yet.") -%}
+<div class="overflow-auto">
+  <table class="striped">
+    <thead>
+      <tr>{% for heading in headers %}<th scope="col">{{ heading }}</th>{% endfor %}</tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>
+      {% else %}
+      <tr><td colspan="{{ headers | length }}">{{ empty }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{%- endmacro %}

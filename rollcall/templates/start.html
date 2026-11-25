@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<article>
+  <h1>Rollcall is running</h1>
+  <p>The server and database are working. Pages for customers and tire sets come next.</p>
+  <footer><small>Shop time: {{ now | shop_time }}</small></footer>
+</article>
+{% endblock %}

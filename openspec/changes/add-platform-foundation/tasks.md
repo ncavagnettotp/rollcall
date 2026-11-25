@@ -52,7 +52,7 @@ see it fail, implement, see it pass.
   relative or same-origin URL; every nav link returns 200; the response carries the CSP,
   `X-Content-Type-Options` and `Referrer-Policy` headers from design.md; the page sets
   `includeIndicatorStyles` to false. Verify: the tests fail.
-- [ ] 4.3 Implement `rollcall/main.py` (`create_app()`, lifespan checking `DATA_DIR` is writable, opening the pool and running
+- [x] 4.3 Implement `rollcall/main.py` (`create_app()`, lifespan checking `DATA_DIR` is writable, opening the pool and running
   migrations), `rollcall/web.py` (templates, nav registry, header middleware, shop-time filter),
   `templates/base.html`, `macros.html` (field, button, table), `start.html`,
   `rollcall/pages/start.py`, `static/app.css` (Pico variable overrides plus status badge styles; system fonts) and
