@@ -27,6 +27,7 @@ class Settings:
     data_dir: Path = Path("/data")
     log_level: str = "INFO"
     db_pool_size: int = 10
+    mockups: bool = False  # the /mockups gallery of page designs with sample data
 
 
 def load_settings(env: Mapping[str, str]) -> Settings:
@@ -75,6 +76,10 @@ def load_settings(env: Mapping[str, str]) -> Settings:
             f"to {POOL_SIZE_RANGE.stop - 1}"
         )
 
+    mockups_text = (get("MOCKUPS") or "off").lower()
+    if mockups_text not in ("on", "off"):
+        problems.append("MOCKUPS must be on or off")
+
     if problems:
         raise ConfigError("Rollcall cannot start:\n  - " + "\n  - ".join(problems))
 
@@ -85,4 +90,5 @@ def load_settings(env: Mapping[str, str]) -> Settings:
         data_dir=data_dir,
         log_level=log_level,
         db_pool_size=db_pool_size,
+        mockups=mockups_text == "on",
     )

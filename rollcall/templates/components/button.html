@@ -1,0 +1,4 @@
+{#- A button. kind: primary (default), secondary, contrast or outline. -#}
+{% macro button(label, kind="primary", type="submit") -%}
+<button type="{{ type }}"{% if kind != "primary" %} class="{{ kind }}"{% endif %}>{{ label }}</button>
+{%- endmacro %}

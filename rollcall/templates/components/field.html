@@ -1,0 +1,13 @@
+{#- A labeled form field. Pico styles it; aria-invalid turns it red and the error shows below. -#}
+{% macro field(name, label, value="", type="text", error=None, required=False, hint=None) -%}
+<label for="f-{{ name }}">{{ label }}
+  <input id="f-{{ name }}" name="{{ name }}" type="{{ type }}" value="{{ value if value is not none else '' }}"
+    {%- if required %} required{% endif %}
+    {%- if error %} aria-invalid="true" aria-describedby="e-{{ name }}"{% endif %}>
+  {%- if error %}
+  <small id="e-{{ name }}">{{ error }}</small>
+  {%- elif hint %}
+  <small>{{ hint }}</small>
+  {%- endif %}
+</label>
+{%- endmacro %}

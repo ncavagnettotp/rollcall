@@ -13,6 +13,7 @@ from zoneinfo import ZoneInfo
 
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
+from jinja2 import StrictUndefined
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
@@ -58,6 +59,9 @@ def format_shop_time(moment: datetime, shop_timezone: ZoneInfo) -> str:
 
 def make_templates(shop_timezone: ZoneInfo, nav_items: list[NavItem]) -> Jinja2Templates:
     templates = Jinja2Templates(directory=TEMPLATES_DIR)
+    # A value a template shows but the page data lacks is an error naming it, never a blank.
+    # Optional values are passed explicitly as None.
+    templates.env.undefined = StrictUndefined
     templates.env.filters["shop_time"] = partial(format_shop_time, shop_timezone=shop_timezone)
     templates.env.globals["assets"] = ASSETS
     templates.env.globals["nav_items"] = nav_items

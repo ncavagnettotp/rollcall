@@ -47,6 +47,7 @@ def test_defaults():
     assert settings.data_dir == Path("/data")
     assert settings.log_level == "INFO"
     assert settings.db_pool_size == 10
+    assert settings.mockups is False
 
 
 def test_settings_cannot_be_changed_after_loading():
@@ -147,3 +148,19 @@ def test_every_problem_is_reported_together():
     assert "DATABASE_URL" in message
     assert "SECRET_KEY" in message
     assert "SHOP_TIMEZONE" in message
+
+
+# --- mockup gallery (spec: Mockup gallery) ---------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"), [("on", True), ("off", False), ("ON", True), ("", False)]
+)
+def test_mockups_setting(text, expected):
+    assert load_settings(valid_env(MOCKUPS=text)).mockups is expected
+
+
+@pytest.mark.parametrize("text", ["maybe", "yes", "1", "true"])
+def test_mockups_setting_rejects_anything_but_on_or_off(text):
+    message = error_for(MOCKUPS=text)
+    assert "MOCKUPS must be on or off" in message

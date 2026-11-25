@@ -6,11 +6,11 @@ test, see it fail, implement, see it pass. Sample data is always invented; nothi
 
 ## 1. Gallery and component setup
 
-- [ ] 1.1 Write tests: `MOCKUPS` accepts `on`/`off`, defaults to off, rejects other values naming
+- [x] 1.1 Write tests: `MOCKUPS` accepts `on`/`off`, defaults to off, rejects other values naming
   the setting (`tests/test_config.py`); with the gallery off, `/mockups` and
   `/mockups/pages/x/y` are 404 (`tests/test_mockups.py`). Then add the setting to
   `rollcall/config.py` and `.env.example` (commented). Verify: the tests pass.
-- [ ] 1.2 Write a test that rendering a page with a dataclass missing a shown value fails with an
+- [x] 1.2 Write a test that rendering a page with a dataclass missing a shown value fails with an
   error naming it. Then switch the Jinja environment to `StrictUndefined`, fix the platform
   templates if needed, and move `macros.html` into `templates/components/` (field, button,
   table). Verify: the new test and all existing tests pass.
