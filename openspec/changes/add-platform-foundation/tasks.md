@@ -47,7 +47,7 @@ see it fail, implement, see it pass.
   `VENDORED.txt`; `/static/app.css`, `/static/app.js` and both vendored files return 200 with
   correct content types. Verify: the checksum
   test passes, and the route tests fail until 4.3.
-- [ ] 4.2 Write `tests/test_frame.py`: `GET /` returns 200, links the vendored Pico stylesheet, contains the "Rollcall" header, the
+- [x] 4.2 Write `tests/test_frame.py`: `GET /` returns 200, links the vendored Pico stylesheet, contains the "Rollcall" header, the
   `<nav>`, `id="messages"` and the "Rollcall is running" line; every `src`/`href` in the page is a
   relative or same-origin URL; every nav link returns 200; the response carries the CSP,
   `X-Content-Type-Options` and `Referrer-Policy` headers from design.md; the page sets
