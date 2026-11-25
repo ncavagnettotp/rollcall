@@ -27,7 +27,7 @@ see it fail, implement, see it pass.
 
 ## 3. Database and migrations
 
-- [ ] 3.1 Write `tests/test_migrate.py` using temporary migration folders: pending migrations apply
+- [x] 3.1 Write `tests/test_migrate.py` using temporary migration folders: pending migrations apply
   in number order and are recorded with `applied_at`; already-applied ones are skipped; a failing
   migration leaves no tables or rows behind, is not recorded, and raises an error naming its
   number; two threads running the runner together apply a migration once (assert one row and the

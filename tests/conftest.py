@@ -7,6 +7,7 @@ database. Override the server with TEST_DATABASE_ADMIN_URL.
 
 import os
 import uuid
+from contextlib import contextmanager
 
 import psycopg
 import pytest
@@ -22,8 +23,9 @@ def _url_for(database: str) -> str:
     return f"{base}/{database}"
 
 
-@pytest.fixture(scope="session")
-def database_url():
+@contextmanager
+def throwaway_database():
+    """Create a uniquely named empty database, yield its URL, then drop it."""
     name = f"rollcall_test_{uuid.uuid4().hex[:12]}"
     try:
         admin = psycopg.connect(ADMIN_URL, autocommit=True, connect_timeout=5)
@@ -41,6 +43,20 @@ def database_url():
             admin.execute(
                 sql.SQL("DROP DATABASE IF EXISTS {} WITH (FORCE)").format(sql.Identifier(name))
             )
+
+
+@pytest.fixture(scope="session")
+def database_url():
+    """One database shared by the whole test session."""
+    with throwaway_database() as url:
+        yield url
+
+
+@pytest.fixture
+def empty_database_url():
+    """A fresh empty database for one test, for tests that need a clean slate."""
+    with throwaway_database() as url:
+        yield url
 
 
 @pytest.fixture
