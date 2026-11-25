@@ -57,14 +57,14 @@ when writing the owning change):
 
 ## 4. Product questions
 
-- [ ] 4.1 Add a "Product questions" section to design.md with a recommendation for each: tire set
+- [x] 4.1 Add a "Product questions" section to design.md with a recommendation for each: tire set
   fields and units (tread depth in 32nds of an inch, per wheel position); whether a stored item is
   always a set of four or can be fewer/more (e.g. staggered sizes, a single spare); customer fields;
   vehicles as their own records or text on the set; what "remove" means for a set and for a
   customer (recommended: archive, never delete, history stays); dashboard stats and the
   "too long" threshold; search fields; which PDF fields pre-fill; storage location on/off. Verify:
   every item has a recommendation and states what it changes.
-- [ ] 4.2 Walk the owner through 4.1 in one message, most consequential first; record answers in
+- [x] 4.2 Walk the owner through 4.1 in one message, most consequential first; record answers in
   design.md Decisions with source "Owner". Verify: no "confirm in Phase 2" entries remain in the
   Decisions table.
 

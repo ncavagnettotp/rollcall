@@ -61,9 +61,22 @@ migrating v1 data.
 | Root record | The **customer** is the root. Staff create a customer (e.g. Bob) and log the tires he stores under him | Owner |
 | Returning tires | Tire sets stay under the customer permanently. Staff toggle a set **checked in** when it arrives and **checked out** when it leaves; it can return any number of times | Owner |
 | Stays | Each check-in/check-out pair is kept as a stay in the set's history | Assistant (follows from owner decision) |
-| Customers don't sign in | Customers are records only; only staff have sign-in accounts. "Customer" and "staff account" are the terms used in specs to avoid two kinds of "user" | Assistant proposal, confirm in Phase 2 |
-| Record unit | A stored item is a set of tires, tread depth per wheel position | Assistant proposal, confirm in Phase 2 |
-| "Too long" | One shop-wide threshold, measured from the current stay's check-in | Assistant proposal, confirm in Phase 2 |
+| Customers don't sign in | Customers are records only; only staff have sign-in accounts. "Customer" and "staff account" are the terms used in specs to avoid two kinds of "user" | Owner (Q8) |
+| Customer fields | First name, last name, one or more phones, email, notes; no address | Owner (Q8) |
+| Record unit | A **tire set**: 1–8 tires (usually 4) stored together for one customer; one size or two (staggered front/rear); each tire has a position (LF, RF, LR, RR, Extra) | Owner (Q1) |
+| Tread depth | Recorded per tire on **every check-in**, in 32nds of an inch (whole numbers 0–20), kept on the stay; the set shows the latest readings; blank allowed; never from the PDF | Owner (Q2) |
+| Set fields | Size(s); brand and model; on wheels or tires only, with wheel description; season; lug nuts, center caps, centering rings, TPMS sensors, each unknown/yes/no; notes. Per tire: position, **DOT date code** (4 digits, week + year, optional) | Owner (Q3) |
+| Stay fields | Check-in date, RO number, storage location, tread depths, check-out date, attached PDF if any | Owner (Q2, Q3, Q9) |
+| Not stored | Condition grades, photos, storage pricing | Owner (Q3) |
+| Remove | Nothing is deleted. A set can be archived only while checked out; a customer only when none of their sets are checked in; both hidden from search and restorable; history kept | Owner (Q4) |
+| Roles | Every staff account does all inventory work; admins also manage staff accounts and shop settings | Owner (Q5) |
+| Dashboard | Sets checked in now; sets in too long; checked in this week; checked out this week; customers with a set in the shop. Each links to the matching search | Owner (Q6) |
+| "Too long" | Current stay older than one shop-wide threshold, default **6 months**, changeable by admins | Owner (Q6) |
+| PDF for a returning customer | The form suggests the existing customer; staff can check one of their checked-out sets in from the PDF instead of creating a new set. Every value the new PDF provides **replaces** the stored value in the form, with no per-field choice; fields the PDF could not read keep their stored value (a blank never wipes data). Staff still review the form and save, as for any PDF; previous values stay in history. The new PDF is attached to the new stay; earlier PDFs stay with earlier stays | Owner (Q7); blank-keeps-stored is the assistant's call |
+| PDF fills | Customer name, phone, email; vehicle, VIN, plate; RO and invoice numbers; invoice date as check-in date; size(s) and brand from storage notes; accessories. Never tread depth, DOT codes or location | Owner (Q7) |
+| Vehicles | Text on the set (year make model, optional VIN and plate); no vehicle records | Owner (Q9) |
+| Storage location | On; optional free text on each stay; current location shown while checked in | Owner (Q9) |
+| Search | One box: customer name, phone, tire size (digits only), brand, vehicle, VIN, plate, RO, location. Filters: in shop, out, too long, archived. Archived hidden by default | Owner (Q10) |
 | Go-live | Staff start using the app only after every change is built | Owner |
 | Branch | Work on `rewrite`; merge when the rewrite replaces v1 | Assistant call |
 
@@ -130,6 +143,108 @@ Cycle for each change:
 Because staff only start after everything is built, HTTPS, backups and the host choice stay in
 `add-operations`. Before go-live, `add-operations` must be finished and the full stack rehearsed.
 This planning change is archived with `--skip-specs` after the last change is archived.
+
+## Product questions (Phase 2)
+
+**Answered by the owner on 2026-11-24; the answers are in Decisions.** All ten were accepted.
+Q3 added a DOT date code per tire. Q7 added that a new PDF replaces the stored details outright
+(no per-field choice). The recommendations
+below are kept as the reasoning. Evidence from the five real invoices in `samples/private/`
+(checked 2026-11-24): none contains tread depths; all contain `Bill To`, a vehicle `Description`,
+VIN, license plate, `Invoice #`, `Work Order #`, and a storage section with the accessories line
+and a free-text tire description.
+
+**Q1. What is one stored item?**
+Recommendation: a **tire set**, meaning the tires one customer stores together. It is usually 4
+tires, but it can have 1 to 8 (a spare, or a set with a spare), and one size or two (staggered
+front/rear). Each tire has a position (LF, RF, LR, RR, or Extra).
+Changes: the `tire-inventory` data model. The form starts with four tire rows and has "add tire".
+
+**Q2. When is tread depth recorded?**
+Recommendation: on **each check-in**, per tire, in 32nds of an inch (whole numbers 0–20). Tires
+wear between stays, so each stay keeps its own readings. The set shows the latest ones, and the
+history shows how they changed. The PDFs never contain tread depth, so staff always type it.
+Changes: tread depth belongs to the stay, not the set. The check-in step asks for readings;
+leaving them blank is allowed.
+
+**Q3. Tire set fields.**
+Recommendation:
+- Per set: size (front, and rear if staggered); brand and model; on wheels or tires only, with a
+  wheel description; season (summer, winter, all-season); lug nuts, center caps and centering
+  rings, each unknown/yes/no; TPMS sensors, unknown/yes/no; notes.
+- Per stay: check-in date, RO number, storage location (Q9), tread depths (Q2), check-out date.
+
+Left out unless asked for: DOT date codes, condition grades, photos, storage pricing.
+Changes: the form, the search and what the PDF can fill.
+
+**Q4. What does "remove" mean?**
+Recommendation: nothing is ever deleted.
+- **Archive a set**, for example after it is sold or disposed of. This is allowed only while the
+  set is checked out. The set is hidden from search, listed under "Archived" on the customer, and
+  can be restored.
+- **Archive a customer.** This is allowed only when none of their sets are checked in. It hides
+  the customer and their sets, and can be undone.
+- A record created by mistake is archived too.
+
+History always stays.
+Changes: there is no delete button anywhere. Archive and restore appear in history.
+
+**Q5. Who can do what?**
+Recommendation: every staff account can do all inventory work: add and edit records, check in and
+out, archive and restore, upload PDFs. Admins can also manage staff accounts and change shop
+settings (the Q6 threshold).
+Changes: there are only two roles, and only admin settings are restricted.
+
+**Q6. Dashboard stats and "too long".**
+Recommendation:
+- Sets checked in now.
+- Sets in too long.
+- Checked in this week and checked out this week.
+- Customers with at least one set in the shop.
+
+"Too long" means the current stay is older than one shop-wide threshold. The default is **6
+months**, which matches "6 month maximum" on the invoices, and admins can change it. Each stat
+links to the matching search.
+Changes: `dashboard` counting rules, plus one setting in admin settings.
+
+**Q7. Uploading a PDF for a returning customer.**
+Recommendation: after upload, the form suggests existing customers with similar names (already
+decided). If the chosen customer has checked-out sets, staff can **check one of them in** from the
+PDF instead of creating a new set. The RO number and date fill the new stay.
+Fields the PDF fills:
+- customer: name, phone, email
+- vehicle: description, VIN, plate
+- RO number and invoice number
+- invoice date, as the check-in date
+- size(s) and brand, read from the storage notes
+- accessories
+
+It never fills tread depth or storage location.
+Changes: `pdf-prefill` leads to either "new set" or "check in an existing set".
+
+**Q8. Customer fields and terms.**
+Recommendation:
+- Fields: first name, last name, one or more phone numbers, email and notes. Address is not
+  stored, because Protractor has it.
+- Customers never sign in. Specs say "customer" for the person storing tires and "staff account"
+  for people who sign in.
+
+Changes: the customer form and the duplicate suggestions (name and phone).
+
+**Q9. Vehicles, and storage location.**
+Recommendation:
+- **Vehicle:** stored as text on the set (year make model, plus optional VIN and plate), not as
+  separate vehicle records.
+- **Storage location:** on, as optional free text on each stay (for example "Rack B3"). While the
+  set is checked in, its current location is shown.
+
+Changes: there is no vehicle table or page. Location appears on the check-in step and in search.
+
+**Q10. Search fields.**
+Recommendation: one box matching customer name, phone, tire size (by digits, so `225/55R17` and
+`2255517` both match), brand, vehicle, VIN, plate, RO number and location. Filters are: in shop,
+out, too long and archived. The default shows customers that are not archived.
+Changes: the `tire-inventory` search and the database indexes.
 
 ## Open Questions
 
