@@ -1,0 +1,227 @@
+{#- Tire set page, design D: design B's compact workshop layout (two columns on a desktop, big
+    check in / check out buttons, the check-in step opening in place) with soft cards, icon tiles,
+    tinted pills and orange primary buttons, after the owner's reference picture.
+    Always light. UI design discovery, task 2.3 (first revision). -#}
+{% extends "base.html" %}
+{% from "components/field.html" import field %}
+{% import "mockups/discovery/components_d.html" as ui %}
+
+{% block html_attributes %} data-theme="light"{% endblock %}
+{% block head %}<link rel="stylesheet" href="/static/mockups/discovery-d.css">{% endblock %}
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block messages %}{% for item in page.messages %}{{ ui.message(item) }}{% endfor %}{% endblock %}
+
+{% block content %}
+{% set d = page.details %}
+<div class="d-topbar">
+  <div class="d-heading">
+    <h1><span class="d-tile d-blue">{{ ui.icon("tire") }}</span>{{ page.title }}</h1>
+    <p>
+      {% if page.status and not page.form %}{{ ui.status_pills(page.status, page.in_too_long) }}{% endif %}
+      <a href="{{ page.customer.url }}" class="d-chip">{{ ui.icon("user") }}{{ page.customer.name }}</a>
+      {% for phone in page.customer.phones %}<span class="d-phone">{{ phone }}</span>{% endfor %}
+    </p>
+  </div>
+  {% if page.actions %}
+  <div class="d-actions">{% for action in page.actions %}{{ ui.action_button(action) }}{% endfor %}</div>
+  {% endif %}
+</div>
+
+{% if page.form %}
+{#- New set, edit, filled from a PDF. -#}
+{% set form = page.form %}
+{% set v = form.values %}
+{% set e = form.errors %}
+{% if form.conflict %}
+<div class="d-card d-tint-red" role="alert">
+  {{ ui.card_head("alert", "Save conflict", "red", extra=ui.pill("Not saved", "red")) }}
+  <p><strong>This set was changed by {{ form.conflict.changed_by }} at {{ form.conflict.changed_at | shop_time }}</strong>
+    while you were editing. Your changes below are not saved yet. Save to replace theirs, or
+    <a href="{{ form.conflict.reload_url }}">load their version</a>.</p>
+</div>
+{% endif %}
+<div class="d-form-layout{% if form.invoice %} d-has-invoice{% endif %}">
+  <form method="post" action="{{ form.action_url }}" class="d-form">
+    {% if form.heading != page.title %}<h2 class="d-form-heading">{{ form.heading }}</h2>{% endif %}
+    <div class="d-columns">
+      <div>
+        {% if form.new_customer %}
+        <fieldset class="d-card">
+          <legend class="d-sr">Customer</legend>
+          {{ ui.card_head("user", "Customer", "blue") }}
+          {% for match in form.customer_matches %}
+          <label class="d-option"><input type="radio" name="customer" value="{{ match.id }}" checked> <span><b>{{ match.name }}</b> {{ match.phones | join(", ") }} {{ ui.pill("Existing customer", "green") }}</span></label>
+          {% endfor %}
+          <label class="d-option"><input type="radio" name="customer" value="new"{% if not form.customer_matches %} checked{% endif %}> <span>New customer from the invoice:</span></label>
+          <div class="d-pair">
+            {{ field("first_name", "First name", form.new_customer.first_name) }}
+            {{ field("last_name", "Last name", form.new_customer.last_name) }}
+          </div>
+          <div class="d-pair">
+            {{ field("phone", "Phone", form.new_customer.phone, type="tel") }}
+            {{ field("email", "Email", form.new_customer.email, type="email") }}
+          </div>
+        </fieldset>
+        {% endif %}
+
+        {% if form.check_in %}
+        <fieldset class="d-card d-tint-orange">
+          <legend class="d-sr">Check in</legend>
+          {{ ui.card_head("in", "Check in", "orange") }}
+          <div class="d-pair">
+            {{ field("checked_in", "Date", form.check_in.checked_in, type="date", required=True, error=e.get("checked_in")) }}
+            {{ field("ro_number", "RO number", form.check_in.ro_number, error=e.get("ro_number")) }}
+          </div>
+          {{ field("location", "Storage location", form.check_in.location, hint="e.g. Rack B3", error=e.get("location")) }}
+        </fieldset>
+        {% endif %}
+
+        <fieldset class="d-card">
+          <legend class="d-sr">Tires</legend>
+          {{ ui.card_head("tire", "Tires", "blue") }}
+          <div class="d-pair">
+            {{ field("front_size", "Size (front)", v.front_size, required=True, hint="225/60R17 or 35x12.50R20", error=e.get("front_size")) }}
+            {{ field("rear_size", "Rear, if staggered", v.rear_size, error=e.get("rear_size")) }}
+          </div>
+          {{ field("brand_model", "Brand and model", v.brand_model, error=e.get("brand_model")) }}
+          {{ ui.segmented("season", "Season", v.season, [("summer", "Summer"), ("winter", "Winter"), ("all_season", "All-season")]) }}
+          {{ ui.segmented("on_wheels", "Stored", v.on_wheels, [("wheels", "On wheels"), ("tires", "Tires only")]) }}
+          {{ field("wheel_description", "Wheel description", v.wheel_description, error=e.get("wheel_description")) }}
+          <table class="d-table d-tire-inputs">
+            <thead><tr><th scope="col">Tire</th><th scope="col">DOT (week, year)</th>{% if form.check_in %}<th scope="col">Tread /32</th>{% endif %}</tr></thead>
+            <tbody>
+              {% for tire in v.tires %}
+              {% set row = loop.index0 %}
+              <tr class="tire-input">
+                <th scope="row">{{ tire.position }}<input type="hidden" name="tires-{{ row }}-position" value="{{ tire.position }}"></th>
+                <td>{{ ui.cell_input("tires-%d-dot" % row, tire.position ~ " DOT code", tire.dot_code, e.get("tires-%d-dot" % row)) }}</td>
+                {% if form.check_in %}<td>{{ ui.cell_input("tires-%d-tread" % row, tire.position ~ " tread in 32nds", tire.tread, e.get("tires-%d-tread" % row), type="number") }}</td>{% endif %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <button type="submit" name="add_tire" value="1" formaction="{{ form.add_tire_url }}" class="d-link-button">{{ ui.icon("plus") }}Add tire</button>
+        </fieldset>
+      </div>
+
+      <div>
+        <fieldset class="d-card">
+          <legend class="d-sr">With the set</legend>
+          {{ ui.card_head("box", "With the set", "green") }}
+          {{ ui.unknown_yes_no("lug_nuts", "Lug nuts", v.lug_nuts) }}
+          {{ ui.unknown_yes_no("center_caps", "Center caps", v.center_caps) }}
+          {{ ui.unknown_yes_no("centering_rings", "Centering rings", v.centering_rings) }}
+          {{ ui.unknown_yes_no("tpms_sensors", "TPMS sensors", v.tpms_sensors) }}
+        </fieldset>
+
+        <fieldset class="d-card">
+          <legend class="d-sr">Vehicle</legend>
+          {{ ui.card_head("car", "Vehicle", "blue") }}
+          {{ field("vehicle", "Year, make, model", v.vehicle) }}
+          <div class="d-pair">
+            {{ field("vin", "VIN", v.vin, error=e.get("vin")) }}
+            {{ field("plate", "Plate", v.plate) }}
+          </div>
+        </fieldset>
+
+        <div class="d-card d-tint-amber">
+          {{ ui.card_head("note", "Notes", "amber") }}
+          <label for="f-notes" class="d-sr">Notes</label>
+          <textarea id="f-notes" name="notes" rows="4">{{ v.notes }}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-submit">
+      <button type="submit" class="d-button d-primary">{{ ui.icon("check") }}{{ form.submit_label }}</button>
+      <a href="{{ form.cancel_url }}" class="d-link-button">Cancel</a>
+    </div>
+  </form>
+
+  {% if form.invoice %}
+  <aside class="d-card d-invoice">
+    {{ ui.card_head("file", "Invoice " ~ form.invoice.invoice_number, "orange") }}
+    <p><a href="{{ form.invoice.url }}">Open the invoice</a> <small>{{ form.invoice.filename }}</small></p>
+    <iframe src="{{ form.invoice.url }}" title="Invoice {{ form.invoice.invoice_number }}"></iframe>
+  </aside>
+  {% endif %}
+</div>
+
+{% else %}
+{#- The set: details on the left; where it is, check-in and history on the right. -#}
+<div class="d-columns">
+  <section class="d-card">
+    {{ ui.card_head("tire", "Set", "blue", value=(d.sizes[0] ~ " F / " ~ d.sizes[1] ~ " R") if d.staggered else d.sizes[0]) }}
+    <dl class="d-facts">
+      <div class="d-wide"><dt>Brand and model</dt><dd>{{ d.brand_model }}</dd></div>
+      <div><dt>Season</dt><dd>{{ d.season.label if d.season else "–" }}</dd></div>
+      <div class="d-half"><dt>Stored</dt><dd>{% if d.on_wheels %}On wheels{% if d.wheel_description %}: {{ d.wheel_description }}{% endif %}{% else %}Tires only{% endif %}</dd></div>
+      {% for label, value in d.accessories.items() %}<div><dt>{{ label }}</dt><dd>{{ ui.answer(value) }}</dd></div>{% endfor %}
+      <div class="d-wide"><dt>Vehicle</dt><dd>{{ d.vehicle or "–" }}</dd></div>
+      <div class="d-half"><dt>VIN</dt><dd>{{ d.vin or "–" }}</dd></div>
+      <div><dt>Plate</dt><dd>{{ d.plate or "–" }}</dd></div>
+    </dl>
+    {{ ui.tire_grid(d.tires) }}
+    {% if d.notes %}
+    <div class="d-note">{{ ui.icon("note") }}<p>{{ d.notes }}</p></div>
+    {% endif %}
+  </section>
+
+  <div class="d-side">
+    {% if page.check_in %}
+    {% set step = page.check_in %}
+    <section class="d-card d-tint-orange d-step">
+      {{ ui.card_head("in", "Check in", "orange") }}
+      <form method="post" action="{{ step.action_url }}">
+        <div class="d-pair">
+          {{ field("checked_in", "Date", step.values.checked_in, type="date", required=True, error=step.errors.get("checked_in")) }}
+          {{ field("ro_number", "RO number", step.values.ro_number, error=step.errors.get("ro_number")) }}
+        </div>
+        {{ field("location", "Storage location", step.values.location, hint="e.g. Rack B3", error=step.errors.get("location")) }}
+        <table class="d-table d-tire-inputs">
+          <thead><tr><th scope="col">Tire</th><th scope="col">DOT</th><th scope="col">Tread /32</th></tr></thead>
+          <tbody>
+            {% for tire in step.tires %}
+            <tr><th scope="row">{{ tire.position }}</th><td>{{ tire.dot_code or "–" }}</td>
+              <td>{{ ui.cell_input("tires-%d-tread" % loop.index0, tire.position ~ " tread in 32nds", tire.tread, step.errors.get("tires-%d-tread" % loop.index0), type="number") }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <div class="d-submit">
+          <button type="submit" class="d-button d-primary">{{ ui.icon("in") }}Check in</button>
+          <a href="{{ step.cancel_url }}" class="d-link-button">Cancel</a>
+        </div>
+      </form>
+    </section>
+    {% elif page.current_stay %}
+    <section class="d-card d-tint-{{ 'red' if page.in_too_long else 'green' }}">
+      {{ ui.card_head("pin", "Where", "red" if page.in_too_long else "green", value=page.current_stay.location or "Location not recorded", extra=ui.pill("In too long", "red") if page.in_too_long else None) }}
+      <div class="d-subtiles">
+        <div><b>{{ page.current_stay.checked_in | shop_date }}</b><span>Checked in</span></div>
+        <div><b>{{ page.current_stay.ro_number or "–" }}</b><span>RO number</span></div>
+      </div>
+    </section>
+    {% elif page.archived_on %}
+    <section class="d-card">
+      {{ ui.card_head("archive", "Archived", "slate", value=page.archived_on | shop_date) }}
+      <p class="d-muted">Hidden from search. The history is kept; restore the set to use it again.</p>
+    </section>
+    {% elif page.past_stays %}
+    <section class="d-card">
+      {{ ui.card_head("user", "With the customer", "slate", value="Since " ~ (page.past_stays[0].checked_out | shop_date)) }}
+    </section>
+    {% endif %}
+
+    {% set stays = (page.past_stays | length) + (1 if page.current_stay else 0) %}
+    <section class="d-card d-tint-blue">
+      {{ ui.card_head("clock", "History", "blue", extra=ui.pill(stays ~ (" stay" if stays == 1 else " stays"), "blue")) }}
+      <ol class="d-history">
+        {% if page.current_stay %}{{ ui.stay_line(page.current_stay) }}{% endif %}
+        {% for stay in page.past_stays %}{{ ui.stay_line(stay) }}{% endfor %}
+      </ol>
+    </section>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

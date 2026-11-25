@@ -1,0 +1,402 @@
+/* Design B: compact workshop (UI design discovery). Dense type and spacing, panels, two columns
+   on a desktop, big buttons. Mobile-first: one column on phones. */
+
+html {
+  font-size: 15px;
+}
+:root {
+  --b-in: #15803d;
+  --b-out: #64748b;
+  --b-archived: #44403c;
+  --b-late: #c2410c;
+  --b-panel: var(--pico-card-background-color);
+  --b-line: var(--pico-muted-border-color);
+}
+/* Wider than Pico's 1200 px on big screens, always leaving a margin at the sides
+   (Pico drops the container's own padding above 576 px). */
+@media (min-width: 1280px) {
+  header.container,
+  main.container,
+  .mockup-banner .container {
+    max-width: min(1400px, calc(100% - 3rem));
+  }
+}
+/* Dense spacing for the page itself; the header keeps Pico's own. */
+main.container {
+  --pico-spacing: 0.75rem;
+  --pico-form-element-spacing-vertical: 0.45rem;
+  --pico-form-element-spacing-horizontal: 0.6rem;
+  padding-top: 0.5rem;
+}
+h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+h2 {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--pico-muted-color);
+  margin-bottom: 0.5rem;
+}
+label,
+legend {
+  font-size: 0.9rem;
+}
+
+/* The bar at the top: what the set is, whose it is, and the big buttons. */
+.b-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+  border-left: 6px solid var(--b-line);
+  background: var(--b-panel);
+  border-radius: var(--pico-border-radius);
+}
+.b-topbar.b-in_shop { border-left-color: var(--b-in); }
+.b-topbar.b-out { border-left-color: var(--b-out); }
+.b-topbar.b-archived { border-left-color: var(--b-archived); }
+.b-heading {
+  min-width: 0;
+}
+.b-heading p {
+  margin: 0.25rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+}
+.b-phone {
+  color: var(--pico-muted-color);
+  white-space: nowrap;
+}
+.b-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+}
+.b-actions form {
+  margin: 0;
+  flex: 1;
+}
+.b-actions > a {
+  flex: 1;
+}
+
+/* Big buttons for the main jobs; easy to hit with gloves on. */
+.b-big {
+  margin: 0;
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+.b-panel .b-small {
+  width: auto;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.9rem;
+  margin: 0.5rem 0 0;
+}
+
+/* Status tags: square, solid. */
+.b-tag {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  border-radius: 0.2rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #fff;
+  white-space: nowrap;
+}
+.b-tag.b-in_shop { background: var(--b-in); }
+.b-tag.b-out { background: var(--b-out); }
+.b-tag.b-archived { background: var(--b-archived); }
+.b-tag.b-late { background: var(--b-late); }
+
+.b-message {
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--pico-border-radius);
+  background: color-mix(in srgb, var(--b-in) 15%, transparent);
+  border-left: 4px solid var(--b-in);
+}
+.b-message.b-error {
+  background: color-mix(in srgb, var(--pico-del-color) 15%, transparent);
+  border-left-color: var(--pico-del-color);
+}
+
+/* Panels */
+.b-panel {
+  background: var(--b-panel);
+  border: 1px solid var(--b-line);
+  border-radius: var(--pico-border-radius);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+fieldset.b-panel > legend {
+  float: left;
+  width: 100%;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--pico-muted-color);
+  font-weight: 700;
+}
+fieldset.b-panel > legend + * {
+  clear: both;
+}
+.b-alert {
+  border-left: 6px solid var(--pico-del-color);
+}
+.b-step {
+  border: 2px solid var(--pico-primary);
+}
+.b-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 0.75rem;
+}
+/* On a phone, where the set is (and the check-in step) comes before its details. */
+.b-columns > .b-side {
+  order: -1;
+}
+@media (min-width: 1024px) {
+  .b-columns > .b-side {
+    order: 0;
+  }
+}
+.b-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 0.75rem;
+}
+
+/* The set's facts: a dense grid of small labeled values. */
+.b-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+  margin: 0 0 0.75rem;
+}
+.b-facts .b-wide {
+  grid-column: 1 / -1;
+}
+.b-facts .b-half {
+  grid-column: span 2;
+}
+.b-facts dt {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--pico-muted-color);
+}
+.b-facts dd {
+  margin: 0;
+  font-weight: 600;
+}
+.b-facts dd.b-unknown {
+  color: var(--pico-muted-color);
+  font-weight: 400;
+}
+
+.b-tires,
+.b-tire-inputs {
+  margin-bottom: 0.25rem;
+}
+.b-tires th,
+.b-tires td,
+.b-tire-inputs th,
+.b-tire-inputs td {
+  padding: 0.3rem 0.5rem;
+}
+.b-tire-inputs input {
+  margin: 0;
+}
+.b-tires th,
+.b-tire-inputs th {
+  white-space: nowrap;
+}
+.b-tire-inputs td .b-cell-error {
+  display: block;
+  margin-top: 0.2rem; /* Pico pulls hints up under the input */
+  color: var(--pico-del-color);
+  font-size: 0.8rem;
+}
+
+/* Where the set is */
+.b-where .b-location {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0;
+}
+.b-where p {
+  margin: 0.25rem 0 0;
+}
+
+/* History: one dense line per stay. */
+.b-history {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.b-history li {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1rem 1rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--b-line);
+  font-size: 0.95rem;
+}
+.b-history li:last-child {
+  border-bottom: 0;
+}
+.b-history .b-current {
+  font-weight: 700;
+}
+.b-dates {
+  white-space: nowrap;
+  min-width: 11rem;
+}
+.b-readings {
+  color: var(--pico-muted-color);
+}
+
+/* Segmented control: radio buttons drawn as one row of buttons. */
+.b-seg > div {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid var(--pico-form-element-border-color);
+  border-radius: var(--pico-border-radius);
+  overflow: hidden;
+  width: fit-content;
+  max-width: 100%;
+}
+.b-seg label {
+  margin: 0;
+  position: relative;
+}
+.b-seg input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+}
+.b-seg span {
+  display: block;
+  padding: 0.4rem 0.9rem;
+  border-right: 1px solid var(--pico-form-element-border-color);
+  cursor: pointer;
+}
+.b-seg label:last-child span {
+  border-right: 0;
+}
+.b-seg input:checked + span {
+  background: var(--pico-primary-background);
+  color: var(--pico-primary-inverse);
+  font-weight: 700;
+}
+.b-seg input:focus-visible + span {
+  outline: 3px solid var(--pico-primary-focus);
+  outline-offset: -3px;
+}
+.b-option {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+.b-option input {
+  flex: none;
+  margin-top: 0.15rem;
+}
+.b-option em {
+  color: var(--pico-muted-color);
+  font-size: 0.85rem;
+}
+
+/* Read out by screen readers, not shown. */
+.b-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.b-submit {
+  display: flex;
+  gap: 0.5rem;
+}
+.b-submit > * {
+  flex: 1;
+}
+
+/* The invoice: a link on phones, beside the form on a desktop. */
+.b-invoice iframe {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .b-actions {
+    width: auto;
+  }
+  .b-actions .b-big,
+  .b-submit .b-big {
+    width: auto;
+    min-width: 10rem;
+  }
+  .b-submit > * {
+    flex: none;
+  }
+  .b-facts {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .b-columns {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+  .b-form .b-columns {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .b-has-invoice {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: 0.75rem;
+    align-items: start;
+  }
+  .b-has-invoice .b-form .b-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .b-invoice {
+    position: sticky;
+    top: 0.5rem;
+  }
+  .b-invoice iframe {
+    display: block;
+    width: 100%;
+    height: calc(100vh - 4rem);
+    border: 1px solid var(--b-line);
+    border-radius: var(--pico-border-radius);
+  }
+}
+
+/* Very wide screens: the form beside the invoice gets two columns of its own. */
+@media (min-width: 1680px) {
+  .b-has-invoice {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .b-has-invoice .b-form .b-columns {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}

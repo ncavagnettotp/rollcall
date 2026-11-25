@@ -11,6 +11,15 @@
   {% for page in pages %}
   <article>
     <header><strong><a href="{{ page.url }}">{{ page.title }}</a></strong></header>
+    {% if page.designs %}
+    <p>Designs to compare (the banner switches between them on every state):</p>
+    <ul>
+      {% for design in page.designs %}
+      <li><a href="{{ page.design_url(design) }}">Design {{ design.letter | upper }}: {{ design.name }}</a>. {{ design.description }}</li>
+      {% endfor %}
+    </ul>
+    <p>States:</p>
+    {% endif %}
     {% if page.states %}
     <ul>
       {% for state in page.states %}

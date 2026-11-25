@@ -1,0 +1,207 @@
+{#- Tire set page, design A: calm and roomy. Pico's own look, one narrow column, classic
+    tables; the check-in step is a page of its own. UI design discovery, task 2.2. -#}
+{% extends "base.html" %}
+{% from "components/field.html" import field %}
+{% from "components/button.html" import button %}
+{% import "mockups/discovery/components_a.html" as ui %}
+
+{% block head %}<link rel="stylesheet" href="/static/mockups/discovery-a.css">{% endblock %}
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block messages %}{% for item in page.messages %}{{ ui.message(item) }}{% endfor %}{% endblock %}
+
+{% block content %}
+<div class="a-page{% if page.form and page.form.invoice %} a-wide{% endif %}">
+  <hgroup>
+    <h1>{{ page.title }}</h1>
+    <p><a href="{{ page.customer.url }}">{{ page.customer.name }}</a>{% for phone in page.customer.phones %} · {{ phone }}{% endfor %}</p>
+  </hgroup>
+
+  {% if page.status and not page.form %}
+  <p class="a-status">
+    {{ ui.status_badge(page.status, page.in_too_long) }}
+    {% if page.archived_on %}<small>Archived {{ page.archived_on | shop_date }}. Hidden from search; the history is kept.</small>{% endif %}
+  </p>
+  {% endif %}
+
+  {% if page.check_in %}
+  {#- The check-in step, on its own page. -#}
+  {% set step = page.check_in %}
+  <article>
+    <header><h2>Check in</h2></header>
+    <form method="post" action="{{ step.action_url }}">
+      <div class="grid">
+        {{ field("checked_in", "Check-in date", step.values.checked_in, type="date", required=True, error=step.errors.get("checked_in")) }}
+        {{ field("ro_number", "RO number", step.values.ro_number, error=step.errors.get("ro_number")) }}
+      </div>
+      {{ field("location", "Storage location", step.values.location, hint="Where the set sits, e.g. Rack B3", error=step.errors.get("location")) }}
+      <fieldset>
+        <legend>Tread depth, in 32nds of an inch</legend>
+        <div class="a-tread-inputs">
+          {% for tire in step.tires %}
+          {{ field("tires-%d-tread" % loop.index0, tire.position, tire.tread, type="number", error=step.errors.get("tires-%d-tread" % loop.index0)) }}
+          {% endfor %}
+        </div>
+        <small>Leave a tire blank if it was not measured.</small>
+      </fieldset>
+      <div class="a-buttons">
+        {{ button("Check in") }}
+        <a href="{{ step.cancel_url }}" role="button" class="secondary outline">Cancel</a>
+      </div>
+    </form>
+  </article>
+
+  {% elif page.form %}
+  {#- New set, edit, filled from a PDF. -#}
+  {% set form = page.form %}
+  {% set v = form.values %}
+  {% set e = form.errors %}
+  <div class="a-form-layout">
+    <div>
+      {% if form.conflict %}
+      <article class="a-conflict" role="alert">
+        <p><strong>This set was changed by {{ form.conflict.changed_by }} at {{ form.conflict.changed_at | shop_time }}</strong> while you were editing.</p>
+        <p>Your changes below are not saved yet. Save to replace their changes with yours, or <a href="{{ form.conflict.reload_url }}">load their version</a> and start again.</p>
+      </article>
+      {% endif %}
+
+      <form method="post" action="{{ form.action_url }}">
+        {% if form.heading != page.title %}<h2>{{ form.heading }}</h2>{% endif %}
+
+        {% if form.new_customer %}
+        <article>
+          <header><h3>Customer</h3></header>
+          <fieldset>
+            <legend>Who the set belongs to</legend>
+            {% for match in form.customer_matches %}
+            <label><input type="radio" name="customer" value="{{ match.id }}" checked> {{ match.name }}, {{ match.phones | join(", ") }} <span class="a-muted">· existing customer</span></label>
+            {% endfor %}
+            <label><input type="radio" name="customer" value="new"{% if not form.customer_matches %} checked{% endif %}> A new customer, as on the invoice:</label>
+          </fieldset>
+          <div class="grid">
+            {{ field("first_name", "First name", form.new_customer.first_name) }}
+            {{ field("last_name", "Last name", form.new_customer.last_name) }}
+          </div>
+          <div class="grid">
+            {{ field("phone", "Phone", form.new_customer.phone, type="tel") }}
+            {{ field("email", "Email", form.new_customer.email, type="email") }}
+          </div>
+        </article>
+        {% endif %}
+
+        {% if form.check_in %}
+        <article>
+          <header><h3>Check in</h3></header>
+          <div class="grid">
+            {{ field("checked_in", "Check-in date", form.check_in.checked_in, type="date", required=True, error=e.get("checked_in")) }}
+            {{ field("ro_number", "RO number", form.check_in.ro_number, error=e.get("ro_number")) }}
+          </div>
+          {{ field("location", "Storage location", form.check_in.location, hint="Where the set sits, e.g. Rack B3", error=e.get("location")) }}
+        </article>
+        {% endif %}
+
+        <article>
+          <header><h3>Tires</h3></header>
+          <div class="grid">
+            {{ field("front_size", "Size", v.front_size, required=True, hint="e.g. 225/60R17 or 35x12.50R20", error=e.get("front_size")) }}
+            {{ field("rear_size", "Rear size, if staggered", v.rear_size, error=e.get("rear_size")) }}
+          </div>
+          {{ field("brand_model", "Brand and model", v.brand_model, error=e.get("brand_model")) }}
+          {{ ui.choice("season", "Season", v.season, [("summer", "Summer"), ("winter", "Winter"), ("all_season", "All-season")]) }}
+          {{ ui.choice("on_wheels", "Stored", v.on_wheels, [("wheels", "On wheels"), ("tires", "Tires only")]) }}
+          {{ field("wheel_description", "Wheel description", v.wheel_description, hint="e.g. OEM alloys, black steel wheels", error=e.get("wheel_description")) }}
+
+          <fieldset>
+            <legend>Each tire</legend>
+            {% for tire in v.tires %}
+            {% set row = loop.index0 %}
+            <div class="a-tire-row tire-input">
+              <input type="hidden" name="tires-{{ row }}-position" value="{{ tire.position }}">
+              <span class="a-position">{{ tire.position }}</span>
+              {{ field("tires-%d-dot" % row, tire.position ~ " DOT code", tire.dot_code, hint="Week and year, e.g. 2321" if loop.first else None, error=e.get("tires-%d-dot" % row)) }}
+              {% if form.check_in %}
+              {{ field("tires-%d-tread" % row, tire.position ~ " tread, 32nds", tire.tread, type="number", error=e.get("tires-%d-tread" % row)) }}
+              {% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" name="add_tire" value="1" formaction="{{ form.add_tire_url }}" class="secondary outline a-add">Add tire</button>
+          </fieldset>
+        </article>
+
+        <article>
+          <header><h3>With the set</h3></header>
+          {{ ui.unknown_yes_no("lug_nuts", "Lug nuts", v.lug_nuts) }}
+          {{ ui.unknown_yes_no("center_caps", "Center caps", v.center_caps) }}
+          {{ ui.unknown_yes_no("centering_rings", "Centering rings", v.centering_rings) }}
+          {{ ui.unknown_yes_no("tpms_sensors", "TPMS sensors", v.tpms_sensors) }}
+        </article>
+
+        <article>
+          <header><h3>Vehicle</h3></header>
+          {{ field("vehicle", "Vehicle", v.vehicle, hint="Year, make and model") }}
+          <div class="grid">
+            {{ field("vin", "VIN", v.vin, error=e.get("vin")) }}
+            {{ field("plate", "License plate", v.plate) }}
+          </div>
+        </article>
+
+        <label for="f-notes">Notes
+          <textarea id="f-notes" name="notes" rows="3">{{ v.notes }}</textarea>
+        </label>
+
+        <div class="a-buttons">
+          {{ button(form.submit_label) }}
+          <a href="{{ form.cancel_url }}" role="button" class="secondary outline">Cancel</a>
+        </div>
+      </form>
+    </div>
+
+    {% if form.invoice %}
+    <aside class="a-invoice">
+      <p><a href="{{ form.invoice.url }}">Open the invoice</a> <small>{{ form.invoice.filename }}</small></p>
+      <iframe src="{{ form.invoice.url }}" title="Invoice {{ form.invoice.invoice_number }}"></iframe>
+    </aside>
+    {% endif %}
+  </div>
+
+  {% else %}
+  {#- The set: where it is, what it is, its history. -#}
+  {% set d = page.details %}
+  {% if page.current_stay %}
+  <article class="a-where">
+    <small>In the shop since {{ page.current_stay.checked_in | shop_date }}{% if page.current_stay.ro_number %} · RO {{ page.current_stay.ro_number }}{% endif %}</small>
+    <p class="a-location">{{ page.current_stay.location or "Location not recorded" }}</p>
+  </article>
+  {% elif page.past_stays and page.status.value == "out" %}
+  <article class="a-where">
+    <small>With the customer since {{ page.past_stays[0].checked_out | shop_date }}</small>
+  </article>
+  {% endif %}
+
+  {% if page.actions %}
+  <div class="a-buttons">{% for action in page.actions %}{{ ui.action_button(action) }}{% endfor %}</div>
+  {% endif %}
+
+  <section>
+    <h2>Details</h2>
+    <dl class="a-details">
+      <dt>Size</dt><dd>{% if d.staggered %}{{ d.sizes[0] }} front, {{ d.sizes[1] }} rear{% else %}{{ d.sizes[0] }}{% endif %}</dd>
+      <dt>Brand and model</dt><dd>{{ d.brand_model }}</dd>
+      <dt>Season</dt><dd>{{ d.season.label if d.season else "Not recorded" }}</dd>
+      <dt>Stored</dt><dd>{% if d.on_wheels %}On wheels{% if d.wheel_description %}: {{ d.wheel_description }}{% endif %}{% else %}Tires only{% endif %}</dd>
+      {% for label, value in d.accessories.items() %}<dt>{{ label }}</dt><dd>{{ value.label }}</dd>{% endfor %}
+      <dt>Vehicle</dt><dd>{{ d.vehicle or "Not recorded" }}</dd>
+      <dt>VIN</dt><dd>{{ d.vin or "Not recorded" }}</dd>
+      <dt>License plate</dt><dd>{{ d.plate or "Not recorded" }}</dd>
+      <dt>Notes</dt><dd>{{ d.notes or "None" }}</dd>
+    </dl>
+    {{ ui.tire_table(d.tires) }}
+  </section>
+
+  <section>
+    <h2>History</h2>
+    {{ ui.stay_table(page.current_stay, page.past_stays) }}
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

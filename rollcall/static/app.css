@@ -83,3 +83,16 @@ header nav .signed-in button {
 .mockup-banner a {
   color: inherit;
 }
+.mockup-banner .design-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+}
+.mockup-banner .design-switch a[aria-current] {
+  font-weight: 700;
+  text-decoration: none;
+  background: #78350f;
+  color: #fef3c7;
+  padding: 0 0.4rem;
+  border-radius: 0.25rem;
+}

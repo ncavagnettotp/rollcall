@@ -1,0 +1,467 @@
+/* Design C: cards and high contrast (UI design discovery). Always light (data-theme="light" on
+   the page); near-black text, strong borders, bold status colors, big touch targets.
+   Mobile-first: one column on phones; grids widen on a desktop. */
+
+:root {
+  --c-ink: #0b0b0c;
+  --c-paper: #ffffff;
+  --c-ground: #eceef1;
+  --c-line: #0b0b0c;
+  --c-soft-line: #c7ccd3;
+  --c-in: #0b7a3b;
+  --c-out: #3f4652;
+  --c-archived: #0b0b0c;
+  --c-late: #c2410c;
+  --c-blue: #0b57d0;
+}
+/* Pico's own light theme sets these on [data-theme=light]; this selector outranks it. */
+:root[data-theme="light"] {
+  --pico-color: var(--c-ink);
+  --pico-h1-color: var(--c-ink);
+  --pico-h2-color: var(--c-ink);
+  --pico-primary: var(--c-blue);
+  --pico-form-element-border-color: #5b6470;
+  --pico-form-element-background-color: #fff;
+}
+body {
+  background: var(--c-ground);
+  color: var(--c-ink);
+}
+
+/* A dark header bar across the whole width. */
+body > header {
+  background: var(--c-ink);
+  box-shadow: 0 0 0 100vmax var(--c-ink);
+  clip-path: inset(0 -100vmax);
+}
+body > header a,
+body > header small {
+  color: #fff;
+}
+body > header nav a[aria-current] {
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+body > header .signed-in button {
+  color: #fff;
+  border-color: #fff;
+}
+
+h1 {
+  font-size: 1.75rem;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+h2 {
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 1.25rem 0 0.6rem;
+}
+.c-sub {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 600;
+  color: var(--c-out);
+}
+.c-head {
+  margin: 0.5rem 0 1rem;
+}
+.c-customer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0.35rem 0 0;
+  font-size: 1.05rem;
+}
+.c-customer a {
+  font-weight: 700;
+  color: var(--c-blue);
+}
+
+/* Messages */
+.c-message {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--c-in);
+  background: #e7f5ec;
+  font-weight: 600;
+}
+.c-message.c-error {
+  border-color: #b3261e;
+  background: #fdecea;
+}
+
+/* The status block: the colour says it from across the room. */
+.c-status {
+  --pico-color: #fff; /* Pico colors paragraphs itself; white on the status color */
+  padding: 1rem 1.25rem;
+  color: #fff;
+  border-radius: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.c-status p {
+  margin: 0;
+}
+.c-status.c-in_shop { background: var(--c-in); }
+.c-status.c-out { background: var(--c-out); }
+.c-status.c-archived { background: var(--c-archived); }
+.c-status-label {
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.9;
+}
+.c-status .c-status-main {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.15;
+  margin: 0.2rem 0;
+}
+.c-late {
+  margin: -0.25rem 0 0.75rem;
+  padding: 0.6rem 1rem;
+  background: var(--c-late);
+  color: #fff;
+  font-weight: 800;
+  border-radius: 0.5rem;
+}
+
+/* Buttons: big, bold, full width on a phone. */
+.c-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0.75rem 0 1rem;
+}
+.c-buttons form {
+  margin: 0;
+}
+.c-button,
+.c-buttons .c-button {
+  display: block;
+  width: 100%;
+  margin: 0;
+  min-height: 3.5rem;
+  padding: 0.85rem 1.25rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: center;
+  border: 2px solid var(--c-line);
+  border-radius: 0.5rem;
+}
+.c-button.c-primary {
+  background: var(--c-ink);
+  color: #fff;
+}
+.c-button.c-secondary,
+.c-button.c-outline,
+.c-button.c-contrast {
+  background: #fff;
+  color: var(--c-ink);
+}
+.c-button:focus-visible {
+  outline: 4px solid var(--c-blue);
+  outline-offset: 2px;
+}
+
+/* Cards */
+.c-card {
+  background: var(--c-paper);
+  border: 2px solid var(--c-line);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
+.c-card h2 {
+  margin-top: 0;
+}
+fieldset.c-card > legend {
+  float: left;
+  width: 100%;
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+fieldset.c-card > legend + * {
+  clear: both;
+}
+.c-alert {
+  border-color: #b3261e;
+  border-width: 3px;
+}
+.c-notes {
+  background: #fff8db;
+}
+.c-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 0.75rem;
+}
+
+/* Tires as cards */
+.c-tires {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+.c-tire {
+  background: var(--c-paper);
+  border: 2px solid var(--c-line);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+.c-tire p {
+  margin: 0;
+}
+.c-position {
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+.c-tread {
+  font-size: 2.25rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+.c-tread small {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--c-out);
+}
+.c-tire meter {
+  width: 100%;
+  height: 0.75rem;
+}
+.c-dot {
+  color: var(--c-out);
+  font-weight: 600;
+}
+
+/* Facts and chips */
+.c-facts dt {
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--c-out);
+}
+.c-facts dd {
+  margin: 0 0 0.6rem;
+  font-weight: 600;
+}
+.c-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0;
+  margin: 0;
+}
+.c-chips li.c-chip {
+  list-style: none;
+  margin: 0;
+  padding: 0.3rem 0.7rem;
+  border: 2px solid var(--c-line);
+  border-radius: 999px;
+  font-size: 0.95rem;
+}
+.c-chip.c-yes {
+  background: var(--c-ink);
+  color: #fff;
+}
+.c-chip.c-unknown {
+  border-style: dashed;
+  color: var(--c-out);
+}
+.c-mark {
+  font-weight: 900;
+}
+
+/* History as cards */
+.c-history {
+  padding: 0;
+  margin: 0;
+}
+.c-history li.c-stay {
+  list-style: none;
+  background: var(--c-paper);
+  border: 2px solid var(--c-soft-line);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+}
+.c-history li.c-current {
+  border-color: var(--c-in);
+  border-width: 3px;
+}
+.c-stay p {
+  margin: 0;
+}
+.c-stay-dates {
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+.c-stay-treads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1rem;
+}
+
+/* Forms: big fields, bold labels. */
+.c-card label,
+.c-card legend {
+  font-weight: 700;
+}
+.c-card input:not([type="radio"], [type="checkbox"]),
+.c-card textarea {
+  min-height: 3.25rem;
+  font-size: 1.1rem;
+  border-width: 2px;
+}
+.c-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 0.75rem;
+}
+.c-card label.c-option {
+  font-weight: 400;
+}
+.c-option {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.6rem 0.75rem;
+  border: 2px solid var(--c-soft-line);
+  border-radius: 0.5rem;
+}
+.c-option:has(input:checked) {
+  border-color: var(--c-ink);
+}
+.c-option input {
+  flex: none;
+  margin-top: 0.2rem;
+}
+.c-tire-inputs {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.6rem;
+}
+/* Tread is one short number: two tires to a row even on a phone. */
+.c-tire-inputs.c-tread-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.c-tire-input {
+  border: 2px solid var(--c-soft-line);
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.75rem 0;
+}
+.c-tire-input p {
+  margin: 0 0 0.4rem;
+}
+.c-card .c-add {
+  margin-top: 0.75rem;
+}
+
+/* Pills: radio buttons drawn as big buttons; the chosen one is solid. */
+.c-pills > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.c-pills label {
+  position: relative;
+  margin: 0;
+}
+.c-pills input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+}
+.c-pills span {
+  display: block;
+  min-height: 3rem;
+  padding: 0.6rem 1.1rem;
+  border: 2px solid var(--c-line);
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.c-pills input:checked + span {
+  background: var(--c-ink);
+  color: #fff;
+}
+.c-pills input:focus-visible + span {
+  outline: 4px solid var(--c-blue);
+  outline-offset: 2px;
+}
+
+/* The invoice: a button on phones, the PDF beside the form on a desktop. */
+.c-invoice {
+  margin-bottom: 0.75rem;
+}
+.c-invoice iframe {
+  display: none;
+}
+
+@media (min-width: 576px) {
+  .c-pair {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .c-tire-inputs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .c-status .c-status-main {
+    font-size: 2rem;
+  }
+  .c-tires {
+    grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  }
+  .c-buttons {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .c-button,
+  .c-buttons .c-button {
+    width: auto;
+    min-width: 12rem;
+  }
+  .c-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .c-grid .c-notes {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .c-tire-inputs {
+    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  }
+  .c-has-invoice {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 1rem;
+    align-items: start;
+  }
+  .c-invoice {
+    position: sticky;
+    top: 0.75rem;
+    order: 2;
+  }
+  .c-invoice iframe {
+    display: block;
+    width: 100%;
+    height: calc(100vh - 7rem);
+    margin-top: 0.6rem;
+    border: 2px solid var(--c-line);
+    border-radius: 0.5rem;
+  }
+}

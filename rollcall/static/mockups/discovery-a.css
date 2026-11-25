@@ -1,0 +1,213 @@
+/* Design A: calm and roomy (UI design discovery). Pico's own look; one narrow column.
+   Mobile-first: base rules are for phones; wider screens get more room. */
+
+.a-page,
+#messages {
+  max-width: 48rem;
+  margin: 0 auto;
+}
+.a-page.a-wide,
+#messages:has(+ .a-wide) {
+  max-width: none;
+}
+.a-muted {
+  color: var(--pico-muted-color);
+}
+
+.a-page hgroup {
+  margin-bottom: 1rem;
+}
+
+/* Status badges: soft colors, readable in light and dark. */
+.a-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.a-badge {
+  display: inline-block;
+  padding: 0.15rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: #fff;
+}
+.a-in_shop { background: #2e7d32; }
+.a-out { background: #6b7280; }
+.a-archived { background: #44403c; }
+.a-late { background: #b45309; }
+
+/* Messages above the page. */
+.a-message {
+  padding: 0.75rem 1rem;
+  border-radius: var(--pico-border-radius);
+  border-left: 4px solid #2e7d32;
+  background: var(--pico-card-background-color);
+}
+.a-message.a-error {
+  border-left-color: var(--pico-del-color);
+}
+
+/* Where the set is: the one thing staff look for first. */
+.a-where small {
+  color: var(--pico-muted-color);
+}
+.a-where .a-location {
+  margin: 0.25rem 0 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.a-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: var(--pico-spacing);
+}
+.a-buttons form {
+  margin: 0;
+}
+.a-buttons button,
+.a-buttons [role="button"] {
+  margin: 0;
+  width: auto;
+}
+
+/* Details: label above value on phones, side by side when there is room. */
+.a-details {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.1rem 1.5rem;
+}
+.a-details dt {
+  margin-top: 0.6rem;
+  font-weight: 600;
+  color: var(--pico-muted-color);
+  font-size: 0.9rem;
+}
+.a-details dd {
+  margin: 0;
+}
+
+/* Dates and numbers never break in the middle. */
+.a-stays td:nth-child(-n + 3) {
+  white-space: nowrap;
+}
+.a-stays .a-current td {
+  font-weight: 600;
+}
+.a-treads span span {
+  display: inline-block;
+  margin-right: 0.6rem;
+  white-space: nowrap;
+}
+
+/* Forms */
+.a-choice label {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 1.25rem;
+}
+/* A tire row: the position above its fields on a phone, beside them on a desktop. */
+.a-tire-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0 1rem;
+  align-items: start;
+}
+.a-tire-row:has(> label + label) {
+  grid-template-columns: 1fr 1fr;
+}
+.a-position {
+  grid-column: 1 / -1;
+  font-weight: 700;
+}
+.a-tread-inputs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0 1rem;
+}
+.a-conflict {
+  border-left: 4px solid var(--pico-del-color);
+}
+
+/* The invoice: a link on phones, the PDF beside the form on a desktop. */
+.a-invoice iframe {
+  display: none;
+}
+
+/* History on a phone: each stay is a block of "label  value" lines. */
+@media (max-width: 767px) {
+  .a-stays thead {
+    display: none;
+  }
+  .a-stays tr {
+    display: block;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--pico-muted-border-color);
+  }
+  .a-stays td {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    gap: 0.5rem;
+    padding: 0.15rem 0;
+    border: 0;
+    background: none;
+  }
+  .a-stays td::before {
+    content: attr(data-label);
+    color: var(--pico-muted-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .a-stays td[colspan] {
+    display: block;
+  }
+  .a-stays td[colspan]::before {
+    content: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .a-tire-row {
+    grid-template-columns: 3.5rem 1fr;
+  }
+  .a-tire-row:has(> label + label) {
+    grid-template-columns: 3.5rem 1fr 1fr;
+  }
+  .a-position {
+    grid-column: auto;
+    padding-top: 2.2rem;
+  }
+  .a-details {
+    grid-template-columns: 12rem 1fr;
+  }
+  .a-details dt {
+    margin-top: 0;
+  }
+  .a-tread-inputs {
+    grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .a-wide .a-form-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: start;
+  }
+  .a-invoice {
+    position: sticky;
+    top: 1rem;
+  }
+  .a-invoice iframe {
+    display: block;
+    width: 100%;
+    height: calc(100vh - 6rem);
+    border: 1px solid var(--pico-muted-border-color);
+    border-radius: var(--pico-border-radius);
+  }
+}

@@ -44,14 +44,39 @@ def page(request: Request, page_slug: str):
     return render(request, "mockups/not_yet.html", context)
 
 
+DESIGN_COOKIE = "mockup_design"
+
+
 @router.get("/pages/{page_slug}/{state_slug}")
-def state(request: Request, page_slug: str, state_slug: str):
+def state(request: Request, page_slug: str, state_slug: str, design: str | None = None):
     found = samples.find_page(page_slug)
     shown = found and samples.find_state(found, state_slug)
     if not shown:
         raise HTTPException(404)
-    context = dict(shown.data()) | _frame(f"{found.title}: {shown.title}", shown.staff)
-    return render(request, shown.template, context)
+    title = f"{found.title}: {shown.title}"
+    context = dict(shown.data()) | _frame(title, shown.staff)
+    if not found.designs:
+        return render(request, shown.template, context)
+
+    # ?design= picks a design; a cookie remembers it while the owner clicks through.
+    if design is not None:
+        chosen = samples.find_design(found, design)
+        if chosen is None:
+            raise HTTPException(404)
+    else:
+        remembered = request.cookies.get(DESIGN_COOKIE, "")
+        chosen = samples.find_design(found, remembered) or found.designs[0]
+    switch = tuple(
+        samples.DesignChoice(
+            d.letter, d.name, f"{request.url.path}?design={d.letter}", d.letter == chosen.letter
+        )
+        for d in found.designs
+    )
+    context["mockup"] = samples.Banner(f"{title} · design {chosen.letter.upper()}", designs=switch)
+    context["design"] = chosen
+    response = render(request, shown.template.format(design=chosen.letter), context)
+    response.set_cookie(DESIGN_COOKIE, chosen.letter, path=samples.INDEX_URL, samesite="lax")
+    return response
 
 
 @router.post("/pages/{page_slug}")

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en"{% block html_attributes %}{% endblock %}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="{{ assets.app_css }}">
   <script src="{{ assets.htmx_js }}" defer></script>
   <script src="{{ assets.app_js }}" defer></script>
+  {% block head %}{% endblock %}
 </head>
 <body>
   {% if mockup %}
@@ -19,6 +20,14 @@
       <strong>Mockup: sample data</strong>
       <span>{{ mockup.title }}</span>
       <a href="{{ mockup.index_url }}">All mockups</a>
+      {% if mockup.designs %}
+      <nav aria-label="Design" class="design-switch">
+        Design:
+        {% for choice in mockup.designs %}
+        <a href="{{ choice.url }}" title="{{ choice.name }}"{% if choice.current %} aria-current="true"{% endif %}>{{ choice.letter | upper }}: {{ choice.name }}</a>
+        {% endfor %}
+      </nav>
+      {% endif %}
     </div>
   </div>
   {% endif %}
