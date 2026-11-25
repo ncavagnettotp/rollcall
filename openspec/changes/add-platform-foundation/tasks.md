@@ -16,7 +16,7 @@ see it fail, implement, see it pass.
 
 ## 2. Configuration
 
-- [ ] 2.1 Write `tests/test_config.py`: missing `DATABASE_URL` → error naming it; `SECRET_KEY` of
+- [x] 2.1 Write `tests/test_config.py`: missing `DATABASE_URL` → error naming it; `SECRET_KEY` of
   31 chars → error "too short" without the value in the message; `SHOP_TIMEZONE=Mars/Base` → error
   naming the setting; defaults for `DATA_DIR`, `LOG_LEVEL`, `DB_POOL_SIZE`; `DB_POOL_SIZE=0`
   rejected. Verify: the tests fail (no module).
@@ -52,7 +52,7 @@ see it fail, implement, see it pass.
   relative or same-origin URL; every nav link returns 200; the response carries the CSP,
   `X-Content-Type-Options` and `Referrer-Policy` headers from design.md; the page sets
   `includeIndicatorStyles` to false. Verify: the tests fail.
-- [ ] 4.3 Implement `rollcall/main.py` (`create_app()`, lifespan opening the pool and running
+- [ ] 4.3 Implement `rollcall/main.py` (`create_app()`, lifespan checking `DATA_DIR` is writable, opening the pool and running
   migrations), `rollcall/web.py` (templates, nav registry, header middleware, shop-time filter),
   `templates/base.html`, `macros.html` (field, button, table), `start.html`,
   `rollcall/pages/start.py`, `static/app.css` (Pico variable overrides plus status badge styles; system fonts) and

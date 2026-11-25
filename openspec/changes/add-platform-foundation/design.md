@@ -74,7 +74,7 @@ writes use explicit transactions through `db.transaction()`.
 | `DATABASE_URL` | yes | `postgresql://` URL |
 | `SECRET_KEY` | yes | ≥ 32 characters; used by `add-accounts` for sessions |
 | `SHOP_TIMEZONE` | yes | valid IANA name (`zoneinfo`), used for "this week" and displayed times; the shop's is `America/Chicago` (set in `.env.example`) |
-| `DATA_DIR` | no, `/data` | must be writable; holds PDFs later |
+| `DATA_DIR` | no, `/data` | absolute path; holds PDFs later. Writability is checked at app startup, not when settings load |
 | `LOG_LEVEL` | no, `INFO` | standard level name |
 | `DB_POOL_SIZE` | no, `10` | 1–50 |
 | `APP_PORT` | no, `8080` | port published by Compose on the host |
