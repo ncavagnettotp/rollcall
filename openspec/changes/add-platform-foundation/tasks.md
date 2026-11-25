@@ -20,7 +20,7 @@ see it fail, implement, see it pass.
   31 chars → error "too short" without the value in the message; `SHOP_TIMEZONE=Mars/Base` → error
   naming the setting; defaults for `DATA_DIR`, `LOG_LEVEL`, `DB_POOL_SIZE`; `DB_POOL_SIZE=0`
   rejected. Verify: the tests fail (no module).
-- [ ] 2.2 Implement `rollcall/config.py` (`Settings` frozen dataclass, `load_settings(env)`
+- [x] 2.2 Implement `rollcall/config.py` (`Settings` frozen dataclass, `load_settings(env)`
   raising `ConfigError`) and commit `.env.example` with every variable and a comment each
   (`SHOP_TIMEZONE=America/Chicago`).
   Verify: `tests/test_config.py` passes.
