@@ -60,7 +60,7 @@ see it fail, implement, see it pass.
 
 ## 5. Errors and health
 
-- [ ] 5.1 Write `tests/test_errors.py`: an unknown path returns 404 with the "Page not found" page in
+- [x] 5.1 Write `tests/test_errors.py`: an unknown path returns 404 with the "Page not found" page in
   the frame and a link to `/`; a test-only route that raises returns 500 with a reference code
   matching `E-[A-Z0-9]{6}`, and no traceback, file path or exception text in the body; the captured
   log has the same code and the traceback; the same failing route with `HX-Request: true` returns
