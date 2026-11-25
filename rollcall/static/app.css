@@ -42,3 +42,8 @@ main {
     font-size: 0.85rem;
   }
 }
+
+/* Error messages in the message area (see templates/_error_fragment.html and app.js). */
+.error-message {
+  border-left: 4px solid var(--pico-del-color);
+}

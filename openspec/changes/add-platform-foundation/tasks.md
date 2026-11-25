@@ -68,7 +68,7 @@ see it fail, implement, see it pass.
   with the database up; 503 `database unavailable` with the pool pointed at a closed port, with
   nothing else in the body; returns to 200 once the database is reachable again. Verify: the tests
   fail.
-- [ ] 5.2 Implement the error handlers and `error.html` in `rollcall/web.py`, the htmx error handler
+- [x] 5.2 Implement the error handlers and `error.html` in `rollcall/web.py`, the htmx error handler
   in `static/app.js` (4xx/5xx responses swapped into `#messages`), and `rollcall/health.py`.
   Verify: `tests/test_errors.py` and `tests/test_health.py` pass.
 

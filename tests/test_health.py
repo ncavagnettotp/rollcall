@@ -38,6 +38,10 @@ class Relay:
         """Refuse new connections and cut every open one, like the database going away."""
         with self._lock:
             if self._listener:
+                # On Linux, close() alone does not wake a thread blocked in accept();
+                # shutdown() does, so no new connection slips through.
+                with contextlib.suppress(OSError):
+                    self._listener.shutdown(socket.SHUT_RDWR)
                 self._listener.close()
                 self._listener = None
             for sock in self._sockets:

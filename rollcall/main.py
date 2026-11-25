@@ -11,8 +11,9 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from rollcall import web
+from rollcall import health, web
 from rollcall.config import ConfigError, Settings, load_settings
 from rollcall.db import create_pool
 from rollcall.migrate import apply_migrations
@@ -66,7 +67,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.settings = settings
     app.state.templates = web.make_templates(settings.shop_timezone, nav_items=[start.NAV_ITEM])
-    app.add_middleware(web.SecurityHeaders)
+    app.add_exception_handler(StarletteHTTPException, web.http_error)
+    app.add_middleware(web.CatchErrors)  # inner: turns crashes into the error page
+    app.add_middleware(web.SecurityHeaders)  # outer: headers on every response, errors too
     app.mount("/static", StaticFiles(directory=web.STATIC_DIR), name="static")
+    app.include_router(health.router)
     app.include_router(start.router)
     return app

@@ -102,3 +102,10 @@ def test_the_browser_script_shows_htmx_error_responses():
     script = (STATIC_DIR / "app.js").read_text()
     assert "htmx:beforeSwap" in script
     assert "shouldSwap" in script
+
+
+def test_error_pages_carry_the_security_headers(failing_client):
+    response = failing_client.get("/explode")
+    assert response.status_code == 500
+    assert "default-src 'self'" in response.headers["content-security-policy"]
+    assert response.headers["x-content-type-options"] == "nosniff"

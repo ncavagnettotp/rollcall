@@ -28,6 +28,7 @@ def create_pool(
         min_size=1,
         max_size=size,
         kwargs={"autocommit": True},
+        check=ConnectionPool.check_connection,  # drop dead connections before handing one out
         open=False,
         name="rollcall",
     )

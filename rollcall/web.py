@@ -1,14 +1,19 @@
 """Templates, the page frame's navigation, security headers and time display."""
 
+import logging
 import mimetypes
+import secrets
+import string
 from dataclasses import dataclass
 from datetime import datetime
 from functools import partial
+from http import HTTPStatus
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 PACKAGE_DIR = Path(__file__).parent
@@ -87,3 +92,89 @@ class SecurityHeaders:
             await send(message)
 
         await self.app(scope, receive, send_with_headers)
+
+
+# --- errors -------------------------------------------------------------------------------
+
+log_errors = logging.getLogger("rollcall.errors")
+
+CODE_ALPHABET = string.ascii_uppercase + string.digits
+FRIENDLY = {
+    404: ("Page not found", "There is no page at this address."),
+    405: ("Not allowed here", "That action is not available on this page."),
+}
+FRAGMENT_HEADERS = {"HX-Retarget": "#messages", "HX-Reswap": "innerHTML"}
+
+
+def reference_code() -> str:
+    """A short code shown to staff and written to the log, e.g. E-7F3K2Q."""
+    return "E-" + "".join(secrets.choice(CODE_ALPHABET) for _ in range(6))
+
+
+def render_error(
+    request: Request,
+    status_code: int,
+    title: str,
+    message: str,
+    code: str | None = None,
+    headers: dict | None = None,
+):
+    """The error page in the frame, or for htmx requests a fragment for the message area."""
+    context = {"title": title, "message": message, "code": code}
+    if request.headers.get("HX-Request") == "true":
+        response = render(request, "_error_fragment.html", context, status_code)
+        response.headers.update(FRAGMENT_HEADERS)
+    else:
+        response = render(request, "error.html", context, status_code)
+    response.headers.update(headers or {})
+    return response
+
+
+async def http_error(request: Request, error: StarletteHTTPException):
+    """Expected errors such as page not found: friendly words, no reference code."""
+    status = error.status_code
+    title, message = FRIENDLY.get(status, (HTTPStatus(status).phrase, "The request did not work."))
+    return render_error(request, status, title, message, headers=getattr(error, "headers", None))
+
+
+class CatchErrors:
+    """Turns any unhandled error into the "Something went wrong" page with a reference code.
+
+    The full error goes only to the log, under the same code. Sits inside SecurityHeaders, so
+    error pages get the same headers as every other response.
+    """
+
+    def __init__(self, app: ASGIApp):
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        started = False
+
+        async def tracking_send(message: Message):
+            nonlocal started
+            started = started or message["type"] == "http.response.start"
+            await send(message)
+
+        try:
+            await self.app(scope, receive, tracking_send)
+        except Exception as error:
+            code = reference_code()
+            log_errors.error(
+                "%s unhandled error on %s %s", code, scope["method"], scope["path"], exc_info=error
+            )
+            if started:
+                return  # the response was already under way; nothing more can be sent
+            request = Request(scope)
+            response = render_error(
+                request,
+                500,
+                "Something went wrong",
+                "Rollcall could not finish that. Try again; if it keeps happening, "
+                "tell the person who looks after Rollcall and give them this code.",
+                code=code,
+            )
+            await response(scope, receive, send)

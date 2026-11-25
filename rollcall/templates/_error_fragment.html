@@ -1,0 +1,5 @@
+{#- Swapped into #messages by htmx when a partial update fails; the page stays as it was. -#}
+<article role="alert" class="error-message">
+  <strong>{{ title }}.</strong> {{ message }}
+  {% if code %}Reference code: <code>{{ code }}</code>{% endif %}
+</article>
