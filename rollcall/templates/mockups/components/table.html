@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% from "components/table.html" import table %}
+{% block title %}{{ component.title }}{% endblock %}
+{% block content %}
+<hgroup><h1>{{ component.title }}</h1><p>{{ component.description }}</p></hgroup>
+<h2>With rows</h2>
+{{ table(["Position", "Size", "DOT", "Tread"], [
+  ["LF", "225/55R17", "2319", "7/32"],
+  ["RF", "225/55R17", "2319", "7/32"],
+  ["LR", "225/55R17", "1821", "5/32"],
+  ["RR", "225/55R17", "1821", "6/32"],
+]) }}
+<h2>With no rows</h2>
+{{ table(["Position", "Size", "DOT", "Tread"], [], "No tires yet.") }}
+{% endblock %}

@@ -45,6 +45,12 @@ def test_optional_values_are_explicit_none(env):
     assert page.render(notes=None) == "No notes"
 
 
+def test_shop_date_filter(env):
+    from datetime import date
+
+    assert env.from_string("{{ day | shop_date }}").render(day=date(2026, 3, 2)) == "3/2/2026"
+
+
 # --- components -------------------------------------------------------------------------------
 
 

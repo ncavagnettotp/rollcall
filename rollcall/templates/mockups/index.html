@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Mockups{% endblock %}
+{% block content %}
+<hgroup>
+  <h1>Mockups</h1>
+  <p>Every page and component, filled with invented sample data. Nothing here is saved.</p>
+</hgroup>
+
+<section>
+  <h2>Pages</h2>
+  {% for page in pages %}
+  <article>
+    <header><strong><a href="{{ page.url }}">{{ page.title }}</a></strong></header>
+    {% if page.states %}
+    <ul>
+      {% for state in page.states %}
+      <li><a href="{{ page.state_url(state) }}">{{ state.title }}</a>: {{ state.description }}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p><small>Mocked up later.</small></p>
+    {% endif %}
+  </article>
+  {% endfor %}
+</section>
+
+<section>
+  <h2>Components</h2>
+  <ul>
+    {% for component in components %}
+    <li><a href="{{ component.url }}">{{ component.title }}</a>: {{ component.description }}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

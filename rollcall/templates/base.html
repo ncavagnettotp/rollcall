@@ -13,15 +13,32 @@
   <script src="{{ assets.app_js }}" defer></script>
 </head>
 <body>
+  {% if mockup %}
+  <div class="mockup-banner" role="note">
+    <div class="container">
+      <strong>Mockup: sample data</strong>
+      <span>{{ mockup.title }}</span>
+      <a href="{{ mockup.index_url }}">All mockups</a>
+    </div>
+  </div>
+  {% endif %}
   <header class="container">
     <nav>
       <ul>
-        <li><a href="/" class="brand"><strong>Rollcall</strong></a></li>
+        <li><a href="{{ mockup.home_url if mockup else '/' }}" class="brand"><strong>Rollcall</strong></a></li>
       </ul>
       <ul>
         {% for item in nav_items %}
-        <li><a href="{{ item.url }}"{% if request.url.path == item.url %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
+        <li><a href="{{ item.url }}"{% if item.is_current(request.url.path) %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
         {% endfor %}
+        {% if signed_in %}
+        <li class="signed-in">
+          <form method="post" action="{{ signed_in.sign_out_url }}">
+            <small>{{ signed_in.name }}</small>
+            <button type="submit" class="outline secondary">Sign out</button>
+          </form>
+        </li>
+        {% endif %}
       </ul>
     </nav>
   </header>

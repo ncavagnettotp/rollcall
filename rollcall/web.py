@@ -5,7 +5,7 @@ import mimetypes
 import secrets
 import string
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from functools import partial
 from http import HTTPStatus
 from pathlib import Path
@@ -36,6 +36,13 @@ SECURITY_HEADERS = {
     "x-content-type-options": "nosniff",
     "referrer-policy": "same-origin",
 }
+# A PDF may be shown inside Rollcall's own pages (the invoice beside the tire set form);
+# nothing else may be shown inside any page, Rollcall's or another site's.
+PDF_SECURITY_HEADERS = SECURITY_HEADERS | {
+    "content-security-policy": (
+        "default-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
+    ),
+}
 
 # Serve JavaScript with its standard type whatever the host's mime.types file says.
 mimetypes.add_type("text/javascript", ".js")
@@ -45,6 +52,10 @@ mimetypes.add_type("text/javascript", ".js")
 class NavItem:
     label: str
     url: str
+
+    def is_current(self, path: str) -> bool:
+        """True on this item's page and on the pages below it (but "/" only on itself)."""
+        return path == self.url or (self.url != "/" and path.startswith(self.url.rstrip("/") + "/"))
 
 
 def format_shop_time(moment: datetime, shop_timezone: ZoneInfo) -> str:
@@ -57,14 +68,23 @@ def format_shop_time(moment: datetime, shop_timezone: ZoneInfo) -> str:
     return f"{local.month}/{local.day}/{local.year} {hour}:{local.minute:02d} {half}"
 
 
+def format_shop_date(day: date) -> str:
+    """A calendar date as the shop's invoices write it: 3/2/2026."""
+    return f"{day.month}/{day.day}/{day.year}"
+
+
 def make_templates(shop_timezone: ZoneInfo, nav_items: list[NavItem]) -> Jinja2Templates:
     templates = Jinja2Templates(directory=TEMPLATES_DIR)
     # A value a template shows but the page data lacks is an error naming it, never a blank.
     # Optional values are passed explicitly as None.
     templates.env.undefined = StrictUndefined
     templates.env.filters["shop_time"] = partial(format_shop_time, shop_timezone=shop_timezone)
+    templates.env.filters["shop_date"] = format_shop_date
     templates.env.globals["assets"] = ASSETS
     templates.env.globals["nav_items"] = nav_items
+    # Optional frame values; a page may pass its own. None means not shown.
+    templates.env.globals["signed_in"] = None  # views.frame.SignedInStaff
+    templates.env.globals["mockup"] = None  # mockups.samples.Banner, gallery pages only
     return templates
 
 
@@ -89,7 +109,10 @@ class SecurityHeaders:
             if message["type"] == "http.response.start":
                 headers = list(message.get("headers", []))
                 present = {name.lower() for name, _ in headers}
-                for name, value in SECURITY_HEADERS.items():
+                content_type = dict(headers).get(b"content-type", b"")
+                is_pdf = content_type.split(b";")[0].strip().lower() == b"application/pdf"
+                chosen = PDF_SECURITY_HEADERS if is_pdf else SECURITY_HEADERS
+                for name, value in chosen.items():
                     if name.encode() not in present:
                         headers.append((name.encode(), value.encode()))
                 message["headers"] = headers

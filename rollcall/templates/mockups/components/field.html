@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% from "components/field.html" import field %}
+{% block title %}{{ component.title }}{% endblock %}
+{% block content %}
+<hgroup><h1>{{ component.title }}</h1><p>{{ component.description }}</p></hgroup>
+<form>
+  {{ field("ro", "RO number") }}
+  {{ field("location", "Storage location", value="Rack B3", hint="Where the set sits, e.g. Rack B3") }}
+  {{ field("last_name", "Last name", required=True) }}
+  {{ field("dot", "DOT code", value="23x9", error="Use four digits: week and year, e.g. 2319") }}
+</form>
+{% endblock %}

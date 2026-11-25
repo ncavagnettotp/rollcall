@@ -14,19 +14,19 @@ test, see it fail, implement, see it pass. Sample data is always invented; nothi
   error naming it. Then switch the Jinja environment to `StrictUndefined`, fix the platform
   templates if needed, and move `macros.html` into `templates/components/` (field, button,
   table). Verify: the new test and all existing tests pass.
-- [ ] 1.3 Write the gallery tests from design.md decision 8 against a registry with one trivial
+- [x] 1.3 Write the gallery tests from design.md decision 8 against a registry with one trivial
   test state. Then build `rollcall/mockups/` (registry, index, page and component routes, banner
   block in `base.html`, optional navigation and signed-in staff in the frame). Verify:
   `scripts/test.sh` passes; `http://localhost:8080/mockups` lists the trivial state with
   `MOCKUPS=on`.
-- [ ] 1.4 Write a test that `/mockups/sample-invoice.pdf` is served as `application/pdf` with
+- [x] 1.4 Write a test that `/mockups/sample-invoice.pdf` is served as `application/pdf` with
   `frame-ancestors 'self'` while pages keep `'none'`. Then write `scripts/make_sample_invoice.py`,
   commit its synthetic output and adjust `SecurityHeaders`. Verify: the tests pass; the PDF opens
   in a browser and shows an invented customer.
 
 ## 2. Phase 1: UI design discovery (the tire set page only)
 
-- [ ] 2.1 Define `rollcall/views/tire_set.py` (the tire set page's data) and its sample states in
+- [x] 2.1 Define `rollcall/views/tire_set.py` (the tire set page's data) and its sample states in
   the registry: checked in; checked out with three past stays; new set (four empty tire rows);
   filled from a PDF with the invoice beside it; check-in step (RO, location, tread per tire);
   staggered set with five tires and very long text; form errors; save conflict; archived. Write

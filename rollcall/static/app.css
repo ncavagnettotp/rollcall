@@ -47,3 +47,39 @@ main {
 .error-message {
   border-left: 4px solid var(--pico-del-color);
 }
+
+/* On narrow screens the header wraps onto more lines instead of running off the side. */
+header nav,
+header nav ul {
+  flex-wrap: wrap;
+}
+
+/* The signed-in staff member and the sign-out button, at the end of the navigation. */
+header nav .signed-in form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+header nav .signed-in button {
+  width: auto;
+  margin: 0;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+/* The banner on every mockup gallery page (templates/base.html, rollcall/mockups/). */
+.mockup-banner {
+  background: #fef3c7;
+  color: #78350f;
+  font-size: 0.85rem;
+  padding: 0.35rem 0;
+}
+.mockup-banner .container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+}
+.mockup-banner a {
+  color: inherit;
+}

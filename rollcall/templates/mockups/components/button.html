@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% from "components/button.html" import button %}
+{% block title %}{{ component.title }}{% endblock %}
+{% block content %}
+<hgroup><h1>{{ component.title }}</h1><p>{{ component.description }}</p></hgroup>
+<div class="grid">
+  {{ button("Save") }}
+  {{ button("Cancel", "secondary", "button") }}
+  {{ button("Add tire", "outline", "button") }}
+  {{ button("Check in", "contrast", "button") }}
+</div>
+{% endblock %}
