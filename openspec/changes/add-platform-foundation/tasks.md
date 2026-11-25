@@ -74,9 +74,9 @@ see it fail, implement, see it pass.
 
 ## 6. Docker stack
 
-- [ ] 6.1 Write `Dockerfile` (pinned `python:3.13-slim` patch version, uv, `uv sync --frozen
-  --no-dev`, non-root user, `uvicorn rollcall.main:create_app --factory`, `WEB_CONCURRENCY`
-  default 2) and `compose.yaml` (`postgres:18` pinned minor with `pg_isready` health check and
+- [x] 6.1 Write `Dockerfile` (pinned `python:3.13-slim` patch version, uv, `uv sync --frozen
+  --no-dev`, non-root user, `python -m rollcall` launcher that does all startup checks and migrations before
+  starting `WEB_CONCURRENCY` workers (default 2), tested in `tests/test_entrypoint.py`) and `compose.yaml` (`postgres:18` pinned minor with `pg_isready` health check and
   `db-data` at `/var/lib/postgresql`; app with health check via `/health`, `app-data` at `/data`,
   `depends_on` db healthy, published on `${APP_PORT:-8080}` on all host addresses). Verify: `docker compose up -d --build`
   shows both containers healthy within 60 s; `curl -s localhost:8080/health` and

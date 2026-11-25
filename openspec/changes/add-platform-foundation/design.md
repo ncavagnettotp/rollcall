@@ -63,8 +63,13 @@ understand and test. This change adds no business tables, so there is no `0001` 
 runner is tested with migration folders created inside the tests.
 
 ### Processes and concurrency
-Uvicorn runs with `WEB_CONCURRENCY` worker processes (default 2). Every worker runs the migration
-runner at startup, and the advisory lock makes that safe. Each worker has its own pool. All later
+The container runs `python -m rollcall` (`rollcall/__main__.py`). It checks settings and the data
+folder, waits for the database and applies migrations **once, before any worker exists**, exiting
+with status 1 and a clear message on any problem. Then it starts Uvicorn with `WEB_CONCURRENCY`
+worker processes (1–16, default 2). Found while building 6.1: running Uvicorn's `--workers`
+directly makes the process manager restart a worker that fails at startup forever, so a bad
+setting never exits. Every worker still runs the migration runner at startup (a no-op by then),
+and the advisory lock keeps that safe. Each worker has its own pool. All later
 writes use explicit transactions through `db.transaction()`.
 
 ### Configuration

@@ -1,0 +1,7 @@
+# Only pyproject.toml, uv.lock and rollcall/ are needed to build the image.
+# Never send customer PDFs, secrets, v1 code or history into it.
+*
+!pyproject.toml
+!uv.lock
+!rollcall/
+**/__pycache__

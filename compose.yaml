@@ -1,0 +1,58 @@
+# Rollcall: the app and its PostgreSQL database.
+#   cp .env.example .env   (fill in the two passwords)
+#   docker compose up -d
+# Then open http://localhost:8080, or http://<this PC's IP>:8080 from another device.
+name: rollcall
+
+services:
+  db:
+    image: postgres:18.7
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: rollcall
+      POSTGRES_DB: rollcall
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      # PostgreSQL 18 images keep their data under /var/lib/postgresql/18/docker.
+      - db-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "rollcall", "-d", "rollcall"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+
+  app:
+    build: .
+    image: rollcall-app:local
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://rollcall:${POSTGRES_PASSWORD}@db:5432/rollcall
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in .env}
+      SHOP_TIMEZONE: ${SHOP_TIMEZONE:?Set SHOP_TIMEZONE in .env}
+      DATA_DIR: /data
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      DB_POOL_SIZE: ${DB_POOL_SIZE:-10}
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-2}
+    volumes:
+      - app-data:/data
+    ports:
+      # Every network address of this PC, so other devices on the shop network can reach it.
+      - "${APP_PORT:-8080}:8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  db-data:
+  app-data:

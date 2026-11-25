@@ -6,6 +6,7 @@ Run with: uvicorn rollcall.main:create_app --factory
 import logging
 import os
 import sys
+import tempfile
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -30,9 +31,9 @@ def ensure_data_dir(path: Path) -> None:
     """Create the data folder if needed and prove the app can write to it."""
     try:
         path.mkdir(parents=True, exist_ok=True)
-        probe = path / ".write-test"
-        probe.write_text("ok")
-        probe.unlink()
+        # A uniquely named file per check, so workers starting together never collide.
+        with tempfile.NamedTemporaryFile(dir=path, prefix=".write-test-"):
+            pass
     except OSError as error:
         raise StartupError(f"DATA_DIR {path} is not a writable folder ({error.strerror})") from None
 
