@@ -81,7 +81,7 @@ see it fail, implement, see it pass.
   `depends_on` db healthy, published on `${APP_PORT:-8080}` on all host addresses). Verify: `docker compose up -d --build`
   shows both containers healthy within 60 s; `curl -s localhost:8080/health` and
   `curl -s <host-LAN-ip>:8080/health` both print `ok`.
-- [ ] 6.2 Persistence and recovery check: add a throwaway migration in a scratch branch of the
+- [x] 6.2 Persistence and recovery check: add a throwaway migration in a scratch branch of the
   working copy (not committed), start the stack, then `docker compose down && docker compose up -d`.
   Confirm `schema_migrations` still has the row and the app log shows no migration applied on the
   second start. Then stop `db`: `/health` → 503. Start `db`: `/health` → 200 with no app restart.
