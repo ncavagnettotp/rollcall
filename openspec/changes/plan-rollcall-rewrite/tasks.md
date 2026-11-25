@@ -1,7 +1,7 @@
 # Tasks: plan the Rollcall rewrite
 
 **Goal:** The master checklist for the whole rewrite: settle the shared decisions, then specify
-and build six OpenSpec changes one at a time until Rollcall is ready for staff. This planning
+and build seven OpenSpec changes one at a time until Rollcall is ready for staff. This planning
 change holds no application code; each build change has its own detailed tasks.md.
 
 **Approach:** Work through design.md's roadmap: finish setup, record v1 lessons, confirm the
@@ -78,17 +78,22 @@ specs under `openspec/specs/`. Do not start the next task until the previous one
 
 - [x] 5.1 `add-platform-foundation`: Docker Compose (app + PostgreSQL), configuration, health check,
   database migrations, base page layout, vendored htmx, styling conventions, test setup.
-- [ ] 5.2 `add-accounts`: first-admin bootstrap, sign-in/out, sessions, admin user management
+- [ ] 5.2 `add-ui-components`: page and component templates shown in a `/mockups` gallery with
+  invented sample data, in two phases. **UI design discovery:** two or three distinct designs of
+  one sample page (the tire set page); the owner picks one or has them adjusted or combined until
+  happy. **Mock up the rest:** only then are the other five pages mocked up in that design and
+  signed off one at a time. Later changes wire real data into these templates.
+- [ ] 5.3 `add-accounts`: first-admin bootstrap, sign-in/out, sessions, admin user management
   (create with temporary password, reset, promote/demote, deactivate), last-admin protection.
-- [ ] 5.3 `add-customers-and-tire-inventory`: customers as root records; tire sets under them;
+- [ ] 5.4 `add-customers-and-tire-inventory`: customers as root records; tire sets under them;
   check in / check out with stays kept; list and search; version-checked saves; change history
   with staff name (fold in `audit-history`, or split into `add-audit-history` if the spec exceeds
   roughly ten requirements; record the choice in its proposal).
-- [ ] 5.4 `add-pdf-prefill`: upload limits, PDF archive, suggested values, side-by-side review,
+- [ ] 5.5 `add-pdf-prefill`: upload limits, PDF archive, suggested values, side-by-side review,
   customer suggestions by similar name, synthetic test PDFs, `samples/private/` for real ones.
-- [ ] 5.5 `add-dashboard`: each stat with its exact counting rule, using check-in state and the
+- [ ] 5.6 `add-dashboard`: each stat with its exact counting rule, using check-in state and the
   current stay.
-- [ ] 5.6 `add-operations`: host choice, HTTPS with a shop-trusted certificate, start after
+- [ ] 5.7 `add-operations`: host choice, HTTPS with a shop-trusted certificate, start after
   reboot, coordinated database + PDF backup, restore drill, install guide, full rehearsal before
   go-live.
 

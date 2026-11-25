@@ -77,6 +77,7 @@ migrating v1 data.
 | Vehicles | Text on the set (year make model, optional VIN and plate); no vehicle records | Owner (Q9) |
 | Storage location | On; optional free text on each stay; current location shown while checked in | Owner (Q9) |
 | Search | One box: customer name, phone, tire size (digits only), brand, vehicle, VIN, plate, RO, location. Filters: in shop, out, too long, archived. Archived hidden by default | Owner (Q10) |
+| Mockups | Pages are designed as the app's own templates in a `/mockups` gallery with invented data, before the features behind them are built. A UI design discovery phase comes first: two or three distinct designs of one sample page, adjusted until the owner is happy; only then are the other pages mocked up in that design | Owner (2026-11-25) |
 | Go-live | Staff start using the app only after every change is built | Owner |
 | Branch | Work on `rewrite`; merge when the rewrite replaces v1 | Assistant call |
 
@@ -124,11 +125,12 @@ specified with the real code of the earlier changes in hand.
 Order:
 
 1. `add-platform-foundation`
-2. `add-accounts`
-3. `add-customers-and-tire-inventory` (audit history folded in if small, else `add-audit-history`)
-4. `add-pdf-prefill`
-5. `add-dashboard`
-6. `add-operations`
+2. `add-ui-components` (added 2026-11-25 by the owner: mockups first)
+3. `add-accounts`
+4. `add-customers-and-tire-inventory` (audit history folded in if small, else `add-audit-history`)
+5. `add-pdf-prefill`
+6. `add-dashboard`
+7. `add-operations`
 
 Cycle for each change:
 
@@ -267,7 +269,7 @@ None blocking. Both earlier questions are answered (see Decisions):
 
 ## Left to the builder
 
-Python package layout; template organization; CSS approach (plain or a minimal classless
+Python package layout; CSS approach (plain or a minimal classless
 stylesheet); migration tool (Alembic or numbered SQL); password hashing (argon2 recommended);
 session storage; PDF viewer in the review screen (browser built-in or pdf.js); test tooling,
 linting and CI.
