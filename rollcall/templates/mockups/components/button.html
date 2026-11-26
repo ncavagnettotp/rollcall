@@ -4,9 +4,9 @@
 {% block content %}
 <hgroup><h1>{{ component.title }}</h1><p>{{ component.description }}</p></hgroup>
 <div class="grid">
-  {{ button("Save") }}
-  {{ button("Cancel", "secondary", "button") }}
-  {{ button("Add tire", "outline", "button") }}
-  {{ button("Check in", "contrast", "button") }}
+  {{ button("Check in", icon_name="in") }}
+  {{ button("Edit", "secondary", "button", icon_name="edit") }}
+  {{ button("Archive", "quiet", "button", icon_name="archive") }}
+  {{ button("Add tire", "link", "button", icon_name="plus") }}
 </div>
 {% endblock %}

@@ -100,8 +100,8 @@ available for comparison until the owner approves one. Starting points, refined 
 Revisions so far: **D**, B's layout with soft cards, icon tiles, tinted outlined pills and orange
 primary buttons, after a reference picture the owner supplied, is the owner's choice so far
 (2026-11-25); the owner found A and C unattractive. **E**, D in an owner-supplied colour palette,
-was tried and withdrawn at the owner's request. D is so far always light; its dark mode is added
-under decision 9.
+was tried and withdrawn at the owner's request. D's dark mode was added under decision 9 and
+approved; D became the only design in task 2.6 (see "Approved design").
 
 When the owner approves a design, its template becomes `templates/pages/tire_set.html`, its
 stylesheet, with its light and dark colour tokens, is merged into `static/app.css`, its components
@@ -184,5 +184,40 @@ No data changes. Production `.env` leaves `MOCKUPS` unset. Rollback is reverting
 
 ## Approved design
 
-To be filled in when the owner approves a design at the end of discovery, with its rules for
-both the light and the dark mode.
+Design D, approved by the owner on 2026-11-25 in light and in dark mode (tasks 2.3 and 2.5), made
+the app's only design in task 2.6. The same rules head `static/app.css`, where the tokens live.
+
+- **Layout.** Mobile first: one column on phones; from 1024 px two columns (a set's details left,
+  where it is and its history right; forms in two equal columns). A form filled from a PDF shows
+  the PDF beside it (3:2, equal from 1680 px); on phones only a link. Pages use up to 1400 px on
+  wide screens. On phones what matters now (where the set is, the check-in step) comes first.
+  Nothing scrolls sideways at 360 px.
+- **Frame.** A full-width navy-to-indigo header with white links; the current page is a soft
+  white pill; the Light / Dark / Device switch sits at its end.
+- **Cards.** Everything sits on cards: white on a warm off-white page, 1 px line, 14 px corners, a
+  soft shadow. A card that needs attention is tinted faintly toward its colour. Each card starts
+  with a tinted icon tile, a small uppercase label and, where it helps, one big value.
+- **Buttons.** One solid orange button for the main job (white text, at least 3rem tall, full
+  width on phones); secondary actions white with blue text; quiet ones muted with no frame;
+  "Cancel" and "Add tire" read as links. Every action button has an icon.
+- **Pills.** Tinted, outlined in the text colour, and always carrying a word: green good / in
+  shop, grey out / archived / no, red a problem, amber a warning, blue counts, dashed unknown.
+  Tread: green 6/32 and up, amber 4-5, red 3 and below.
+- **Forms.** Pico fields with a 3:1 border; an error is red, under its field, and keeps the typed
+  value. Choices (season, unknown / yes / no) are segmented controls. Tire rows are a compact
+  table whose inputs are labelled for screen readers only.
+- **Type.** The system font at 15 px; page title 1.65rem extra bold; values 1.35rem (1.6rem from
+  768 px); labels and table headings small, uppercase, letter-spaced, muted.
+- **Spacing.** Dense: a 0.75rem rhythm inside pages, 1rem between cards.
+- **Icons.** Small line icons drawn inline (`components/icon.html`), decorative only.
+- **Colour, light and dark.** Only tokens (`--rc-*`). Light: deep navy ink and slate text on a
+  warm off-white page (`#f6f5f2`) and white cards; orange `#cf4a0e` for the main action, blue
+  `#1d4ed8` for links, indigo `#4338ca` for the chosen segment and focus. Dark: the same layout on
+  a near-black page (`#111318`) with charcoal cards (`#1a1d24`) and light text; the soft fills
+  turn deep and the colours light (links `#93b4ff`, accent `#a5b4fc`); the orange button stays
+  orange with white text; the header darkens. Text reaches 4.5:1 against its background, icons
+  and borders 3:1, in both modes, checked by `tests/test_contrast.py`.
+- **Names.** Rollcall's own classes start with `rc-`; plain elements are styled by Pico through
+  its variables, set from the tokens. Components live in `templates/components/` (icon, pill,
+  badge, tread, card, message, button, choice, field, tire_table, history, table); pages in
+  `templates/pages/` import them and define none of their own.

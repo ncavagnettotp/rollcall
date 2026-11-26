@@ -1,0 +1,13 @@
+{% from "components/tread.html" import tread %}
+
+{#- A set's tires: one compact row each, tread as a coloured pill. Each row has class "tire". -#}
+{% macro tire_table(tires) -%}
+<table class="rc-table">
+  <thead><tr><th scope="col">Tire</th><th scope="col">DOT</th><th scope="col">Tread /32</th></tr></thead>
+  <tbody>
+    {% for tire in tires %}
+    <tr class="tire"><th scope="row">{{ tire.position }}</th><td>{{ tire.dot_code or "–" }}</td><td>{{ tread("", tire.tread) }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{%- endmacro %}

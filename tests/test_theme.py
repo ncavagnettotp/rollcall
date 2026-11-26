@@ -69,7 +69,7 @@ def test_oversized_form_is_refused(client):
 
 
 def test_returns_to_the_same_address_with_its_query(client):
-    target = "/mockups/pages/tire-set/edit?design=d"
+    target = "/mockups/pages/tire-set/edit?from=test"
     assert post_theme(client, "dark", target).headers["location"] == target
 
 

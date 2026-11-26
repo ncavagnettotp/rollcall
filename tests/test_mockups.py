@@ -22,17 +22,9 @@ from rollcall.mockups import samples
 STATE_URLS = [
     f"/mockups/pages/{page.slug}/{state.slug}" for page in samples.PAGES for state in page.states
 ]
-# Pages in UI design discovery: every state in every candidate design.
-DESIGN_STATE_URLS = [
-    f"/mockups/pages/{page.slug}/{state.slug}?design={design.letter}"
-    for page in samples.PAGES
-    for state in page.states
-    for design in page.designs
-]
 COMPONENT_URLS = [f"/mockups/components/{c.slug}" for c in samples.COMPONENTS]
 PAGE_URLS = [f"/mockups/pages/{page.slug}" for page in samples.PAGES]
-ALL_GALLERY_URLS = ["/mockups", *PAGE_URLS, *STATE_URLS, *DESIGN_STATE_URLS, *COMPONENT_URLS]
-DESIGN_LETTERS = [design.letter for design in samples.DESIGNS]
+ALL_GALLERY_URLS = ["/mockups", *PAGE_URLS, *STATE_URLS, *COMPONENT_URLS]
 BANNER = "Mockup: sample data"
 SAMPLE_INVOICE_URL = "/mockups/sample-invoice.pdf"
 THEME_SWITCH = "/theme"  # the light/dark switch in the header posts here (tests/test_theme.py)
@@ -266,14 +258,8 @@ TIRE_SET_FLOW = {
 }
 
 
-@pytest.fixture(params=DESIGN_LETTERS)
-def design(request):
-    """Each tire set test runs once per candidate design: same data, different look."""
-    return request.param
-
-
-def tire_set_html(gallery, state: str, design: str) -> str:
-    response = gallery.get(f"/mockups/pages/tire-set/{state}?design={design}")
+def tire_set_html(gallery, state: str) -> str:
+    response = gallery.get(f"/mockups/pages/tire-set/{state}")
     assert response.status_code == 200
     return response.text
 
@@ -290,32 +276,32 @@ def test_tire_set_states_all_use_the_page_data_shape():
 
 
 @pytest.mark.parametrize("state", TIRE_SET_STATES)
-def test_tire_set_states_link_to_each_other(gallery, state, design):
+def test_tire_set_states_link_to_each_other(gallery, state):
     prefix = "/mockups/pages/tire-set/"
     targets = {
         urlsplit(target).path.removeprefix(prefix)
-        for target in parse(tire_set_html(gallery, state, design)).targets
+        for target in parse(tire_set_html(gallery, state)).targets
         if urlsplit(target).path.startswith(prefix)
     }
     assert TIRE_SET_FLOW[state] <= targets
 
 
-def test_checked_in_set_shows_where_it_is_and_its_history(gallery, design):
-    html = tire_set_html(gallery, "checked-in", design)
+def test_checked_in_set_shows_where_it_is_and_its_history(gallery):
+    html = tire_set_html(gallery, "checked-in")
     for text in ("Renata Kowalczyk", "225/60R17", "Bridgestone Alenza", "Rack B3", "48213"):
         assert text in html, text
     assert "11/18/2026" in html  # dates as the shop writes them
     assert count_class(html, "stay") == 4  # the current stay and three past ones
 
 
-def test_checked_out_set_lists_three_past_stays_and_offers_check_in(gallery, design):
-    html = tire_set_html(gallery, "checked-out", design)
+def test_checked_out_set_lists_three_past_stays_and_offers_check_in(gallery):
+    html = tire_set_html(gallery, "checked-out")
     assert count_class(html, "stay") == 3
     assert "Check in" in html
 
 
-def test_new_set_has_four_empty_tire_rows(gallery, design):
-    html = tire_set_html(gallery, "new", design)
+def test_new_set_has_four_empty_tire_rows(gallery):
+    html = tire_set_html(gallery, "new")
     for row, position in enumerate(("LF", "RF", "LR", "RR")):
         assert f'name="tires-{row}-dot"' in html
         assert position in html
@@ -324,33 +310,33 @@ def test_new_set_has_four_empty_tire_rows(gallery, design):
     assert "Add tire" in html
 
 
-def test_set_from_a_pdf_shows_the_invoice_beside_the_form(gallery, design):
-    parts = parse(tire_set_html(gallery, "from-pdf", design))
+def test_set_from_a_pdf_shows_the_invoice_beside_the_form(gallery):
+    parts = parse(tire_set_html(gallery, "from-pdf"))
     assert SAMPLE_INVOICE_URL in parts.targets  # embedded, plus the "Open the invoice" link
-    html = tire_set_html(gallery, "from-pdf", design)
+    html = tire_set_html(gallery, "from-pdf")
     assert "<iframe" in html
     assert "Open the invoice" in html
     for text in ("JF2EXAMPLE0000001", "48213", "225/60R17", "2019 Subaru Outback"):
         assert text in html, text
 
 
-def test_check_in_step_asks_for_ro_location_and_tread_per_tire(gallery, design):
-    html = tire_set_html(gallery, "check-in", design)
+def test_check_in_step_asks_for_ro_location_and_tread_per_tire(gallery):
+    html = tire_set_html(gallery, "check-in")
     assert 'name="ro_number"' in html
     assert 'name="location"' in html
     for row in range(4):
         assert f'name="tires-{row}-tread"' in html
 
 
-def test_staggered_set_shows_two_sizes_and_five_tires(gallery, design):
-    html = tire_set_html(gallery, "staggered", design)
+def test_staggered_set_shows_two_sizes_and_five_tires(gallery):
+    html = tire_set_html(gallery, "staggered")
     assert "275/35R21" in html and "315/30R21" in html
     assert count_class(html, "tire") == 5
     assert "Extra" in html
 
 
-def test_form_errors_mark_each_wrong_field_and_keep_its_value(gallery, design):
-    html = tire_set_html(gallery, "form-errors", design)
+def test_form_errors_mark_each_wrong_field_and_keep_its_value(gallery):
+    html = tire_set_html(gallery, "form-errors")
     page = samples.find_state(samples.find_page("tire-set"), "form-errors").data()["page"]
     assert page.form.errors
     for name, message in page.form.errors.items():
@@ -359,88 +345,58 @@ def test_form_errors_mark_each_wrong_field_and_keep_its_value(gallery, design):
     assert 'value="22555"' in html  # the wrong size as typed
 
 
-def test_save_conflict_names_who_and_when_and_keeps_typed_values(gallery, design):
-    html = tire_set_html(gallery, "save-conflict", design)
+def test_save_conflict_names_who_and_when_and_keeps_typed_values(gallery):
+    html = tire_set_html(gallery, "save-conflict")
     assert "changed by Marcus Oyelaran" in html
     assert "11/18/2026 2:42 PM" in html
     assert "Customer asked for nitrogen fill on return" in html  # the note being typed
 
 
-def test_archived_set_can_only_be_restored(gallery, design):
-    html = tire_set_html(gallery, "archived", design)
+def test_archived_set_can_only_be_restored(gallery):
+    html = tire_set_html(gallery, "archived")
     assert "Restore" in html
     assert "Check in" not in html
     assert "Archived" in html
 
 
-# --- UI design discovery (spec: UI design discovery on one sample page) -----------------------
+# --- the approved design (spec: One approved design; Light and dark mode) ---------------------
 
 
-def test_at_least_two_designs_are_offered():
-    """Discovery starts with two or three; each revision adds another letter."""
-    assert len(samples.DESIGNS) >= 2
-    assert samples.find_page("tire-set").designs == samples.DESIGNS
+def test_tire_set_uses_the_real_page_template():
+    """The gallery renders the page template the real route will use (task 2.6)."""
+    for state in samples.find_page("tire-set").states:
+        assert state.template == "pages/tire_set.html", state.slug
 
 
-def test_other_pages_wait_for_the_approved_design():
-    with_states = [page.slug for page in samples.PAGES if page.states]
-    assert with_states == ["frame", "tire-set"]
+@pytest.mark.parametrize("url", STATE_URLS)
+def test_no_switch_between_designs_remains(gallery, url):
+    html = gallery.get(url).text
+    assert "?design=" not in html
+    stylesheets = {t for t in parse(html).targets if t.split("?")[0].endswith(".css")}
+    assert {t.split("?")[0] for t in stylesheets} == {
+        "/static/vendor/pico-2.1.1.min.css",
+        "/static/app.css",
+    }
 
 
-def test_each_design_has_its_own_stylesheet(gallery, design):
-    html = tire_set_html(gallery, "checked-in", design)
-    assert f"/static/mockups/discovery-{design}.css" in parse(html).targets
-    for other in DESIGN_LETTERS:
-        if other != design:
-            assert f"/static/mockups/discovery-{other}.css" not in html
+def test_candidate_designs_are_gone():
+    from rollcall.web import STATIC_DIR, TEMPLATES_DIR
 
-
-def test_banner_switches_between_designs_on_the_same_state(gallery, design):
-    parts = parse(tire_set_html(gallery, "check-in", design))
-    for letter in DESIGN_LETTERS:
-        assert f"/mockups/pages/tire-set/check-in?design={letter}" in parts.targets
-    html = tire_set_html(gallery, "check-in", design)
-    current = re.findall(r'<a href="[^"]*\?design=(\w)"[^>]*aria-current="true"', html)
-    assert current == [design]
-
-
-def test_chosen_design_is_remembered_while_clicking_through(gallery):
-    gallery.cookies.clear()
-    try:
-        gallery.get("/mockups/pages/tire-set/checked-in?design=b")
-        html = gallery.get("/mockups/pages/tire-set/checked-out").text
-        assert "/static/mockups/discovery-b.css" in html
-    finally:
-        gallery.cookies.clear()
-
-
-def test_first_design_is_shown_when_none_is_chosen(gallery):
-    gallery.cookies.clear()
-    html = gallery.get("/mockups/pages/tire-set/checked-in").text
-    assert f"/static/mockups/discovery-{DESIGN_LETTERS[0]}.css" in html
-
-
-def test_unknown_design_is_not_found(gallery):
-    assert gallery.get("/mockups/pages/tire-set/checked-in?design=z").status_code == 404
-
-
-def test_index_links_to_each_design(gallery):
-    targets = parse(gallery.get("/mockups").text).targets
-    for letter in DESIGN_LETTERS:
-        assert f"/mockups/pages/tire-set/checked-in?design={letter}" in targets
+    assert not (TEMPLATES_DIR / "mockups" / "discovery").exists()
+    assert not (STATIC_DIR / "mockups").exists()
 
 
 def test_gallery_pages_have_the_light_dark_switch_returning_to_the_same_state(gallery):
-    html = gallery.get("/mockups/pages/tire-set/edit?design=d").text
+    html = gallery.get("/mockups/pages/tire-set/edit?from=test").text
     assert 'action="/theme"' in html
-    assert 'name="next" value="/mockups/pages/tire-set/edit?design=d"' in html
+    assert 'name="next" value="/mockups/pages/tire-set/edit?from=test"' in html
 
 
 def test_approved_design_is_drawn_in_the_chosen_mode(gallery):
     gallery.cookies.clear()
     try:
         gallery.post("/theme", data={"mode": "dark", "next": "/"}, follow_redirects=False)
-        html = gallery.get("/mockups/pages/tire-set/checked-in?design=d").text
+        html = gallery.get("/mockups/pages/tire-set/checked-in").text
         assert re.search(r'<html[^>]*data-theme="dark"', html)
     finally:
         gallery.cookies.clear()

@@ -1,0 +1,23 @@
+{% from "components/pill.html" import pill %}
+
+{#- Radio buttons drawn as one segmented control; the chosen one raised, in indigo. -#}
+{% macro segmented(name, legend, current, options) -%}
+<fieldset class="rc-seg">
+  <legend>{{ legend }}</legend>
+  <div>
+    {% for value, label in options -%}
+    <label><input type="radio" name="{{ name }}" value="{{ value }}"{% if value == current %} checked{% endif %}><span>{{ label }}</span></label>
+    {%- endfor %}
+  </div>
+</fieldset>
+{%- endmacro %}
+
+{#- Lug nuts, center caps, centering rings, TPMS: unknown is its own answer, never "no". -#}
+{% macro unknown_yes_no(name, legend, current) -%}
+{{ segmented(name, legend, current, [("unknown", "Unknown"), ("yes", "Yes"), ("no", "No")]) }}
+{%- endmacro %}
+
+{#- A saved unknown / yes / no answer, shown as a pill. -#}
+{% macro answer(value) -%}
+{{ pill(value.label, {"yes": "green", "no": "slate", "unknown": "unknown"}[value.value]) }}
+{%- endmacro %}

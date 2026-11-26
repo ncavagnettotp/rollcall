@@ -42,26 +42,6 @@ class Banner:
     title: str
     index_url: str = INDEX_URL
     home_url: str = INDEX_URL
-    designs: tuple["DesignChoice", ...] = ()  # the design switch, on pages in discovery
-
-
-@dataclass(frozen=True)
-class Design:
-    """A candidate design in UI design discovery (design.md decision 6)."""
-
-    letter: str
-    name: str
-    description: str
-
-
-@dataclass(frozen=True)
-class DesignChoice:
-    """One link of the design switch in the banner."""
-
-    letter: str
-    name: str
-    url: str
-    current: bool
 
 
 @dataclass(frozen=True)
@@ -79,8 +59,6 @@ class Page:
     slug: str
     title: str
     states: tuple[State, ...] = field(default_factory=tuple)
-    # In discovery: the candidate designs; state templates name theirs with {design}.
-    designs: tuple[Design, ...] = ()
 
     @property
     def url(self) -> str:
@@ -88,9 +66,6 @@ class Page:
 
     def state_url(self, state: State) -> str:
         return page_url(self.slug, state.slug)
-
-    def design_url(self, design: Design) -> str:
-        return f"{page_url(self.slug, self.states[0].slug)}?design={design.letter}"
 
 
 @dataclass(frozen=True)
@@ -105,19 +80,7 @@ class Component:
         return component_url(self.slug)
 
 
-# UI design discovery: every tire set state is shown in each candidate design.
-DESIGNS = (
-    Design("a", "Calm and roomy", "Pico's own look, one column, classic tables."),
-    Design("b", "Compact workshop", "Dense two columns on a desktop, big check in / out buttons."),
-    Design("c", "Cards, high contrast", "Always light, bold status colors, each tire as a card."),
-    Design(
-        "d",
-        "Workshop, refreshed",
-        "B's layout with soft cards, icon tiles, tinted pills and orange buttons "
-        "(after the owner's reference picture).",
-    ),
-)
-TIRE_SET_TEMPLATE = "mockups/discovery/tire_set_{design}.html"
+TIRE_SET_TEMPLATE = "pages/tire_set.html"
 
 
 def _frame_note() -> Mapping[str, object]:
@@ -214,7 +177,6 @@ PAGES: tuple[Page, ...] = (
                 ),
             )
         ),
-        designs=DESIGNS,
     ),
     Page("customer", "Customer"),
     Page("search", "Search"),
@@ -233,7 +195,7 @@ COMPONENTS: tuple[Component, ...] = (
     Component(
         "button",
         "Button",
-        "The button kinds: primary, secondary, outline and contrast.",
+        "The button kinds: primary, secondary, quiet and link.",
         "mockups/components/button.html",
     ),
     Component(
@@ -251,10 +213,6 @@ def find_page(slug: str) -> Page | None:
 
 def find_state(page: Page, slug: str) -> State | None:
     return next((state for state in page.states if state.slug == slug), None)
-
-
-def find_design(page: Page, letter: str) -> Design | None:
-    return next((design for design in page.designs if design.letter == letter), None)
 
 
 def find_component(slug: str) -> Component | None:

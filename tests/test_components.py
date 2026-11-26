@@ -1,5 +1,6 @@
 """Shared components and strict templates (spec: Pages built from shared components)."""
 
+import re
 from dataclasses import dataclass
 from zoneinfo import ZoneInfo
 
@@ -84,11 +85,15 @@ def test_field_component_without_error_shows_the_hint(env):
 def test_button_component(env):
     source = '{% from "components/button.html" import button %}'
     assert render_component(env, source + '{{ button("Save") }}') == (
-        '<button type="submit">Save</button>'
+        '<button type="submit" class="rc-button rc-primary">Save</button>'
     )
-    assert render_component(env, source + '{{ button("Cancel", "secondary", "button") }}') == (
-        '<button type="button" class="secondary">Cancel</button>'
+    assert render_component(env, source + '{{ button("Cancel", "link", "button") }}') == (
+        '<button type="button" class="rc-link-button">Cancel</button>'
     )
+    edit = '{{ button("Edit", "secondary", icon_name="edit") }}'
+    with_icon = render_component(env, source + edit)
+    assert with_icon.startswith('<button type="submit" class="rc-button rc-secondary"><svg')
+    assert with_icon.endswith("</svg>Edit</button>")
 
 
 def test_table_component(env):
@@ -107,3 +112,28 @@ def test_old_macros_file_is_gone():
     from rollcall.web import TEMPLATES_DIR
 
     assert not (TEMPLATES_DIR / "macros.html").exists()
+
+
+def test_pages_define_no_components_of_their_own():
+    """Pages import their parts from components/, so a part looks the same on every page."""
+    from rollcall.web import TEMPLATES_DIR
+
+    pages = sorted((TEMPLATES_DIR / "pages").glob("*.html"))
+    assert pages
+    for page in pages:
+        assert "{% macro" not in page.read_text(), page.name
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        '{% from "components/badge.html" import status_badge %}{{ status_badge(s, True) }}',
+        '{% from "components/tread.html" import tread %}{{ tread("LF", 3) }}',
+    ],
+)
+def test_pills_always_carry_a_word(env, source):
+    """Colour is never the only signal (spec: Light and dark mode, Readable in both modes)."""
+    from rollcall.views.tire_set import Status
+
+    html = render_component(env, source, s=Status.IN_SHOP)
+    assert re.sub(r"<[^>]+>", "", html).strip()

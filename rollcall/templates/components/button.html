@@ -1,4 +1,18 @@
-{#- A button. kind: primary (default), secondary, contrast or outline. -#}
-{% macro button(label, kind="primary", type="submit") -%}
-<button type="{{ type }}"{% if kind != "primary" %} class="{{ kind }}"{% endif %}>{{ label }}</button>
+{% from "components/icon.html" import icon, action_icon %}
+
+{#- A button. kind: primary (solid orange, the main job), secondary (white, blue text), quiet
+    (muted, no frame) or link (reads as a link: "Cancel", "Add tire"). icon: see icon.html. -#}
+{% macro button(label, kind="primary", type="submit", icon_name=None) -%}
+<button type="{{ type }}" class="{{ 'rc-link-button' if kind == 'link' else 'rc-button rc-' ~ kind }}">{% if icon_name %}{{ icon(icon_name) }}{% endif %}{{ label }}</button>
+{%- endmacro %}
+
+{#- An action on a page (views: Action): a small form when it changes data, else a link drawn
+    as a button. -#}
+{% macro action_button(action) -%}
+{% set classes = "rc-button rc-" ~ action.kind %}
+{% if action.post -%}
+<form method="post" action="{{ action.url }}"><button type="submit" class="{{ classes }}">{{ action_icon(action.label) }}{{ action.label }}</button></form>
+{%- else -%}
+<a href="{{ action.url }}" role="button" class="{{ classes }}">{{ action_icon(action.label) }}{{ action.label }}</a>
+{%- endif %}
 {%- endmacro %}

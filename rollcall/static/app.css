@@ -1,31 +1,232 @@
-/* Rollcall styles on top of Pico CSS (static/vendor/pico-*.min.css).
-   Pico styles plain HTML; this file holds only Pico variable overrides and what is specific to
-   Rollcall. Mobile-first: base rules are for phones, the one media query widens for desktops. */
+/* Rollcall's styles, on top of Pico CSS (static/vendor/pico-*.min.css).
+
+   THE DESIGN RULES (approved by the owner 2026-11-25, add-ui-components design.md "Approved
+   design"). Every page follows them, in light and in dark mode.
+
+   Layout   Mobile first: one column on phones; from 1024 px two columns (a set's details left,
+            where it is and its history right; forms in two equal columns). A form filled from
+            a PDF shows the PDF beside it (3:2, equal from 1680 px); on phones only a link.
+            Pages use up to 1400 px on wide screens. On phones what matters now (where the set
+            is, the check-in step) comes first. Nothing ever scrolls sideways at 360 px.
+   Frame    A full-width navy-to-indigo header with white links; the current page is a soft
+            white pill; the Light / Dark / Device switch sits at its end.
+   Cards    Everything sits on cards: white on a warm off-white page, 1 px line, 14 px corners,
+            a soft shadow. A card that needs attention is tinted faintly toward its colour.
+            Each card starts with a tinted icon tile, a small uppercase label and, where it
+            helps, one big value (the size, the location).
+   Buttons  One solid orange button for the main job (white text, at least 3rem tall, full
+            width on phones); secondary actions white with blue text; quiet ones muted with no
+            frame; "Cancel" and "Add tire" read as links. Every action button has an icon.
+   Pills    Tinted, with an outline in the text colour, and always a word, so colour is never
+            the only signal: green good / in shop, grey out / archived / no, red a problem,
+            amber a warning, blue counts, dashed for unknown. Tread: green 6/32 and up, amber
+            4-5, red 3 and below.
+   Forms    Pico fields with a 3:1 border; an error is red, under its field, and keeps the
+            typed value. Choices (season, unknown / yes / no) are segmented controls. Tire rows
+            are a compact table whose inputs are labelled for screen readers only.
+   Type     The system font at 15 px; page title 1.65rem, extra bold; values 1.35rem (1.6rem
+            from 768 px); labels and table headings small, uppercase, letter-spaced, muted.
+   Spacing  Dense: 0.75rem rhythm inside pages, 1rem between cards.
+   Icons    Small line icons drawn inline (components/icon.html), decorative only.
+   Colour   Only tokens (--rc-*). Light values in :root; dark values in the two dark blocks,
+            which must stay identical: one for a device set to dark when no mode is chosen, one
+            for Dark chosen with the switch (data-theme on <html>). Dark mode keeps the layout:
+            near-black page, charcoal cards, light text, the soft fills turned deep and the
+            colours turned light; the orange button stays orange. Text reaches 4.5:1 against
+            its background, icons and borders 3:1; tests/test_contrast.py checks every pair.
+   Names    Rollcall's own classes start with rc-; plain elements are styled by Pico through
+            its variables, which are set from the tokens below. No inline styles (the content
+            security policy forbids them). */
 
 :root {
-  --rollcall-in: #2e7d32;      /* tire set checked in */
-  --rollcall-out: #6b7280;     /* tire set checked out */
-  --rollcall-late: #b45309;    /* in the shop too long */
+  --rc-ink: #1e293b;          /* headings and values: deep navy */
+  --rc-text: #334155;
+  --rc-muted: #5f6b7f;
+  --rc-ground: #f6f5f2;       /* warm off-white page */
+  --rc-card: #ffffff;
+  --rc-line: #e8eaef;
+  --rc-field-border: #848ea0; /* inputs: 3:1 against the card */
+  --rc-navy: #1e2a78;         /* the header runs from navy to indigo */
+  --rc-indigo: #4338ca;
+  --rc-on-header: #ffffff;
+  --rc-accent: #4338ca;       /* the chosen segment, focus outlines */
+  --rc-orange: #cf4a0e;       /* the main action; white text reads on it */
+  --rc-orange-dark: #b23c08;
+  --rc-on-primary: #ffffff;
+  --rc-orange-ink: #cf4a0e;   /* orange icons */
+  --rc-orange-soft: #fdeee6;
+  --rc-orange-line: #fbd3bd;
+  --rc-link: #1d4ed8;
+  --rc-green: #15803d;
+  --rc-green-soft: #e8f7ee;
+  --rc-red: #b91c1c;
+  --rc-red-soft: #fdecec;
+  --rc-amber: #b45309;
+  --rc-amber-soft: #fef5e4;
+  --rc-blue: #1d4ed8;
+  --rc-blue-soft: #e8f0fe;
+  --rc-slate: #475569;
+  --rc-slate-soft: #eef1f5;
+  --rc-dot: #cbd5e1;          /* past stays */
+  --rc-dot-now: #22c55e;      /* the stay in the shop now */
+  --rc-banner: #fef3c7;      /* the mockup banner: the same in both modes */
+  --rc-on-banner: #78350f;
+  --rc-on-header-soft: rgb(255 255 255 / 18%);  /* the current page in the header */
+  --rc-on-header-line: rgb(255 255 255 / 60%);
+  --rc-radius: 14px;
+  --rc-shadow: 0 1px 2px rgb(15 23 42 / 5%), 0 8px 24px rgb(15 23 42 / 6%);
+  --rc-shadow-button: 0 1px 2px rgb(15 23 42 / 8%);
+  --rc-shadow-raised: 0 1px 3px rgb(15 23 42 / 15%);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --rc-ink: #eef1f6;
+    --rc-text: #d5dbe5;
+    --rc-muted: #9ba6b8;
+    --rc-ground: #111318;
+    --rc-card: #1a1d24;
+    --rc-line: #2a2f3a;
+    --rc-field-border: #77819a;
+    --rc-navy: #141b52;
+    --rc-indigo: #33299e;
+    --rc-on-header: #ffffff;
+    --rc-accent: #a5b4fc;
+    --rc-orange: #cf4a0e;
+    --rc-orange-dark: #b23c08;
+    --rc-on-primary: #ffffff;
+    --rc-orange-ink: #f08a5d;
+    --rc-orange-soft: #3b1f12;
+    --rc-orange-line: #7a3415;
+    --rc-link: #93b4ff;
+    --rc-green: #7ee2a4;
+    --rc-green-soft: #12301f;
+    --rc-red: #fca5a5;
+    --rc-red-soft: #3d1618;
+    --rc-amber: #f6c46a;
+    --rc-amber-soft: #3a2a0e;
+    --rc-blue: #9dbcff;
+    --rc-blue-soft: #172647;
+    --rc-slate: #c3cad6;
+    --rc-slate-soft: #272c37;
+    --rc-dot: #4a5263;
+    --rc-dot-now: #22c55e;
+    --rc-banner: #fef3c7;
+    --rc-on-banner: #78350f;
+    --rc-shadow: 0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px rgb(0 0 0 / 30%);
+  }
+}
+:root[data-theme="dark"] {
+  --rc-ink: #eef1f6;
+  --rc-text: #d5dbe5;
+  --rc-muted: #9ba6b8;
+  --rc-ground: #111318;
+  --rc-card: #1a1d24;
+  --rc-line: #2a2f3a;
+  --rc-field-border: #77819a;
+  --rc-navy: #141b52;
+  --rc-indigo: #33299e;
+  --rc-on-header: #ffffff;
+  --rc-accent: #a5b4fc;
+  --rc-orange: #cf4a0e;
+  --rc-orange-dark: #b23c08;
+  --rc-on-primary: #ffffff;
+  --rc-orange-ink: #f08a5d;
+  --rc-orange-soft: #3b1f12;
+  --rc-orange-line: #7a3415;
+  --rc-link: #93b4ff;
+  --rc-green: #7ee2a4;
+  --rc-green-soft: #12301f;
+  --rc-red: #fca5a5;
+  --rc-red-soft: #3d1618;
+  --rc-amber: #f6c46a;
+  --rc-amber-soft: #3a2a0e;
+  --rc-blue: #9dbcff;
+  --rc-blue-soft: #172647;
+  --rc-slate: #c3cad6;
+  --rc-slate-soft: #272c37;
+  --rc-dot: #4a5263;
+  --rc-dot-now: #22c55e;
+  --rc-banner: #fef3c7;
+  --rc-on-banner: #78350f;
+  --rc-shadow: 0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px rgb(0 0 0 / 30%);
+}
+
+/* ---- The page frame (templates/base.html) ------------------------------------------------ */
+
+/* Pico's colours from the tokens. Set on body, so they follow whichever mode the tokens are in;
+   Pico's own light and dark themes switch everything else with the same data-theme. */
+body {
+  --pico-color: var(--rc-text);
+  --pico-h1-color: var(--rc-ink);
+  --pico-h2-color: var(--rc-ink);
+  --pico-muted-color: var(--rc-muted);
+  --pico-primary: var(--rc-link);
+  --pico-primary-hover: var(--rc-ink);
+  --pico-primary-background: var(--rc-accent);
+  --pico-del-color: var(--rc-red);
+  --pico-form-element-border-color: var(--rc-field-border);
+  --pico-form-element-background-color: var(--rc-card);
+  --pico-form-element-color: var(--rc-text);
+  --pico-form-element-focus-color: var(--rc-accent);
+  --pico-form-element-invalid-border-color: var(--rc-red);
+  --pico-muted-border-color: var(--rc-line);
+  --pico-border-radius: 8px;
+  --pico-font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+}
+/* The page colour on html as well, so a short page has no seam below its content. */
+html {
+  font-size: 15px;
+  background-color: var(--rc-ground);
+}
+body {
+  background: var(--rc-ground);
+}
+
+/* The header: a navy-to-indigo bar across the whole width, white links, the current page as a
+   soft pill. */
+body > header {
+  border-image: linear-gradient(90deg, var(--rc-navy), var(--rc-indigo)) fill 0 // 0 100vmax;
+}
+body > header a,
+body > header small {
+  color: var(--rc-on-header);
+}
+body > header .theme-switch {
+  color: var(--rc-on-header);
+}
+body > header .brand {
+  font-weight: 800;
+}
+body > header nav a[aria-current] {
+  background: var(--rc-on-header-soft);
+  border-radius: 8px;
+}
+body > header .signed-in button {
+  color: var(--rc-on-header);
+  border-color: var(--rc-on-header-line);
+  border-radius: 8px;
+}
+
+/* Dense spacing for the page itself; the header keeps Pico's own. */
+main.container {
+  --pico-spacing: 0.75rem;
+  --pico-form-element-spacing-vertical: 0.45rem;
+  --pico-form-element-spacing-horizontal: 0.65rem;
+  padding-top: 1rem;
+}
+@media (min-width: 1280px) {
+  header.container,
+  main.container,
+  .mockup-banner .container {
+    max-width: min(1400px, calc(100% - 3rem));
+  }
 }
 
 /* The app name in the header reads as a name, not a link. */
 header nav .brand {
   text-decoration: none;
 }
-
-/* Status badges: <span class="badge in">In shop</span> */
-.badge {
-  display: inline-block;
-  padding: 0.1rem 0.5rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #fff;
-  white-space: nowrap;
-}
-.badge.in { background: var(--rollcall-in); }
-.badge.out { background: var(--rollcall-out); }
-.badge.late { background: var(--rollcall-late); }
 
 /* Messages shown above the page content (success and errors). */
 #messages:empty {
@@ -35,12 +236,6 @@ header nav .brand {
 /* Long words (VINs, PDF names) never push the page sideways on a phone. */
 main {
   overflow-wrap: anywhere;
-}
-
-@media (min-width: 768px) {
-  .badge {
-    font-size: 0.85rem;
-  }
 }
 
 /* Error messages in the message area (see templates/_error_fragment.html and app.js). */
@@ -68,8 +263,7 @@ header nav .signed-in button {
   font-size: 0.85rem;
 }
 
-/* The light/dark switch in the header: three small buttons in a pill, the chosen one raised.
-   Uses the header's own text colour, so it reads on any header. */
+/* The light/dark switch in the header: three small buttons in a pill, the chosen one white. */
 header nav .theme-switch form {
   margin: 0;
 }
@@ -92,15 +286,15 @@ header nav .theme-switch button {
   box-shadow: none;
 }
 header nav .theme-switch button[aria-pressed="true"] {
-  background: var(--pico-background-color);
-  color: var(--pico-color);
+  background: var(--rc-on-header);
+  color: var(--rc-navy);
   font-weight: 700;
 }
 
 /* The banner on every mockup gallery page (templates/base.html, rollcall/mockups/). */
 .mockup-banner {
-  background: #fef3c7;
-  color: #78350f;
+  background: var(--rc-banner);
+  color: var(--rc-on-banner);
   font-size: 0.85rem;
   padding: 0.35rem 0;
 }
@@ -112,16 +306,546 @@ header nav .theme-switch button[aria-pressed="true"] {
 .mockup-banner a {
   color: inherit;
 }
-.mockup-banner .design-switch {
+
+/* ---- Components (templates/components/) and pages (templates/pages/) --------------------- */
+
+.rc-icon {
+  width: 1.15em;
+  height: 1.15em;
+  flex: none;
+  vertical-align: -0.2em;
+}
+.rc-muted {
+  color: var(--rc-muted);
+}
+
+/* Icon tiles: a rounded square tinted in the card's colour. */
+.rc-tile {
+  display: inline-grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 10px;
+  flex: none;
+}
+.rc-tile .rc-icon {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+.rc-tile.rc-blue { background: var(--rc-blue-soft); color: var(--rc-blue); }
+.rc-tile.rc-green { background: var(--rc-green-soft); color: var(--rc-green); }
+.rc-tile.rc-red { background: var(--rc-red-soft); color: var(--rc-red); }
+.rc-tile.rc-amber { background: var(--rc-amber-soft); color: var(--rc-amber); }
+.rc-tile.rc-orange { background: var(--rc-orange-soft); color: var(--rc-orange-ink); }
+.rc-tile.rc-slate { background: var(--rc-slate-soft); color: var(--rc-slate); }
+
+/* Pills: tinted, with a coloured outline. */
+.rc-pill {
+  display: inline-block;
+  padding: 0.05rem 0.6rem;
+  border: 1px solid currentcolor;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+  line-height: 1.5;
+  vertical-align: middle;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.rc-pill.rc-green { color: var(--rc-green); background: var(--rc-green-soft); }
+.rc-pill.rc-red { color: var(--rc-red); background: var(--rc-red-soft); }
+.rc-pill.rc-amber { color: var(--rc-amber); background: var(--rc-amber-soft); }
+.rc-pill.rc-blue { color: var(--rc-blue); background: var(--rc-blue-soft); }
+.rc-pill.rc-slate { color: var(--rc-slate); background: var(--rc-slate-soft); }
+.rc-pill.rc-unknown { color: var(--rc-muted); background: transparent; border-style: dashed; }
+
+/* Tread readings: position plus a coloured number. */
+.rc-tread {
+  display: inline-flex;
+  gap: 0.3rem;
+  align-items: baseline;
+  padding: 0 0.55rem;
+  border-radius: 999px;
+  background: var(--rc-slate-soft);
+  color: var(--rc-slate);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.rc-tread b { font-size: 0.95rem; }
+.rc-tread.rc-green { background: var(--rc-green-soft); color: var(--rc-green); }
+.rc-tread.rc-amber { background: var(--rc-amber-soft); color: var(--rc-amber); }
+.rc-tread.rc-red { background: var(--rc-red-soft); color: var(--rc-red); }
+
+/* Messages above the page. */
+.rc-message {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.7rem 1rem;
+  border-radius: var(--rc-radius);
+  font-weight: 600;
+}
+.rc-message.rc-green { background: var(--rc-green-soft); color: var(--rc-green); }
+.rc-message.rc-red { background: var(--rc-red-soft); color: var(--rc-red); }
+
+/* The bar at the top: what the set is, whose it is, and the big buttons. */
+.rc-topbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  margin-bottom: 1rem;
 }
-.mockup-banner .design-switch a[aria-current] {
-  font-weight: 700;
+.rc-heading {
+  min-width: 0;
+}
+.rc-heading h1 {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin: 0;
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: var(--rc-ink);
+}
+.rc-heading p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.75rem;
+  margin: 0.6rem 0 0;
+}
+.rc-chip {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+  padding: 0.25rem 0.8rem;
+  background: var(--rc-card);
+  border-radius: 999px;
+  box-shadow: var(--rc-shadow);
+  font-weight: 600;
   text-decoration: none;
-  background: #78350f;
-  color: #fef3c7;
-  padding: 0 0.4rem;
-  border-radius: 0.25rem;
+}
+.rc-phone {
+  color: var(--rc-muted);
+  white-space: nowrap;
+}
+.rc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  width: 100%;
+}
+.rc-actions form {
+  margin: 0;
+  flex: 1;
+}
+.rc-actions > a {
+  flex: 1;
+}
+
+/* Buttons: solid orange for the main job; white with blue text for the others. */
+.rc-button,
+.rc-actions .rc-button,
+.rc-submit .rc-button {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 3rem;
+  margin: 0;
+  padding: 0.65rem 1.4rem;
+  border-radius: 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  box-shadow: var(--rc-shadow-button);
+}
+.rc-button.rc-primary {
+  background: var(--rc-orange);
+  border-color: var(--rc-orange);
+  color: var(--rc-on-primary);
+}
+.rc-button.rc-primary:hover,
+.rc-button.rc-primary:focus-visible {
+  background: var(--rc-orange-dark);
+  border-color: var(--rc-orange-dark);
+}
+.rc-button.rc-secondary {
+  background: var(--rc-card);
+  border-color: var(--rc-line);
+  color: var(--rc-link);
+}
+.rc-button.rc-quiet {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--rc-muted);
+}
+/* Quiet buttons that read as links ("Cancel", "Add tire"). */
+.rc-link-button,
+.rc-card .rc-link-button {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+  width: auto;
+  margin: 0.5rem 0 0;
+  padding: 0.25rem 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  color: var(--rc-link);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Cards: white, round, a soft shadow, a faint tint by kind. */
+.rc-card {
+  background: var(--rc-card);
+  border: 1px solid var(--rc-line);
+  border-radius: var(--rc-radius);
+  box-shadow: var(--rc-shadow);
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+.rc-tint-green { background: linear-gradient(135deg, var(--rc-card) 55%, var(--rc-green-soft)); }
+.rc-tint-red { background: linear-gradient(135deg, var(--rc-card) 55%, var(--rc-red-soft)); }
+.rc-tint-blue { background: linear-gradient(135deg, var(--rc-card) 60%, color-mix(in srgb, var(--rc-blue-soft) 60%, var(--rc-card))); }
+.rc-tint-orange { background: linear-gradient(135deg, var(--rc-card) 55%, color-mix(in srgb, var(--rc-orange-soft) 70%, var(--rc-card))); }
+.rc-tint-amber { background: linear-gradient(135deg, var(--rc-card) 55%, var(--rc-amber-soft)); }
+.rc-step {
+  border-color: var(--rc-orange-line);
+}
+
+/* Card heading: icon tile, small uppercase label, big value. */
+.rc-card-head {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  margin-bottom: 0.85rem;
+}
+.rc-card-head h2 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.6rem;
+  align-items: center;
+  margin: 0.15rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--rc-muted);
+}
+.rc-value {
+  margin: 0.1rem 0 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--rc-ink);
+}
+.rc-form-heading {
+  font-size: 1.2rem;
+}
+
+.rc-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 1rem;
+}
+/* On a phone, where the set is (and the check-in step) comes before its details. */
+.rc-columns > .rc-side {
+  order: -1;
+}
+.rc-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 0.75rem;
+}
+
+/* Small tinted tiles side by side: checked in, RO. */
+.rc-subtiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+.rc-subtiles > div {
+  padding: 0.6rem 0.75rem;
+  background: color-mix(in srgb, var(--rc-card) 70%, transparent);
+  border: 1px solid var(--rc-line);
+  border-radius: 10px;
+  text-align: center;
+}
+.rc-subtiles b {
+  display: block;
+  font-size: 1.2rem;
+  color: var(--rc-ink);
+}
+.rc-subtiles span {
+  font-size: 0.85rem;
+  color: var(--rc-muted);
+}
+
+/* The set's facts: a dense grid of small labelled values. */
+.rc-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem 1rem;
+  margin: 0 0 0.75rem;
+}
+.rc-facts .rc-wide { grid-column: 1 / -1; }
+.rc-facts .rc-half { grid-column: span 2; }
+.rc-facts dt {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--rc-muted);
+}
+.rc-facts dd {
+  margin: 0.1rem 0 0;
+  font-weight: 600;
+  color: var(--rc-ink);
+}
+
+/* Tables */
+.rc-table {
+  margin-bottom: 0.25rem;
+  --pico-background-color: transparent;
+}
+.rc-table th,
+.rc-table td {
+  padding: 0.35rem 0.5rem;
+  background: transparent;
+}
+.rc-table thead th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--rc-muted);
+  white-space: nowrap;
+}
+.rc-table tbody th {
+  font-weight: 800;
+  color: var(--rc-ink);
+  white-space: nowrap;
+}
+.rc-tire-inputs input {
+  margin: 0;
+}
+.rc-tire-inputs td .rc-cell-error {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--rc-red);
+  font-size: 0.8rem;
+}
+
+/* Notes inside the set card. */
+.rc-note {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+  padding: 0.7rem 0.85rem;
+  background: var(--rc-amber-soft);
+  border-radius: 10px;
+  color: var(--rc-amber);
+}
+.rc-note p {
+  margin: 0;
+  color: var(--rc-text);
+}
+
+/* History: a dot per stay (green for the one in the shop now). */
+.rc-history {
+  padding: 0;
+  margin: 0;
+}
+.rc-history li.stay {
+  list-style: none;
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--rc-line);
+}
+.rc-history li.stay:last-child {
+  border-bottom: 0;
+}
+.rc-dot {
+  flex: none;
+  width: 0.7rem;
+  height: 0.7rem;
+  margin-top: 0.4rem;
+  border-radius: 50%;
+  background: var(--rc-dot);
+}
+.rc-current .rc-dot {
+  background: var(--rc-dot-now);
+  box-shadow: 0 0 0 4px var(--rc-green-soft);
+}
+.rc-history p {
+  margin: 0;
+}
+.rc-stay-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1rem 0.9rem;
+  align-items: baseline;
+}
+.rc-stay-top b {
+  color: var(--rc-ink);
+  white-space: nowrap;
+}
+.rc-stay-top span {
+  color: var(--rc-muted);
+}
+.rc-stay-top a {
+  display: inline-flex;
+  gap: 0.25rem;
+  align-items: center;
+  font-weight: 600;
+}
+.rc-history p.rc-treads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.35rem;
+}
+
+/* Segmented control: radio buttons drawn as one row of buttons; the chosen one in indigo. */
+.rc-seg > div {
+  display: inline-flex;
+  flex-wrap: wrap;
+  padding: 3px;
+  gap: 3px;
+  background: var(--rc-slate-soft);
+  border-radius: 10px;
+  max-width: 100%;
+}
+.rc-seg label {
+  position: relative;
+  margin: 0;
+}
+.rc-seg input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+}
+.rc-seg span {
+  display: block;
+  padding: 0.35rem 0.9rem;
+  border-radius: 8px;
+  font-weight: 600;
+  color: var(--rc-slate);
+  cursor: pointer;
+}
+.rc-seg input:checked + span {
+  background: var(--rc-card);
+  color: var(--rc-accent);
+  box-shadow: var(--rc-shadow-raised);
+}
+.rc-seg input:focus-visible + span {
+  outline: 3px solid var(--rc-accent);
+  outline-offset: 1px;
+}
+.rc-option {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+.rc-option input {
+  flex: none;
+  margin-top: 0.2rem;
+}
+.rc-option span {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  align-items: center;
+}
+
+/* Read out by screen readers, not shown. */
+.rc-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.rc-submit {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  align-items: center;
+}
+.rc-submit .rc-link-button {
+  margin: 0;
+}
+
+/* The invoice: a link on phones, the PDF beside the form on a desktop. */
+.rc-invoice iframe {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .rc-value {
+    font-size: 1.6rem;
+  }
+  .rc-actions {
+    width: auto;
+  }
+  .rc-actions .rc-button,
+  .rc-submit .rc-button {
+    width: auto;
+    min-width: 9rem;
+  }
+  .rc-facts {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .rc-columns {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+  .rc-columns > .rc-side {
+    order: 0;
+  }
+  .rc-form .rc-columns {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .rc-has-invoice {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: 1rem;
+    align-items: start;
+  }
+  .rc-has-invoice .rc-form .rc-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .rc-invoice {
+    position: sticky;
+    top: 0.75rem;
+  }
+  .rc-invoice iframe {
+    display: block;
+    width: 100%;
+    height: calc(100vh - 9rem);
+    border: 1px solid var(--rc-line);
+    border-radius: 10px;
+  }
+}
+
+@media (min-width: 1680px) {
+  .rc-has-invoice {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .rc-has-invoice .rc-form .rc-columns {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
 }

@@ -50,13 +50,14 @@ test, see it fail, implement, see it pass. Sample data is always invented; nothi
 - [x] 2.5 Owner reviews the dark mode in the gallery with the switch, on a desktop and a phone,
   asking for changes until happy. Verify: owner approves the dark mode. Done 2026-11-25: design D's
   dark mode approved as built in 2.4.
-- [ ] 2.6 Make the approved design the real one: its template becomes
+- [x] 2.6 Make the approved design the real one: its template becomes
   `templates/pages/tire_set.html`, its components move to `templates/components/`, its stylesheet
   with its light and dark tokens is merged into `static/app.css`; delete the other designs, the
   design switch and the discovery folders; write the design rules for both modes at the top of
   `app.css` and under "Approved design" in design.md. Verify: tests pass;
   `git grep -i discovery rollcall/` is empty; the page looks the same as the approved design in
-  both modes.
+  both modes. Done 2026-11-26: 59 of 60 before/after screenshots pixel-identical (the 60th
+  differs only inside the headless browser's PDF viewer).
 - [ ] 2.7 Owner signs off the tire set page in its final place, in light and dark mode. Verify:
   owner confirms.
 

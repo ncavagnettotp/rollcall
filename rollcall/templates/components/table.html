@@ -1,7 +1,7 @@
-{#- A striped table that scrolls inside itself on narrow screens, with a line for no rows. -#}
+{#- A table that scrolls inside itself on narrow screens, with a line for no rows. -#}
 {% macro table(headers, rows, empty="Nothing here yet.") -%}
 <div class="overflow-auto">
-  <table class="striped">
+  <table class="rc-table">
     <thead>
       <tr>{% for heading in headers %}<th scope="col">{{ heading }}</th>{% endfor %}</tr>
     </thead>

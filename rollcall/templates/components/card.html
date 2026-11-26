@@ -1,0 +1,14 @@
+{% from "components/icon.html" import icon %}
+
+{#- A card's heading: icon tile, small uppercase label (plus an optional pill after it), and an
+    optional big value under it. tone: blue, green, red, amber, orange or slate. The card itself
+    is <section class="rc-card"> (or a fieldset), tinted with rc-tint-<tone> when it stands out. -#}
+{% macro card_head(icon_name, label, tone, value=None, extra=None) -%}
+<div class="rc-card-head">
+  <span class="rc-tile rc-{{ tone }}">{{ icon(icon_name) }}</span>
+  <div>
+    <h2>{{ label }}{% if extra %} {{ extra }}{% endif %}</h2>
+    {% if value %}<p class="rc-value">{{ value }}</p>{% endif %}
+  </div>
+</div>
+{%- endmacro %}

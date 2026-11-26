@@ -1,0 +1,7 @@
+{% from "components/pill.html" import pill %}
+
+{#- A tire set's status as a pill (in shop green, out and archived grey), plus "In too long". -#}
+{% macro status_badge(status, in_too_long=False) -%}
+{{ pill(status.label, {"in_shop": "green", "out": "slate", "archived": "slate"}[status.value]) }}
+{%- if in_too_long %} {{ pill("In too long", "red") }}{% endif %}
+{%- endmacro %}

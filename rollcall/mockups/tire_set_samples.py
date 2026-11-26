@@ -119,7 +119,7 @@ def checked_out() -> dict:
             actions=(
                 Action("Check in", state("check-in")),
                 EDIT_ACTION,
-                Action("Archive", state("archived"), post=True, kind="outline"),
+                Action("Archive", state("archived"), post=True, kind="quiet"),
             ),
         )
     }

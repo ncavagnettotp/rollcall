@@ -1,0 +1,5 @@
+{#- A tinted pill with a coloured outline: statuses, warnings, counts. Always carries a word, so
+    colour is never the only signal. tone: green, slate, red, amber, blue or unknown (dashed). -#}
+{% macro pill(text, tone) -%}
+<span class="rc-pill rc-{{ tone }}">{{ text }}</span>
+{%- endmacro %}

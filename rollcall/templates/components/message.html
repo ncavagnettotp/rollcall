@@ -1,0 +1,6 @@
+{% from "components/icon.html" import icon %}
+
+{#- A message above the page, with an icon: success in green, errors in red and read out. -#}
+{% macro message(item) -%}
+<p class="rc-message rc-{{ 'red' if item.kind == 'error' else 'green' }}" role="{{ 'alert' if item.kind == 'error' else 'status' }}">{{ icon("alert" if item.kind == "error" else "check") }}<span>{{ item.text }}</span></p>
+{%- endmacro %}

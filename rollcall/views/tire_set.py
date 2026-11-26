@@ -69,7 +69,7 @@ class Action:
     label: str
     url: str
     post: bool = False
-    kind: str = "primary"  # primary, secondary, outline or contrast (see components/button.html)
+    kind: str = "primary"  # primary, secondary or quiet (see components/button.html)
 
 
 @dataclass(frozen=True)

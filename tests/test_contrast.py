@@ -1,6 +1,6 @@
 """Colour contrast of the approved design in light and dark mode (spec: Light and dark mode).
 
-Reads the colour tokens from the design's stylesheet: the light values in its `:root { }` block
+Reads the colour tokens from static/app.css: the light values in its `:root { }` block
 and the dark values in its `:root[data-theme="dark"] { }` block (repeated, identical, for devices
 set to dark). Every pair of a text colour and the background it is drawn on must reach 4.5:1;
 icons and control borders 3:1 (WCAG 2.1 levels AA, 1.4.3 and 1.4.11).
@@ -12,7 +12,7 @@ import pytest
 
 from rollcall.web import STATIC_DIR
 
-STYLESHEET = STATIC_DIR / "mockups" / "discovery-d.css"
+STYLESHEET = STATIC_DIR / "app.css"
 
 TEXT = 4.5
 NON_TEXT = 3.0
@@ -41,11 +41,12 @@ PAIRS = [
     ("field-border", "card", NON_TEXT, "input borders"),
     ("orange-ink", "orange-soft", NON_TEXT, "orange icon tiles"),
     ("accent", "card", NON_TEXT, "focus outlines"),
+    ("on-banner", "banner", TEXT, "the mockup banner"),
 ]
 
 
 def tokens(block: str) -> dict[str, str]:
-    return dict(re.findall(r"--d-([a-z-]+):\s*(#[0-9a-fA-F]{6})\b", block))
+    return dict(re.findall(r"--rc-([a-z-]+):\s*(#[0-9a-fA-F]{6})\b", block))
 
 
 def block_after(css: str, selector: str) -> str:

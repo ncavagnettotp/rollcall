@@ -1,0 +1,6 @@
+{#- A tread reading as a pill: green 6/32 and up, amber 4-5, red 3 and below, grey when unknown.
+    position may be empty when the row already names the tire. -#}
+{% macro tread(position, value) -%}
+{% if value is none %}<span class="rc-tread">{{ position }} <b>–</b></span>
+{%- else %}<span class="rc-tread rc-{{ 'green' if value >= 6 else ('amber' if value >= 4 else 'red') }}">{{ position }} <b>{{ value }}</b></span>{% endif %}
+{%- endmacro %}

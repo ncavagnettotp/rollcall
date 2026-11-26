@@ -1,0 +1,16 @@
+{% from "components/icon.html" import icon %}
+{% from "components/tread.html" import tread %}
+
+{#- One stay in a set's history (views: Stay): a dot (green for the stay in the shop now), the
+    dates, RO, location, the invoice and the tread readings. Goes in <ol class="rc-history">. -#}
+{% macro stay(item) -%}
+<li class="stay{% if not item.checked_out %} rc-current{% endif %}">
+  <span class="rc-dot" aria-hidden="true"></span>
+  <div>
+    <p class="rc-stay-top"><b>{{ item.checked_in | shop_date }} – {{ item.checked_out | shop_date if item.checked_out else "now" }}</b>
+      <span>RO {{ item.ro_number or "–" }}</span><span>{{ item.location or "No location" }}</span>
+      {% if item.invoice %}<a href="{{ item.invoice.url }}">{{ icon("file") }}{{ item.invoice.label }}</a>{% endif %}</p>
+    <p class="rc-treads">{% for reading in item.treads %}{{ tread(reading.position, reading.tread) }}{% endfor %}</p>
+  </div>
+</li>
+{%- endmacro %}
