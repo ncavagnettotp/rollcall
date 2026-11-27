@@ -60,8 +60,9 @@ test, see it fail, implement, see it pass. Sample data is always invented; nothi
   `git grep -i discovery rollcall/` is empty; the page looks the same as the approved design in
   both modes. Done 2026-11-26: 59 of 60 before/after screenshots pixel-identical (the 60th
   differs only inside the headless browser's PDF viewer).
-- [ ] 2.7 Owner signs off the tire set page in its final place, in light and dark mode. Verify:
-  owner confirms.
+- [x] 2.7 Owner signs off the tire set page in its final place, in light and dark mode. Verify:
+  owner confirms. Done 2026-11-27: approved after tread depth, DOT codes and tire positions were
+  dropped.
 
 ## 3. Phase 2: mock up the other pages (one at a time, only after 2.7)
 
