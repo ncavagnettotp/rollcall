@@ -7,6 +7,6 @@
   {{ field("ro", "RO number") }}
   {{ field("location", "Storage location", value="Rack B3", hint="Where the set sits, e.g. Rack B3") }}
   {{ field("last_name", "Last name", required=True) }}
-  {{ field("dot", "DOT code", value="23x9", error="Use four digits: week and year, e.g. 2319") }}
+  {{ field("front_size", "Size (front)", value="22555", error="Enter a full size, e.g. 225/60R17 or 35x12.50R20.") }}
 </form>
 {% endblock %}

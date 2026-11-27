@@ -300,14 +300,19 @@ def test_checked_out_set_lists_three_past_stays_and_offers_check_in(gallery):
     assert "Check in" in html
 
 
-def test_new_set_has_four_empty_tire_rows(gallery):
+@pytest.mark.parametrize("state", TIRE_SET_STATES)
+def test_nothing_is_recorded_per_tire(gallery, state):
+    """No tread depth, DOT codes or tire positions (plan-rollcall-rewrite/design.md, changed
+    2026-11-27): anything about one tire goes in the notes."""
+    html = tire_set_html(gallery, state)
+    for text in ("Tread", "tread", "DOT", 'name="tires-', "Add tire", ">LF<", "Extra"):
+        assert text not in html, text
+
+
+def test_new_set_asks_for_the_set_and_its_check_in(gallery):
     html = tire_set_html(gallery, "new")
-    for row, position in enumerate(("LF", "RF", "LR", "RR")):
-        assert f'name="tires-{row}-dot"' in html
-        assert position in html
-    assert 'name="tires-4-dot"' not in html
-    assert "Extra" not in html
-    assert "Add tire" in html
+    for name in ("front_size", "rear_size", "brand_model", "notes", "checked_in", "location"):
+        assert f'name="{name}"' in html, name
 
 
 def test_set_from_a_pdf_shows_the_invoice_beside_the_form(gallery):
@@ -320,19 +325,15 @@ def test_set_from_a_pdf_shows_the_invoice_beside_the_form(gallery):
         assert text in html, text
 
 
-def test_check_in_step_asks_for_ro_location_and_tread_per_tire(gallery):
+def test_check_in_step_asks_for_date_ro_and_location(gallery):
     html = tire_set_html(gallery, "check-in")
-    assert 'name="ro_number"' in html
-    assert 'name="location"' in html
-    for row in range(4):
-        assert f'name="tires-{row}-tread"' in html
+    for name in ("checked_in", "ro_number", "location"):
+        assert f'name="{name}"' in html, name
 
 
-def test_staggered_set_shows_two_sizes_and_five_tires(gallery):
+def test_staggered_set_shows_both_sizes(gallery):
     html = tire_set_html(gallery, "staggered")
     assert "275/35R21" in html and "315/30R21" in html
-    assert count_class(html, "tire") == 5
-    assert "Extra" in html
 
 
 def test_form_errors_mark_each_wrong_field_and_keep_its_value(gallery):

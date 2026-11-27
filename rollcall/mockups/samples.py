@@ -118,7 +118,7 @@ PAGES: tuple[Page, ...] = (
                 (
                     "checked-in",
                     "Checked in",
-                    "In the shop: where it is, this stay's RO and tread, and three past stays.",
+                    "In the shop: where it is, this stay's RO, and three past stays.",
                     tire_set.checked_in,
                 ),
                 (
@@ -130,7 +130,7 @@ PAGES: tuple[Page, ...] = (
                 (
                     "new",
                     "New set",
-                    "Adding a set to a customer: four empty tire rows, checked in as it is saved.",
+                    "Adding a set to a customer, checked in as it is saved.",
                     tire_set.new_set,
                 ),
                 (
@@ -142,13 +142,13 @@ PAGES: tuple[Page, ...] = (
                 (
                     "check-in",
                     "Check-in step",
-                    "Checking a set back in: date, RO, storage location and tread per tire.",
+                    "Checking a set back in: date, RO and storage location.",
                     tire_set.check_in,
                 ),
                 (
                     "staggered",
-                    "Staggered, five tires, long text",
-                    "Two sizes, a spare, very long names and notes, in the shop too long.",
+                    "Staggered, long text",
+                    "Two sizes, very long names and notes, in the shop too long.",
                     tire_set.staggered,
                 ),
                 (

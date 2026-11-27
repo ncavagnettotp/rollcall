@@ -12,11 +12,3 @@
 </label>
 {%- endmacro %}
 
-{#- A small input in a table cell; the label is read out but not shown (the column says it). -#}
-{% macro cell_input(name, label, value, error=None, type="text") -%}
-<label class="rc-sr" for="f-{{ name }}">{{ label }}</label>
-<input id="f-{{ name }}" name="{{ name }}" type="{{ type }}" value="{{ value if value is not none else '' }}"
-  {%- if type == "number" %} min="0" max="20" inputmode="numeric"{% endif %}
-  {%- if error %} aria-invalid="true" aria-describedby="e-{{ name }}"{% endif %}>
-{%- if error %}<small id="e-{{ name }}" class="rc-cell-error">{{ error }}</small>{% endif %}
-{%- endmacro %}

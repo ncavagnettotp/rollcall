@@ -28,17 +28,13 @@ from rollcall.views.tire_set import (
     Season,
     Status,
     Stay,
-    Tire,
-    TireInput,
     TireSetDetails,
     TireSetForm,
     TireSetInput,
     TireSetPage,
-    TreadReading,
 )
 
 TODAY = date(2026, 11, 18)
-FOUR = ("LF", "RF", "LR", "RR")
 
 
 def state(slug: str) -> str:
@@ -49,41 +45,32 @@ CUSTOMER_URL = page_url("customer")
 RENATA = CustomerSummary("Renata Kowalczyk", ("(555) 014-2271",), CUSTOMER_URL)
 
 
-def treads(*values: int | None, positions=FOUR) -> tuple[TreadReading, ...]:
-    return tuple(TreadReading(p, v) for p, v in zip(positions, values, strict=True))
-
-
 def invoice_link(number: str) -> Link:
     return Link(f"Invoice {number}", SAMPLE_INVOICE_URL)
 
 
 # --- Renata's summer set --------------------------------------------------------------------
 
-ALENZA_DOT = ("2321", "2321", "2421", "2421")
-
-
-def alenza_details(tread: tuple[int | None, ...]) -> TireSetDetails:
-    return TireSetDetails(
-        sizes=("225/60R17",),
-        brand_model="Bridgestone Alenza",
-        on_wheels=True,
-        wheel_description="OEM alloys",
-        season=Season.SUMMER,
-        accessories=Accessories(Choice.YES, Choice.UNKNOWN, Choice.NO, Choice.YES),
-        vehicle="2019 Subaru Outback",
-        vin="JF2EXAMPLE0000001",
-        plate="IL SMPL 123",
-        notes="Wheel locks in the trunk, key in the glovebox.",
-        tires=tuple(Tire(p, d, t) for p, d, t in zip(FOUR, ALENZA_DOT, tread, strict=True)),
-    )
+ALENZA = TireSetDetails(
+    sizes=("225/60R17",),
+    brand_model="Bridgestone Alenza",
+    on_wheels=True,
+    wheel_description="OEM alloys",
+    season=Season.SUMMER,
+    accessories=Accessories(Choice.YES, Choice.UNKNOWN, Choice.NO, Choice.YES),
+    vehicle="2019 Subaru Outback",
+    vin="JF2EXAMPLE0000001",
+    plate="IL SMPL 123",
+    notes="Wheel locks in the trunk, key in the glovebox.",
+)
 
 
 PAST_STAYS = (
-    Stay(date(2025, 11, 14), "46872", "Rack B3", treads(7, 7, 6, 6), date(2026, 4, 20), None),
-    Stay(date(2024, 11, 12), "45120", "Rack A1", treads(8, 8, 8, 7), date(2025, 4, 8), None),
-    Stay(date(2023, 11, 20), "43391", None, treads(9, 9, 9, 9), date(2024, 4, 15), None),
+    Stay(date(2025, 11, 14), "46872", "Rack B3", date(2026, 4, 20), None),
+    Stay(date(2024, 11, 12), "45120", "Rack A1", date(2025, 4, 8), None),
+    Stay(date(2023, 11, 20), "43391", None, date(2024, 4, 15), None),
 )
-CURRENT_STAY = Stay(TODAY, "48213", "Rack B3", treads(6, 6, 5, 5), None, invoice_link("900123"))
+CURRENT_STAY = Stay(TODAY, "48213", "Rack B3", None, invoice_link("900123"))
 
 EDIT_ACTION = Action("Edit", state("edit"), kind="secondary")
 
@@ -96,7 +83,7 @@ def checked_in() -> dict:
             status=Status.IN_SHOP,
             in_too_long=False,
             archived_on=None,
-            details=alenza_details((6, 6, 5, 5)),
+            details=ALENZA,
             current_stay=CURRENT_STAY,
             past_stays=PAST_STAYS,
             actions=(Action("Check out", state("checked-out"), post=True), EDIT_ACTION),
@@ -113,7 +100,7 @@ def checked_out() -> dict:
             status=Status.OUT,
             in_too_long=False,
             archived_on=None,
-            details=alenza_details((7, 7, 6, 6)),
+            details=ALENZA,
             current_stay=None,
             past_stays=PAST_STAYS,
             actions=(
@@ -131,7 +118,6 @@ def check_in() -> dict:
         action_url=state("checked-in"),
         cancel_url=state("checked-out"),
         values=CheckInInput(TODAY.isoformat()),
-        tires=tuple(TireInput(p, d) for p, d in zip(FOUR, ALENZA_DOT, strict=True)),
     )
     return {"page": replace(page, actions=(), check_in=form)}
 
@@ -148,11 +134,10 @@ def archived() -> dict:
         vin=None,
         plate=None,
         notes="Customer sold the Impreza; keeping the record for history.",
-        tires=tuple(Tire(p, "4417", t) for p, t in zip(FOUR, (4, 4, 3, 3), strict=True)),
     )
     stays = (
-        Stay(date(2025, 4, 2), "46010", "Rack D2", treads(4, 4, 3, 3), date(2025, 11, 10), None),
-        Stay(date(2024, 4, 9), "44312", "Rack D2", treads(6, 6, 5, 5), date(2024, 11, 4), None),
+        Stay(date(2025, 4, 2), "46010", "Rack D2", date(2025, 11, 10), None),
+        Stay(date(2024, 4, 9), "44312", "Rack D2", date(2024, 11, 4), None),
     )
     return {
         "page": TireSetPage(
@@ -177,7 +162,6 @@ def _form(**changes) -> TireSetForm:
         heading="New tire set",
         action_url=state("checked-in"),
         cancel_url=CUSTOMER_URL,
-        add_tire_url=state("new"),
         submit_label="Save and check in",
         values=TireSetInput(),
         check_in=CheckInInput(TODAY.isoformat()),
@@ -218,16 +202,14 @@ ALENZA_INPUT = TireSetInput(
     vin="JF2EXAMPLE0000001",
     plate="IL SMPL 123",
     notes="Wheel locks in the trunk, key in the glovebox.",
-    tires=tuple(TireInput(p, d) for p, d in zip(FOUR, ALENZA_DOT, strict=True)),
 )
 
 
 def from_pdf() -> dict:
-    # A PDF never fills DOT codes, tread or location, so those stay empty.
-    values = replace(ALENZA_INPUT, notes="", tires=tuple(TireInput(p) for p in FOUR))
+    # A PDF never fills the storage location or notes, so those stay empty.
+    values = replace(ALENZA_INPUT, notes="")
     form = _form(
         heading="New tire set from an invoice",
-        add_tire_url=state("from-pdf"),
         values=values,
         check_in=CheckInInput("2026-11-18", ro_number="48213"),
         invoice=Invoice("invoice-900123.pdf", SAMPLE_INVOICE_URL, "900123"),
@@ -240,23 +222,13 @@ def from_pdf() -> dict:
 
 
 def form_errors() -> dict:
-    values = replace(
-        ALENZA_INPUT,
-        front_size="22555",
-        tires=(
-            TireInput("LF", "2321", "6"),
-            TireInput("RF", "321", "6"),
-            TireInput("LR", "2421", "25"),
-            TireInput("RR", "2421", "5"),
-        ),
-    )
+    values = replace(ALENZA_INPUT, front_size="22555", rear_size="245", vin="JF2EXAMPLE00001")
     errors = {
         "front_size": "Enter a full size, e.g. 225/60R17 or 35x12.50R20.",
-        "tires-1-dot": "Use four digits: week and year, e.g. 2321.",
-        "tires-2-tread": "Tread is a whole number of 32nds from 0 to 20.",
+        "rear_size": "Enter a full size, e.g. 255/55R17, or leave it empty.",
+        "vin": "A VIN has 17 letters and digits; this one has 15.",
     }
     form = _form(
-        add_tire_url=state("form-errors"),
         values=values,
         check_in=CheckInInput("2026-11-18", "48213", "Rack B3"),
         errors=errors,
@@ -275,7 +247,6 @@ def _edit_form(**changes) -> TireSetForm:
     edit_values = {
         "heading": "Edit tire set",
         "cancel_url": state("checked-in"),
-        "add_tire_url": state("edit"),
         "submit_label": "Save",
         "values": ALENZA_INPUT,
         "check_in": None,
@@ -294,7 +265,6 @@ def save_conflict() -> dict:
         "Customer asked for nitrogen fill on return.",
     )
     form = _edit_form(
-        add_tire_url=state("save-conflict"),
         values=typed,
         conflict=Conflict(
             "Marcus Oyelaran", datetime(2026, 11, 18, 20, 42, tzinfo=UTC), state("edit")
@@ -303,11 +273,10 @@ def save_conflict() -> dict:
     return {"page": _edit_page(form)}
 
 
-# --- staggered, five tires, long text -------------------------------------------------------
+# --- staggered, long text --------------------------------------------------------------------
 
 
 def staggered() -> dict:
-    positions = ("LF", "RF", "LR", "RR", "Extra")
     details = TireSetDetails(
         sizes=("275/35R21", "315/30R21"),
         brand_model="Pirelli P Zero PZ4 Elect Run Flat NCS (Porsche N0 approved)",
@@ -327,21 +296,11 @@ def staggered() -> dict:
             "puncture from 2025 noted on RO 46511. Torque to 160 Nm by hand, no impact guns "
             "on these wheels under any circumstances."
         ),
-        tires=tuple(
-            Tire(p, d, t)
-            for p, d, t in zip(
-                positions,
-                ("1822", "1822", "2022", "2022", "2022"),
-                (7, 7, 5, 6, 10),
-                strict=True,
-            )
-        ),
     )
     stay = Stay(
         date(2026, 3, 2),
         "47205",
         "Mezzanine overflow rack, far left bay behind the alignment machine, top shelf",
-        treads(7, 7, 5, 6, 10, positions=positions),
         None,
         invoice_link("897310"),
     )

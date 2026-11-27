@@ -1,4 +1,4 @@
-{#- The tire set page: the set (details, tires, where it is, history), the check-in step opening
+{#- The tire set page: the set (details, where it is, history), the check-in step opening
     in place, and the form for a new set, an edit or a set filled from a PDF (with the invoice
     beside it on a desktop). Data: views/tire_set.py TireSetPage. Layout and colours: the rules at
     the top of static/app.css. -#}
@@ -7,12 +7,11 @@
 {% from "components/button.html" import action_button %}
 {% from "components/card.html" import card_head %}
 {% from "components/choice.html" import segmented, unknown_yes_no, answer %}
-{% from "components/field.html" import field, cell_input %}
+{% from "components/field.html" import field %}
 {% from "components/history.html" import stay %}
 {% from "components/icon.html" import icon %}
 {% from "components/message.html" import message %}
 {% from "components/pill.html" import pill %}
-{% from "components/tire_table.html" import tire_table %}
 
 {% block title %}{{ page.title }}{% endblock %}
 
@@ -94,20 +93,6 @@
           {{ segmented("season", "Season", v.season, [("summer", "Summer"), ("winter", "Winter"), ("all_season", "All-season")]) }}
           {{ segmented("on_wheels", "Stored", v.on_wheels, [("wheels", "On wheels"), ("tires", "Tires only")]) }}
           {{ field("wheel_description", "Wheel description", v.wheel_description, error=e.get("wheel_description")) }}
-          <table class="rc-table rc-tire-inputs">
-            <thead><tr><th scope="col">Tire</th><th scope="col">DOT (week, year)</th>{% if form.check_in %}<th scope="col">Tread /32</th>{% endif %}</tr></thead>
-            <tbody>
-              {% for tire in v.tires %}
-              {% set row = loop.index0 %}
-              <tr class="tire-input">
-                <th scope="row">{{ tire.position }}<input type="hidden" name="tires-{{ row }}-position" value="{{ tire.position }}"></th>
-                <td>{{ cell_input("tires-%d-dot" % row, tire.position ~ " DOT code", tire.dot_code, e.get("tires-%d-dot" % row)) }}</td>
-                {% if form.check_in %}<td>{{ cell_input("tires-%d-tread" % row, tire.position ~ " tread in 32nds", tire.tread, e.get("tires-%d-tread" % row), type="number") }}</td>{% endif %}
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          <button type="submit" name="add_tire" value="1" formaction="{{ form.add_tire_url }}" class="rc-link-button">{{ icon("plus") }}Add tire</button>
         </fieldset>
       </div>
 
@@ -168,7 +153,6 @@
       <div class="rc-half"><dt>VIN</dt><dd>{{ d.vin or "–" }}</dd></div>
       <div><dt>Plate</dt><dd>{{ d.plate or "–" }}</dd></div>
     </dl>
-    {{ tire_table(d.tires) }}
     {% if d.notes %}
     <div class="rc-note">{{ icon("note") }}<p>{{ d.notes }}</p></div>
     {% endif %}
@@ -185,15 +169,6 @@
           {{ field("ro_number", "RO number", step.values.ro_number, error=step.errors.get("ro_number")) }}
         </div>
         {{ field("location", "Storage location", step.values.location, hint="e.g. Rack B3", error=step.errors.get("location")) }}
-        <table class="rc-table rc-tire-inputs">
-          <thead><tr><th scope="col">Tire</th><th scope="col">DOT</th><th scope="col">Tread /32</th></tr></thead>
-          <tbody>
-            {% for tire in step.tires %}
-            <tr><th scope="row">{{ tire.position }}</th><td>{{ tire.dot_code or "–" }}</td>
-              <td>{{ cell_input("tires-%d-tread" % loop.index0, tire.position ~ " tread in 32nds", tire.tread, step.errors.get("tires-%d-tread" % loop.index0), type="number") }}</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
         <div class="rc-submit">
           <button type="submit" class="rc-button rc-primary">{{ icon("in") }}Check in</button>
           <a href="{{ step.cancel_url }}" class="rc-link-button">Cancel</a>

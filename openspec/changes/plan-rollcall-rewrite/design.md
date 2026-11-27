@@ -21,7 +21,7 @@ Useful v1 knowledge to re-adopt deliberately (summarized in Phase 0, step 3):
 
 **Goals**
 
-- CRUD for customers and their tire sets, with tire size, tread depth and related details.
+- CRUD for customers and their tire sets, with tire size and related details.
 - PDF upload pre-fills the form; original shown beside it; staff review and save.
 - User accounts with admin user management; every change attributed and kept in history.
 - Dashboard: sets in shop, sets in shop too long, and a few other useful stats.
@@ -63,17 +63,17 @@ migrating v1 data.
 | Stays | Each check-in/check-out pair is kept as a stay in the set's history | Assistant (follows from owner decision) |
 | Customers don't sign in | Customers are records only; only staff have sign-in accounts. "Customer" and "staff account" are the terms used in specs to avoid two kinds of "user" | Owner (Q8) |
 | Customer fields | First name, last name, one or more phones, email, notes; no address | Owner (Q8) |
-| Record unit | A **tire set**: 1–8 tires (usually 4) stored together for one customer; one size or two (staggered front/rear); each tire has a position (LF, RF, LR, RR, Extra) | Owner (Q1) |
-| Tread depth | Recorded per tire on **every check-in**, in 32nds of an inch (whole numbers 0–20), kept on the stay; the set shows the latest readings; blank allowed; never from the PDF | Owner (Q2) |
-| Set fields | Size(s); brand and model; on wheels or tires only, with wheel description; season; lug nuts, center caps, centering rings, TPMS sensors, each unknown/yes/no; notes. Per tire: position, **DOT date code** (4 digits, week + year, optional) | Owner (Q3) |
-| Stay fields | Check-in date, RO number, storage location, tread depths, check-out date, attached PDF if any | Owner (Q2, Q3, Q9) |
-| Not stored | Condition grades, photos, storage pricing | Owner (Q3) |
+| Record unit | A **tire set**: the tires one customer stores together; one size or two (staggered front/rear). Nothing is recorded per tire: no positions and no tire count; a spare or anything about one tire goes in the notes | Owner (Q1; per-tire positions dropped 2026-11-27) |
+| Tread depth | **Not recorded** (dropped by the owner on 2026-11-27, while reviewing the tire set mockup) | Owner (Q2, changed 2026-11-27) |
+| Set fields | Size(s); brand and model; on wheels or tires only, with wheel description; season; lug nuts, center caps, centering rings, TPMS sensors, each unknown/yes/no; notes. Nothing per tire (DOT date codes dropped 2026-11-27) | Owner (Q3, changed 2026-11-27) |
+| Stay fields | Check-in date, RO number, storage location, check-out date, attached PDF if any | Owner (Q3, Q9; tread depths dropped 2026-11-27) |
+| Not stored | Tread depth, DOT date codes, tire positions, condition grades, photos, storage pricing | Owner (Q3; first three dropped 2026-11-27) |
 | Remove | Nothing is deleted. A set can be archived only while checked out; a customer only when none of their sets are checked in; both hidden from search and restorable; history kept | Owner (Q4) |
 | Roles | Every staff account does all inventory work; admins also manage staff accounts and shop settings | Owner (Q5) |
 | Dashboard | Sets checked in now; sets in too long; checked in this week; checked out this week; customers with a set in the shop. Each links to the matching search | Owner (Q6) |
 | "Too long" | Current stay older than one shop-wide threshold, default **6 months**, changeable by admins | Owner (Q6) |
 | PDF for a returning customer | The form suggests the existing customer; staff can check one of their checked-out sets in from the PDF instead of creating a new set. Every value the new PDF provides **replaces** the stored value in the form, with no per-field choice; fields the PDF could not read keep their stored value (a blank never wipes data). Staff still review the form and save, as for any PDF; previous values stay in history. The new PDF is attached to the new stay; earlier PDFs stay with earlier stays | Owner (Q7); blank-keeps-stored is the assistant's call |
-| PDF fills | Customer name, phone, email; vehicle, VIN, plate; RO and invoice numbers; invoice date as check-in date; size(s) and brand from storage notes; accessories. Never tread depth, DOT codes or location | Owner (Q7) |
+| PDF fills | Customer name, phone, email; vehicle, VIN, plate; RO and invoice numbers; invoice date as check-in date; size(s) and brand from storage notes; accessories. Never the storage location | Owner (Q7) |
 | Vehicles | Text on the set (year make model, optional VIN and plate); no vehicle records | Owner (Q9) |
 | Storage location | On; optional free text on each stay; current location shown while checked in | Owner (Q9) |
 | Search | One box: customer name, phone, tire size (digits only), brand, vehicle, VIN, plate, RO, location. Filters: in shop, out, too long, archived. Archived hidden by default | Owner (Q10) |
@@ -151,7 +151,10 @@ This planning change is archived with `--skip-specs` after the last change is ar
 
 **Answered by the owner on 2026-11-24; the answers are in Decisions.** All ten were accepted.
 Q3 added a DOT date code per tire. Q7 added that a new PDF replaces the stored details outright
-(no per-field choice). The recommendations
+(no per-field choice). **Changed on 2026-11-27**, while the owner reviewed the tire set mockup:
+tread depth (Q2), DOT date codes (Q3) and per-tire positions (Q1) are not recorded at all;
+anything about one tire goes in the set's notes. The Decisions table is current; the answers
+below are kept as they were given. The recommendations
 below are kept as the reasoning. Evidence from the five real invoices in `samples/private/`
 (checked 2026-11-24): none contains tread depths; all contain `Bill To`, a vehicle `Description`,
 VIN, license plate, `Invoice #`, `Work Order #`, and a storage section with the accessories line
@@ -222,7 +225,7 @@ Fields the PDF fills:
 - size(s) and brand, read from the storage notes
 - accessories
 
-It never fills tread depth or storage location.
+It never fills the storage location.
 Changes: `pdf-prefill` leads to either "new set" or "check in an existing set".
 
 **Q8. Customer fields and terms.**

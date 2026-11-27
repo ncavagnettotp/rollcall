@@ -9,16 +9,15 @@ Form values are text exactly as typed (so a wrong value can be shown back with i
 details are display-ready values. Dates are `date` (shown with the `shop_date` filter), moments
 are UTC `datetime` (shown with `shop_time`).
 
-Fields follow plan-rollcall-rewrite/design.md, Decisions: set fields (Q3), stays and tread depth
-(Q2), archive (Q4), vehicle as text and storage location (Q9), what a PDF fills (Q7).
+Fields follow plan-rollcall-rewrite/design.md, Decisions: set fields (Q3), stays, archive (Q4),
+vehicle as text and storage location (Q9), what a PDF fills (Q7). Nothing is recorded per tire
+(no positions, DOT codes or tread depth; changed 2026-11-27): that goes in the notes.
 """
 
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from enum import StrEnum
-
-POSITIONS = ("LF", "RF", "LR", "RR", "Extra")
 
 
 class Status(StrEnum):
@@ -89,13 +88,6 @@ class CustomerSummary:
 
 
 @dataclass(frozen=True)
-class Tire:
-    position: str  # one of POSITIONS
-    dot_code: str | None  # four digits, week and year (2321 = week 23 of 2021)
-    tread: int | None  # latest reading, 32nds of an inch
-
-
-@dataclass(frozen=True)
 class Accessories:
     lug_nuts: Choice
     center_caps: Choice
@@ -123,17 +115,10 @@ class TireSetDetails:
     vin: str | None
     plate: str | None
     notes: str | None
-    tires: tuple[Tire, ...]
 
     @property
     def staggered(self) -> bool:
         return len(self.sizes) > 1
-
-
-@dataclass(frozen=True)
-class TreadReading:
-    position: str
-    tread: int | None
 
 
 @dataclass(frozen=True)
@@ -143,22 +128,11 @@ class Stay:
     checked_in: date
     ro_number: str | None
     location: str | None
-    treads: tuple[TreadReading, ...]
     checked_out: date | None
     invoice: Link | None  # the PDF attached to this stay
 
 
 # --- forms --------------------------------------------------------------------------------------
-
-
-@dataclass(frozen=True)
-class TireInput:
-    """One tire row. Field names: tires-<row>-position, tires-<row>-dot, tires-<row>-tread,
-    counting rows from 0 (a set can have several Extra tires)."""
-
-    position: str
-    dot_code: str = ""
-    tread: str = ""
 
 
 @dataclass(frozen=True)
@@ -184,7 +158,6 @@ class TireSetInput:
     vin: str = ""
     plate: str = ""
     notes: str = ""
-    tires: tuple[TireInput, ...] = tuple(TireInput(p) for p in POSITIONS[:4])
 
 
 @dataclass(frozen=True)
@@ -229,7 +202,6 @@ class TireSetForm:
     heading: str
     action_url: str
     cancel_url: str
-    add_tire_url: str  # posts the form back with one more tire row
     submit_label: str
     values: TireSetInput
     check_in: CheckInInput | None  # a new set is checked in as it is created
@@ -242,12 +214,11 @@ class TireSetForm:
 
 @dataclass(frozen=True)
 class CheckInForm:
-    """Check a checked-out set back in: date, RO, location and tread per tire."""
+    """Check a checked-out set back in: date, RO and storage location."""
 
     action_url: str
     cancel_url: str
     values: CheckInInput
-    tires: tuple[TireInput, ...]
     errors: Mapping[str, str] = field(default_factory=dict)
 
 

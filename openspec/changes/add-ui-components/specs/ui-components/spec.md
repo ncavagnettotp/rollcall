@@ -45,7 +45,7 @@ otherwise every `/mockups` address SHALL answer "Page not found".
 
 ### Requirement: Pages built from shared components
 Every page SHALL be assembled from shared components, so a part that appears on several pages
-(status badge, unknown/yes/no choice, tire table, message, history list, stat card, form field,
+(status badge, unknown/yes/no choice, message, history list, stat card, form field,
 button) looks and behaves the same everywhere. Each page SHALL receive one fixed shape of data
 holding everything it shows, including every link, and the sample data in the gallery SHALL use
 that same shape.

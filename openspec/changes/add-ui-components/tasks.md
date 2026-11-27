@@ -31,6 +31,8 @@ test, see it fail, implement, see it pass. Sample data is always invented; nothi
   filled from a PDF with the invoice beside it; check-in step (RO, location, tread per tire);
   staggered set with five tires and very long text; form errors; save conflict; archived. Write
   the tests first (each state renders, the states link to each other). Verify: tests pass.
+  Changed 2026-11-27 at the owner's request: no tread, DOT codes or tire rows (the staggered set
+  no longer lists five tires).
 - [x] 2.2 Build designs A, B and C of the tire set page (design.md decision 6), each with its own
   template, stylesheet and components, with the `?design=` switch in the banner. Verify:
   `scripts/test.sh` passes for every design and state; every state of every design checked by the

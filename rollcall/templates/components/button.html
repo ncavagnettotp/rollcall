@@ -1,7 +1,7 @@
 {% from "components/icon.html" import icon, action_icon %}
 
 {#- A button. kind: primary (solid orange, the main job), secondary (white, blue text), quiet
-    (muted, no frame) or link (reads as a link: "Cancel", "Add tire"). icon: see icon.html. -#}
+    (muted, no frame) or link (reads as a link: "Cancel"). icon: see icon.html. -#}
 {% macro button(label, kind="primary", type="submit", icon_name=None) -%}
 <button type="{{ type }}" class="{{ 'rc-link-button' if kind == 'link' else 'rc-button rc-' ~ kind }}">{% if icon_name %}{{ icon(icon_name) }}{% endif %}{{ label }}</button>
 {%- endmacro %}

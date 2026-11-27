@@ -7,7 +7,7 @@ The platform change left a page frame (`templates/base.html`), three macros
 CSS 2.1.1, and one temporary start page. The content security policy forbids inline scripts and
 inline `style` attributes, so all styling must live in stylesheet files and use classes.
 Page contents are fixed by the decisions in `plan-rollcall-rewrite/design.md` (tire set fields,
-stays, tread depth, search fields, dashboard stats). See proposal.md for why mockups must be the
+stays, search fields, dashboard stats). See proposal.md for why mockups must be the
 real templates.
 
 ## Goals / Non-Goals
@@ -199,13 +199,11 @@ the app's only design in task 2.6. The same rules head `static/app.css`, where t
   with a tinted icon tile, a small uppercase label and, where it helps, one big value.
 - **Buttons.** One solid orange button for the main job (white text, at least 3rem tall, full
   width on phones); secondary actions white with blue text; quiet ones muted with no frame;
-  "Cancel" and "Add tire" read as links. Every action button has an icon.
+  "Cancel" reads as a link. Every action button has an icon.
 - **Pills.** Tinted, outlined in the text colour, and always carrying a word: green good / in
   shop, grey out / archived / no, red a problem, amber a warning, blue counts, dashed unknown.
-  Tread: green 6/32 and up, amber 4-5, red 3 and below.
 - **Forms.** Pico fields with a 3:1 border; an error is red, under its field, and keeps the typed
-  value. Choices (season, unknown / yes / no) are segmented controls. Tire rows are a compact
-  table whose inputs are labelled for screen readers only.
+  value. Choices (season, unknown / yes / no) are segmented controls.
 - **Type.** The system font at 15 px; page title 1.65rem extra bold; values 1.35rem (1.6rem from
   768 px); labels and table headings small, uppercase, letter-spaced, muted.
 - **Spacing.** Dense: a 0.75rem rhythm inside pages, 1rem between cards.
@@ -219,5 +217,9 @@ the app's only design in task 2.6. The same rules head `static/app.css`, where t
   and borders 3:1, in both modes, checked by `tests/test_contrast.py`.
 - **Names.** Rollcall's own classes start with `rc-`; plain elements are styled by Pico through
   its variables, set from the tokens. Components live in `templates/components/` (icon, pill,
-  badge, tread, card, message, button, choice, field, tire_table, history, table); pages in
-  `templates/pages/` import them and define none of their own.
+  badge, card, message, button, choice, field, history, table); pages in `templates/pages/`
+  import them and define none of their own.
+- **Contents changed in review (2026-11-27).** While reviewing for 2.7 the owner dropped tread
+  depth, DOT codes and tire positions (`plan-rollcall-rewrite/design.md`, Decisions). The tire
+  table, tire rows, "Add tire", tread pills and the per-tire inputs of the check-in step were
+  removed; the layout and look are otherwise unchanged.

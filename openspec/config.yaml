@@ -6,7 +6,7 @@ context: |
   legacy/ holds the first version for reference only: read it for lessons, never import or copy it wholesale.
 
   Product shape
-  - A CRUD app: customers and their tire sets (tire size, tread depth and related data),
+  - A CRUD app: customers and their tire sets (tire size and related data),
     a small dashboard of stats (e.g. sets in shop, sets in shop too long), admin user management.
   - Keep pages few. Adding a page needs a stated reason.
   - Uploading a Protractor PDF only PRE-FILLS the add/edit form. Staff review and press Save.

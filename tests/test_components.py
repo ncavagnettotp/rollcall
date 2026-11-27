@@ -75,10 +75,10 @@ def test_field_component_without_error_shows_the_hint(env):
     html = render_component(
         env,
         '{% from "components/field.html" import field %}'
-        '{{ field("dot", "DOT code", hint="Week and year, e.g. 2319", required=True) }}',
+        '{{ field("location", "Storage location", hint="e.g. Rack B3", required=True) }}',
     )
     assert "aria-invalid" not in html
-    assert "<small>Week and year, e.g. 2319</small>" in html
+    assert "<small>e.g. Rack B3</small>" in html
     assert " required" in html
 
 
@@ -128,7 +128,7 @@ def test_pages_define_no_components_of_their_own():
     "source",
     [
         '{% from "components/badge.html" import status_badge %}{{ status_badge(s, True) }}',
-        '{% from "components/tread.html" import tread %}{{ tread("LF", 3) }}',
+        '{% from "components/pill.html" import pill %}{{ pill("3 stays", "blue") }}',
     ],
 )
 def test_pills_always_carry_a_word(env, source):

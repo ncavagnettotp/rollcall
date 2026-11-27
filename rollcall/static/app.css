@@ -16,14 +16,12 @@
             helps, one big value (the size, the location).
    Buttons  One solid orange button for the main job (white text, at least 3rem tall, full
             width on phones); secondary actions white with blue text; quiet ones muted with no
-            frame; "Cancel" and "Add tire" read as links. Every action button has an icon.
+            frame; "Cancel" reads as a link. Every action button has an icon.
    Pills    Tinted, with an outline in the text colour, and always a word, so colour is never
             the only signal: green good / in shop, grey out / archived / no, red a problem,
-            amber a warning, blue counts, dashed for unknown. Tread: green 6/32 and up, amber
-            4-5, red 3 and below.
+            amber a warning, blue counts, dashed for unknown.
    Forms    Pico fields with a 3:1 border; an error is red, under its field, and keeps the
-            typed value. Choices (season, unknown / yes / no) are segmented controls. Tire rows
-            are a compact table whose inputs are labelled for screen readers only.
+            typed value. Choices (season, unknown / yes / no) are segmented controls.
    Type     The system font at 15 px; page title 1.65rem, extra bold; values 1.35rem (1.6rem
             from 768 px); labels and table headings small, uppercase, letter-spaced, muted.
    Spacing  Dense: 0.75rem rhythm inside pages, 1rem between cards.
@@ -360,23 +358,6 @@ header nav .theme-switch button[aria-pressed="true"] {
 .rc-pill.rc-slate { color: var(--rc-slate); background: var(--rc-slate-soft); }
 .rc-pill.rc-unknown { color: var(--rc-muted); background: transparent; border-style: dashed; }
 
-/* Tread readings: position plus a coloured number. */
-.rc-tread {
-  display: inline-flex;
-  gap: 0.3rem;
-  align-items: baseline;
-  padding: 0 0.55rem;
-  border-radius: 999px;
-  background: var(--rc-slate-soft);
-  color: var(--rc-slate);
-  font-size: 0.85rem;
-  white-space: nowrap;
-}
-.rc-tread b { font-size: 0.95rem; }
-.rc-tread.rc-green { background: var(--rc-green-soft); color: var(--rc-green); }
-.rc-tread.rc-amber { background: var(--rc-amber-soft); color: var(--rc-amber); }
-.rc-tread.rc-red { background: var(--rc-red-soft); color: var(--rc-red); }
-
 /* Messages above the page. */
 .rc-message {
   display: flex;
@@ -486,7 +467,7 @@ header nav .theme-switch button[aria-pressed="true"] {
   box-shadow: none;
   color: var(--rc-muted);
 }
-/* Quiet buttons that read as links ("Cancel", "Add tire"). */
+/* Quiet buttons that read as links ("Cancel"). */
 .rc-link-button,
 .rc-card .rc-link-button {
   display: inline-flex;
@@ -633,15 +614,6 @@ header nav .theme-switch button[aria-pressed="true"] {
   color: var(--rc-ink);
   white-space: nowrap;
 }
-.rc-tire-inputs input {
-  margin: 0;
-}
-.rc-tire-inputs td .rc-cell-error {
-  display: block;
-  margin-top: 0.2rem;
-  color: var(--rc-red);
-  font-size: 0.8rem;
-}
 
 /* Notes inside the set card. */
 .rc-note {
@@ -706,12 +678,6 @@ header nav .theme-switch button[aria-pressed="true"] {
   gap: 0.25rem;
   align-items: center;
   font-weight: 600;
-}
-.rc-history p.rc-treads {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-  margin-top: 0.35rem;
 }
 
 /* Segmented control: radio buttons drawn as one row of buttons; the chosen one in indigo. */

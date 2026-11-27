@@ -14,7 +14,7 @@ one sample page. Only once the owner is happy with that design are the other pag
 
 ## What Changes
 
-- **Components:** shared parts (status badge, unknown/yes/no choice, tire table, stat card,
+- **Components:** shared parts (status badge, unknown/yes/no choice, stat card,
   message, history list, and others as pages need them) become reusable templates. Every page is
   assembled from them.
 - **Page templates fed by a fixed shape of data:** each page template receives one object

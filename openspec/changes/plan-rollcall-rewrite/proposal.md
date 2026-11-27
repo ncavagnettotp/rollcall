@@ -29,7 +29,7 @@ follow-up change:
   navigation, error pages).
 - `accounts`: sign-in, sessions, first-admin bootstrap, roles, user management.
 - `customers`: customer records, the root of all data; every tire set belongs to one customer.
-- `tire-inventory`: tire sets kept permanently under their customer; sizes, tread depth; toggling
+- `tire-inventory`: tire sets kept permanently under their customer; sizes and related details; toggling
   checked in / checked out, with each stay kept; one search page for customers and sets.
 - `audit-history`: what is recorded on every change and how it is shown.
 - `pdf-prefill`: PDF upload, archive, suggested values, side-by-side review.
