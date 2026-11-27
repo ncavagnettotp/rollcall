@@ -72,9 +72,9 @@ page template; builder checks it at 360 px and desktop width, in light and dark 
 owner reviews in the gallery, revisions, sign-off. Page contents follow
 `plan-rollcall-rewrite/design.md`.
 
-- [ ] 3.1 Customer view: details and phones; sets in shop, out and archived; check in / check out
+- [x] 3.1 Customer view: details and phones; sets in shop, out and archived; check in / check out
   on each set; history; states for a new customer, many sets, long notes, archived customer,
-  save conflict. Verify: owner signs off.
+  save conflict. Verify: owner signs off. Done 2026-11-27: approved as built (11 states).
 - [ ] 3.2 Search: one box and the in shop / out / too long / archived filters; results showing
   customers with their sets; states for no query, no results, many results, size typed as digits,
   a "too long" filter from the dashboard. Verify: owner signs off.
