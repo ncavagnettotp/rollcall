@@ -5,7 +5,7 @@ checked in before 5/18/2026 is in too long. Customers and sets link to the custo
 states that show them best (Renata's own, or the closest one).
 
 The gallery has one state per situation, so a filter or page link opens the state nearest to
-it: the filters lead to the too-long and archived states, or back to the size search.
+it: the filters lead to the in-shop, too-long and archived states, or back to the size search.
 """
 
 from dataclasses import replace
@@ -25,6 +25,7 @@ from rollcall.views.shared import Action, Link
 from rollcall.views.tire_set import Status
 
 PER_PAGE = 20
+TOO_LONG_BEFORE = date(2026, 5, 18)  # checked in before this: in too long (6 months)
 TOO_LONG_NOTE = "In the shop longer than 6 months (set in Admin settings). Longest first."
 
 
@@ -46,7 +47,7 @@ SEARCH_TARGET = state("size-digits")  # where typing a search leads in the galle
 # Which state each filter opens in the gallery.
 FILTER_STATES = {
     Filter.ALL: "size-digits",
-    Filter.IN_SHOP: "size-digits",
+    Filter.IN_SHOP: "in-shop",
     Filter.OUT: "size-digits",
     Filter.TOO_LONG: "too-long",
     Filter.ARCHIVED: "archived",
@@ -424,5 +425,61 @@ def archived() -> dict:
             customers=2,
             sets=2,
             results=results,
+        )
+    }
+
+
+# --- everything in the shop, from the dashboard -----------------------------------------------
+
+IN_SHOP_CUSTOMERS = 118
+IN_SHOP_SETS = 142
+SHOP_SETS = (
+    ("235/65R18 Michelin CrossClimate 2", "2021 Honda Pilot"),
+    ("215/55R17 Continental WinterContact SI", "2018 Toyota Camry"),
+    ("225/45R18 Pirelli Sottozero 3", "2019 BMW 330i"),
+    ("265/70R17 BFGoodrich All-Terrain T/A KO2", "2016 Ford F-150"),
+    ("205/55R16 Bridgestone Blizzak WS90", "2017 Honda Civic"),
+    ("255/50R20 Nokian Hakkapeliitta R5 SUV", "2022 Kia Telluride"),
+    ("195/65R15 Hankook Winter i*cept", "2012 Toyota Prius"),
+)
+
+
+def _in_shop_customer(number: int) -> SearchResult:
+    """The number-th customer (counting from 0) with a set in the shop, oldest stay first."""
+    name = f"{FIRST_NAMES[(number * 3) % 20]} {LAST_NAMES[(number * 11 + 5) % 20]}"
+    title, vehicle = SHOP_SETS[number % 7]
+    since = date(2026, 5 + number // 5, 1 + (number * 5) % 28)
+    rack = f"Rack {'ABCDE'[number % 5]}{1 + number % 6}"
+    too_long = since < TOO_LONG_BEFORE
+    ro = str(47100 + number * 41)
+    sets = (in_shop(title, "checked-in", since, rack, ro, vehicle, "in-shop", too_long),)
+    if number % 4 == 1:
+        sets += (
+            in_shop(
+                "225/60R17 Bridgestone Alenza",
+                "checked-in",
+                since,
+                rack,
+                ro,
+                vehicle,
+                "in-shop",
+                too_long,
+            ),
+        )
+    phone = f"(555) 01{(number + 3) % 10}-{2000 + number * 307 % 8000:04d}"
+    return SearchResult(name, customer_page("active"), (phone,), False, None, sets)
+
+
+def in_shop_filter() -> dict:
+    return {
+        "page": _page(
+            filter=Filter.IN_SHOP,
+            filters=filters(Filter.IN_SHOP),
+            note="Sets in the shop now. Longest first.",
+            customers=IN_SHOP_CUSTOMERS,
+            sets=IN_SHOP_SETS,
+            results=tuple(_in_shop_customer(n) for n in range(PER_PAGE)),
+            # The gallery draws only the first page; "Next" shows it again.
+            paging=Paging(1, PER_PAGE, None, state("in-shop") + "?filter=in_shop&page=2"),
         )
     }

@@ -1,0 +1,81 @@
+{#- The dashboard: the five numbers (each opening the matching search, or this week's list), the
+    search box, the invoice upload, and this week's check-ins and check-outs.
+    Data: views/dashboard.py DashboardPage. Layout and colours: the rules at the top of
+    static/app.css. -#}
+{% extends "base.html" %}
+{% from "components/button.html" import action_button %}
+{% from "components/card.html" import card_head %}
+{% from "components/history.html" import change %}
+{% from "components/icon.html" import icon %}
+{% from "components/message.html" import message %}
+{% from "components/pill.html" import pill %}
+{% from "components/search_box.html" import search_box %}
+
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block messages %}{% for item in page.messages %}{{ message(item) }}{% endfor %}{% endblock %}
+
+{% block content %}
+<div class="rc-topbar">
+  <div class="rc-heading">
+    <h1><span class="rc-tile rc-blue">{{ icon("gauge") }}</span>{{ page.title }}</h1>
+  </div>
+  {% if page.actions %}
+  <div class="rc-actions">{% for action in page.actions %}{{ action_button(action) }}{% endfor %}</div>
+  {% endif %}
+</div>
+
+{#- Each number is a link, centered: icon tile, label, the number, and what it counts. -#}
+<div class="rc-stats">
+  {% for stat in page.stats %}
+  {% set alert = stat.kind.value == "too_long" and stat.value > 0 %}
+  {% set icon_name, tone = {
+    "in_shop": ("pin", "green"),
+    "too_long": ("alert", "red" if alert else "slate"),
+    "checked_in": ("in", "blue"),
+    "checked_out": ("out", "slate"),
+    "customers": ("user", "blue"),
+  }[stat.kind.value] %}
+  <a href="{{ stat.url }}" class="rc-card rc-stat{% if alert %} rc-stat-alert rc-tint-red{% endif %}">
+    <span class="rc-tile rc-{{ tone }}">{{ icon(icon_name) }}</span>
+    <span class="rc-stat-label">{{ stat.kind.label }}</span>
+    <span class="rc-stat-value">{{ stat.value }}</span>
+    {% if stat.note %}<span class="rc-stat-note">{{ stat.note }}</span>{% endif %}
+  </a>
+  {% endfor %}
+</div>
+
+<div class="rc-columns">
+  <div>
+    <section class="rc-card rc-search">
+      {{ card_head("search", "Find a customer or tire set", "blue") }}
+      {{ search_box(page.search_url) }}
+    </section>
+
+    <section class="rc-card rc-tint-orange">
+      {{ card_head("file", "Start from an invoice", "orange") }}
+      <form method="post" action="{{ page.upload_url }}" enctype="multipart/form-data" class="rc-upload">
+        <label for="f-invoice">Protractor invoice (PDF)
+          <input id="f-invoice" name="invoice" type="file" accept="application/pdf,.pdf" required aria-describedby="h-invoice">
+          <small id="h-invoice">Rollcall fills in a new tire set from it, and suggests the customer.
+            Check every value before saving.</small>
+        </label>
+        <button type="submit" class="rc-button rc-primary">{{ icon("file") }}Read the invoice</button>
+      </form>
+    </section>
+  </div>
+
+  <section class="rc-card rc-tint-blue rc-week" id="this-week">
+    {{ card_head("clock", "This week", "blue", extra=pill(page.this_week_total | count("change"), "blue")) }}
+    {% if page.this_week %}
+    <p class="rc-muted">Check-ins and check-outs since Monday {{ page.week_start | shop_date }}
+      {%- if page.this_week_total > page.this_week | length %}: the {{ page.this_week | length }} latest of {{ page.this_week_total }}{% endif %}.</p>
+    <ol class="rc-changes">
+      {% for item in page.this_week %}{{ change(item) }}{% endfor %}
+    </ol>
+    {% else %}
+    <p>Nothing checked in or out this week (since Monday {{ page.week_start | shop_date }}).</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% from "components/icon.html" import icon %}
+
+{#- The search box (search page and dashboard): one box, the Search button, and what it finds.
+    filter: the chosen search filter, kept when a new search is typed (views/search.py Filter). -#}
+{% macro search_box(action_url, query="", filter=None, autofocus=False) -%}
+<form method="get" action="{{ action_url }}" aria-label="Search">
+  <label for="f-q" class="rc-sr">Search</label>
+  <div class="rc-search-box">
+    <input id="f-q" name="q" type="search" value="{{ query }}" aria-describedby="h-q"
+      autocomplete="off"{% if autofocus %} autofocus{% endif %}>
+    {% if filter %}<input type="hidden" name="filter" value="{{ filter.value }}">{% endif %}
+    <button type="submit" class="rc-button rc-primary">{{ icon("search") }}Search</button>
+  </div>
+  <small id="h-q" class="rc-muted">Name, phone, tire size (digits are enough: 2256017), brand,
+    vehicle, VIN, plate, RO or location.</small>
+</form>
+{%- endmacro %}

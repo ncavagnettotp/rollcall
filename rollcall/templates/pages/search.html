@@ -6,6 +6,7 @@
 {% from "components/icon.html" import icon %}
 {% from "components/message.html" import message %}
 {% from "components/pill.html" import pill %}
+{% from "components/search_box.html" import search_box %}
 {% from "components/set_list.html" import set_row %}
 
 {% block title %}{{ page.title }}{% endblock %}
@@ -23,17 +24,7 @@
 </div>
 
 <section class="rc-card rc-search">
-  <form method="get" action="{{ page.action_url }}" aria-label="Search">
-    <label for="f-q" class="rc-sr">Search</label>
-    <div class="rc-search-box">
-      <input id="f-q" name="q" type="search" value="{{ page.query }}" aria-describedby="h-q"
-        autocomplete="off"{% if not page.searched %} autofocus{% endif %}>
-      <input type="hidden" name="filter" value="{{ page.filter.value }}">
-      <button type="submit" class="rc-button rc-primary">{{ icon("search") }}Search</button>
-    </div>
-    <small id="h-q" class="rc-muted">Name, phone, tire size (digits are enough: 2256017), brand,
-      vehicle, VIN, plate, RO or location.</small>
-  </form>
+  {{ search_box(page.action_url, page.query, page.filter, autofocus=not page.searched) }}
   <nav class="rc-filters" aria-label="Filter">
     {% for link in page.filters -%}
     <a href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.filter.label }}</a>

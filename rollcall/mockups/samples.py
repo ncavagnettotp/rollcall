@@ -12,6 +12,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 
 from rollcall.mockups import customer_samples as customer
+from rollcall.mockups import dashboard_samples as dashboard
 from rollcall.mockups import search_samples as search
 from rollcall.mockups import tire_set_samples as tire_set
 from rollcall.mockups.urls import INDEX_URL, component_url, page_url
@@ -85,6 +86,7 @@ class Component:
 TIRE_SET_TEMPLATE = "pages/tire_set.html"
 CUSTOMER_TEMPLATE = "pages/customer.html"
 SEARCH_TEMPLATE = "pages/search.html"
+DASHBOARD_TEMPLATE = "pages/dashboard.html"
 
 
 def _frame_note() -> Mapping[str, object]:
@@ -286,6 +288,12 @@ PAGES: tuple[Page, ...] = (
                     search.many_results_2,
                 ),
                 (
+                    "in-shop",
+                    "In shop",
+                    "From the dashboard: every set in the shop, longest first (page 1 of 6).",
+                    search.in_shop_filter,
+                ),
+                (
                     "too-long",
                     "In too long",
                     "Opened from the dashboard: every set in the shop longer than 6 months.",
@@ -300,7 +308,27 @@ PAGES: tuple[Page, ...] = (
             )
         ),
     ),
-    Page("dashboard", "Dashboard"),
+    Page(
+        "dashboard",
+        "Dashboard",
+        (
+            State(
+                "busy",
+                "A busy week",
+                "The middle of the switch to winter tires: the five numbers, search, the invoice "
+                "upload and this week's check-ins and check-outs.",
+                DASHBOARD_TEMPLATE,
+                dashboard.busy,
+            ),
+            State(
+                "empty",
+                "An empty shop",
+                "A fresh install: every number is 0 and nothing has happened this week.",
+                DASHBOARD_TEMPLATE,
+                dashboard.empty,
+            ),
+        ),
+    ),
     Page("sign-in", "Sign in"),
     Page("admin", "Admin settings"),
 )

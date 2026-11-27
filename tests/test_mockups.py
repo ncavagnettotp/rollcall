@@ -511,6 +511,7 @@ SEARCH_STATES = [
     "no-results",
     "many-results",
     "many-results-2",
+    "in-shop",
     "too-long",
     "archived",
 ]
@@ -615,6 +616,100 @@ def test_archived_filter_shows_archived_customers_and_sets_without_actions(galle
     html = search_html(gallery, "archived")
     assert "Check in" not in html and "Check out" not in html
     assert 'value="impreza"' in html  # the query is kept when the filter changes
+
+
+# --- the dashboard (task 3.3) ----------------------------------------------------------------
+
+DASHBOARD_STATES = ["busy", "empty"]
+STAT_LABELS = (
+    "Sets in the shop",
+    "In too long",
+    "Checked in",
+    "Checked out",
+    "Customers",
+)
+
+
+def dashboard_html(gallery, state: str) -> str:
+    response = gallery.get(f"/mockups/pages/dashboard/{state}")
+    assert response.status_code == 200
+    return response.text
+
+
+def dashboard_page(state: str):
+    return samples.find_state(samples.find_page("dashboard"), state).data()["page"]
+
+
+def test_dashboard_has_every_planned_state():
+    assert [state.slug for state in samples.find_page("dashboard").states] == DASHBOARD_STATES
+
+
+def test_dashboard_states_all_use_the_page_data_shape():
+    from rollcall.views.dashboard import DashboardPage
+
+    for state in samples.find_page("dashboard").states:
+        assert isinstance(state.data()["page"], DashboardPage), state.slug
+        assert state.template == "pages/dashboard.html", state.slug
+
+
+@pytest.mark.parametrize("state", DASHBOARD_STATES)
+def test_dashboard_shows_the_five_numbers_each_with_a_link(gallery, state):
+    html = dashboard_html(gallery, state)
+    for label in STAT_LABELS:
+        assert label in html, label
+    assert count_class(html, "rc-stat") == 5
+    assert html.count("this week, since Monday 11/16") == 2
+    assert "with a set in the shop" in html
+    page = dashboard_page(state)
+    assert [stat.kind.label for stat in page.stats] == list(STAT_LABELS)
+    for stat in page.stats:
+        assert f'href="{stat.url}"' in html, stat.kind
+
+
+def test_shop_wide_numbers_open_the_matching_search(gallery):
+    """The search states opened agree with the numbers (sets and customers in, too long)."""
+    stats = {stat.kind.value: stat for stat in dashboard_page("busy").stats}
+    for kind, search_state in (
+        ("in_shop", "in-shop"),
+        ("too_long", "too-long"),
+        ("customers", "in-shop"),
+    ):
+        assert urlsplit(stats[kind].url).path == f"/mockups/pages/search/{search_state}", kind
+    assert stats["in_shop"].value == search_page("in-shop").sets
+    assert stats["customers"].value == search_page("in-shop").customers
+    assert stats["too_long"].value == search_page("too-long").sets
+
+
+def test_weekly_numbers_open_this_weeks_list(gallery):
+    page = dashboard_page("busy")
+    weekly = [stat for stat in page.stats if stat.kind.value in ("checked_in", "checked_out")]
+    assert all(stat.url.endswith("#this-week") for stat in weekly)
+    assert sum(stat.value for stat in weekly) == page.this_week_total
+    html = dashboard_html(gallery, "busy")
+    assert 'id="this-week"' in html
+    assert count_class(html, "change") == len(page.this_week) == 12
+    assert "12 latest of 27" in html
+
+
+def test_dashboard_starts_the_common_jobs(gallery):
+    html = dashboard_html(gallery, "busy")
+    assert 'name="q"' in html  # search
+    assert 'type="file"' in html and 'name="invoice"' in html and "multipart/form-data" in html
+    assert "from-pdf" in targets_under(html, "/mockups/pages/tire-set/")
+    assert "new" in targets_under(html, "/mockups/pages/customer/")
+    assert "size-digits" in targets_under(html, "/mockups/pages/search/")
+
+
+def test_sets_in_too_long_stand_out_only_when_there_are_some(gallery):
+    assert count_class(dashboard_html(gallery, "busy"), "rc-stat-alert") == 1
+    assert count_class(dashboard_html(gallery, "empty"), "rc-stat-alert") == 0
+
+
+def test_empty_shop_shows_zeros_and_says_nothing_happened(gallery):
+    html = dashboard_html(gallery, "empty")
+    assert all(stat.value == 0 for stat in dashboard_page("empty").stats)
+    assert "Nothing checked in or out this week" in html
+    assert count_class(html, "change") == 0
 
 
 # --- the approved design (spec: One approved design; Light and dark mode) ---------------------
