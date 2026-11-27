@@ -25,5 +25,5 @@
 
 {#- The icon for an action, by what it does. -#}
 {% macro action_icon(label) -%}
-{{ icon({"Check in": "in", "Check out": "out", "Edit": "edit", "Archive": "archive", "Restore": "undo"}.get(label, "check")) }}
+{{ icon({"Check in": "in", "Check out": "out", "Edit": "edit", "Archive": "archive", "Restore": "undo", "Add tire set": "plus"}.get(label, "check")) }}
 {%- endmacro %}

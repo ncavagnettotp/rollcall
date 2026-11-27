@@ -11,6 +11,7 @@ from a real invoice.
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 
+from rollcall.mockups import customer_samples as customer
 from rollcall.mockups import tire_set_samples as tire_set
 from rollcall.mockups.urls import INDEX_URL, component_url, page_url
 from rollcall.views.frame import SignedInStaff
@@ -81,6 +82,7 @@ class Component:
 
 
 TIRE_SET_TEMPLATE = "pages/tire_set.html"
+CUSTOMER_TEMPLATE = "pages/customer.html"
 
 
 def _frame_note() -> Mapping[str, object]:
@@ -178,7 +180,73 @@ PAGES: tuple[Page, ...] = (
             )
         ),
     ),
-    Page("customer", "Customer"),
+    Page(
+        "customer",
+        "Customer",
+        tuple(
+            State(slug, title, description, CUSTOMER_TEMPLATE, data)
+            for slug, title, description, data in (
+                (
+                    "active",
+                    "With sets in and out",
+                    "Details, a set in the shop, one out, one archived, and the history.",
+                    customer.active,
+                ),
+                (
+                    "checked-out",
+                    "All sets out",
+                    "Just checked a set out from this page; with nothing in the shop, it can be "
+                    "archived.",
+                    customer.checked_out,
+                ),
+                (
+                    "archived",
+                    "Archived",
+                    "Hidden from search with their sets, history kept; it can be restored.",
+                    customer.archived,
+                ),
+                ("new", "New customer", "The empty customer form.", customer.new),
+                (
+                    "no-sets",
+                    "Just added, no sets",
+                    "A new customer with no tire sets yet.",
+                    customer.no_sets,
+                ),
+                (
+                    "duplicate",
+                    "Possible duplicate",
+                    "The name and phone typed match an existing customer.",
+                    customer.duplicate,
+                ),
+                (
+                    "form-errors",
+                    "Form errors",
+                    "Saved with three mistakes: each marked, with its message and typed value.",
+                    customer.form_errors,
+                ),
+                ("edit", "Edit", "Changing a customer's details.", customer.edit),
+                (
+                    "save-conflict",
+                    "Save conflict",
+                    "Someone else saved the customer meanwhile; the typed values are kept.",
+                    customer.save_conflict,
+                ),
+                (
+                    "many-sets",
+                    "Many sets",
+                    "A family with eight sets: three in the shop (one too long), four out, one "
+                    "archived.",
+                    customer.many_sets,
+                ),
+                (
+                    "long-text",
+                    "Long text",
+                    "A very long name, three phones, a long email and long notes.",
+                    customer.long_text,
+                ),
+            )
+        ),
+    ),
     Page("search", "Search"),
     Page("dashboard", "Dashboard"),
     Page("sign-in", "Sign in"),

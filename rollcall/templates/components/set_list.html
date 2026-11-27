@@ -1,0 +1,23 @@
+{% from "components/badge.html" import status_badge %}
+{% from "components/button.html" import action_button %}
+
+{#- One tire set in a list (views: SetSummary): its name linking to the set, its status, where
+    it is or since when it is out, the vehicle, and check in / check out. Goes in
+    <ul class="rc-set-list">. -#}
+{% macro set_row(item) -%}
+<li class="set">
+  <div class="rc-set-main">
+    <a href="{{ item.url }}" class="rc-set-title">{{ item.title }}</a>
+    <p class="rc-set-meta">{{ status_badge(item.status, item.in_too_long) }}
+      {%- if item.status.value == "in_shop" %}
+      <span><b>{{ item.location or "No location" }}</b></span><span>since {{ item.since | shop_date }}</span>{% if item.ro_number %}<span>RO {{ item.ro_number }}</span>{% endif %}
+      {%- elif item.status.value == "out" %}
+      <span>since {{ item.since | shop_date }}</span>
+      {%- else %}
+      <span>on {{ item.since | shop_date }}</span>
+      {%- endif %}
+      {% if item.vehicle %}<span>{{ item.vehicle }}</span>{% endif %}</p>
+  </div>
+  {% if item.action %}<div class="rc-set-action">{{ action_button(item.action) }}</div>{% endif %}
+</li>
+{%- endmacro %}

@@ -217,8 +217,8 @@ the app's only design in task 2.6. The same rules head `static/app.css`, where t
   and borders 3:1, in both modes, checked by `tests/test_contrast.py`.
 - **Names.** Rollcall's own classes start with `rc-`; plain elements are styled by Pico through
   its variables, set from the tokens. Components live in `templates/components/` (icon, pill,
-  badge, card, message, button, choice, field, history, table); pages in `templates/pages/`
-  import them and define none of their own.
+  badge, card, message, button, choice, field, history, set_list, table); pages in
+  `templates/pages/` import them and define none of their own.
 - **Contents changed in review (2026-11-27).** While reviewing for 2.7 the owner dropped tread
   depth, DOT codes and tire positions (`plan-rollcall-rewrite/design.md`, Decisions). The tire
   table, tire rows, "Add tire", tread pills and the per-tire inputs of the check-in step were

@@ -429,6 +429,7 @@ header nav .theme-switch button[aria-pressed="true"] {
 
 /* Buttons: solid orange for the main job; white with blue text for the others. */
 .rc-button,
+a.rc-button,
 .rc-actions .rc-button,
 .rc-submit .rc-button {
   display: inline-flex;
@@ -680,6 +681,97 @@ header nav .theme-switch button[aria-pressed="true"] {
   font-weight: 600;
 }
 
+/* A list of tire sets (customer view, later search results): name, status line, and check in /
+   check out beside it on a desktop, under it on a phone. */
+.rc-set-list {
+  padding: 0;
+  margin: 0;
+}
+.rc-set-list li {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--rc-line);
+}
+.rc-set-list li:last-child {
+  border-bottom: 0;
+}
+.rc-set-main {
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+.rc-set-title {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--rc-ink);
+  text-decoration: none;
+}
+.rc-set-title:hover,
+.rc-set-title:focus-visible {
+  color: var(--rc-link);
+  text-decoration: underline;
+}
+.rc-set-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.75rem;
+  align-items: center;
+  margin: 0.3rem 0 0;
+  color: var(--rc-muted);
+}
+.rc-set-meta b {
+  color: var(--rc-ink);
+}
+.rc-set-action {
+  flex: 1 1 100%;
+}
+.rc-set-action form {
+  margin: 0;
+}
+.rc-set-list .rc-button {
+  width: 100%;
+  min-height: 2.6rem;
+  padding: 0.4rem 1rem;
+  font-size: 1rem;
+}
+/* A history of changes: when and who on one line, what under it. */
+.rc-changes {
+  padding: 0;
+  margin: 0;
+}
+.rc-changes li.change {
+  list-style: none;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--rc-line);
+}
+.rc-changes li.change:last-child {
+  border-bottom: 0;
+}
+.rc-changes p {
+  margin: 0;
+}
+.rc-change-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.75rem;
+}
+.rc-change-top b {
+  color: var(--rc-ink);
+  white-space: nowrap;
+}
+.rc-change-top span {
+  color: var(--rc-muted);
+}
+
+/* A main button that sits inside a card (e.g. "Add tire set" with no sets yet). */
+.rc-card .rc-button.rc-inline {
+  width: auto;
+}
+
 /* Segmented control: radio buttons drawn as one row of buttons; the chosen one in indigo. */
 .rc-seg > div {
   display: inline-flex;
@@ -772,6 +864,13 @@ header nav .theme-switch button[aria-pressed="true"] {
   }
   .rc-facts {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .rc-set-action {
+    flex: 0 0 auto;
+  }
+  .rc-set-list .rc-button {
+    width: auto;
+    min-width: 8.5rem;
   }
 }
 

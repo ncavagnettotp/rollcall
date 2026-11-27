@@ -12,3 +12,13 @@
   </div>
 </li>
 {%- endmacro %}
+
+
+{#- One change in a history of changes (views: Change): when, who, what, and the record it was
+    about. Goes in <ol class="rc-changes">. -#}
+{% macro change(item) -%}
+<li class="change">
+  <p class="rc-change-top"><b>{{ item.at | shop_time }}</b> <span>{{ item.by }}</span></p>
+  <p>{{ item.text }}{% if item.link %}: <a href="{{ item.link.url }}">{{ item.link.label }}</a>{% endif %}</p>
+</li>
+{%- endmacro %}

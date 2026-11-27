@@ -41,7 +41,7 @@ def state(slug: str) -> str:
     return page_url("tire-set", slug)
 
 
-CUSTOMER_URL = page_url("customer")
+CUSTOMER_URL = page_url("customer", "active")
 RENATA = CustomerSummary("Renata Kowalczyk", ("(555) 014-2271",), CUSTOMER_URL)
 
 
@@ -307,7 +307,7 @@ def staggered() -> dict:
     customer = CustomerSummary(
         "Bartholomew Alexander Vandersloot-Okonkwo",
         ("(555) 019-8830", "(555) 012-4471"),
-        CUSTOMER_URL,
+        page_url("customer", "long-text"),
     )
     return {
         "page": TireSetPage(

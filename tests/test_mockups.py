@@ -360,6 +360,149 @@ def test_archived_set_can_only_be_restored(gallery):
     assert "Archived" in html
 
 
+# --- the customer view (task 3.1) ------------------------------------------------------------
+
+CUSTOMER_STATES = [
+    "active",
+    "checked-out",
+    "archived",
+    "new",
+    "no-sets",
+    "duplicate",
+    "form-errors",
+    "edit",
+    "save-conflict",
+    "many-sets",
+    "long-text",
+]
+
+# Where each customer state's links and buttons lead, among the customer states.
+CUSTOMER_FLOW = {
+    "active": {"checked-out", "edit"},
+    "checked-out": {"archived", "edit"},
+    "archived": {"checked-out"},
+    "new": {"no-sets"},
+    "no-sets": {"edit"},
+    "duplicate": {"active", "no-sets"},
+    "form-errors": {"no-sets"},
+    "edit": {"active"},
+    "save-conflict": {"active", "edit"},
+    "many-sets": {"edit"},
+    "long-text": {"edit"},
+}
+
+
+def customer_html(gallery, state: str) -> str:
+    response = gallery.get(f"/mockups/pages/customer/{state}")
+    assert response.status_code == 200
+    return response.text
+
+
+def targets_under(html: str, prefix: str) -> set[str]:
+    return {
+        urlsplit(target).path.removeprefix(prefix)
+        for target in parse(html).targets
+        if urlsplit(target).path.startswith(prefix)
+    }
+
+
+def test_customer_has_every_planned_state():
+    assert [state.slug for state in samples.find_page("customer").states] == CUSTOMER_STATES
+
+
+def test_customer_states_all_use_the_page_data_shape():
+    from rollcall.views.customer import CustomerPage
+
+    for state in samples.find_page("customer").states:
+        assert isinstance(state.data()["page"], CustomerPage), state.slug
+        assert state.template == "pages/customer.html", state.slug
+
+
+@pytest.mark.parametrize("state", CUSTOMER_STATES)
+def test_customer_states_link_to_each_other(gallery, state):
+    html = customer_html(gallery, state)
+    assert CUSTOMER_FLOW[state] <= targets_under(html, "/mockups/pages/customer/")
+
+
+def test_customer_shows_details_sets_and_history(gallery):
+    html = customer_html(gallery, "active")
+    for text in ("Renata Kowalczyk", "(555) 014-2271", "renata.k@example.com", "Wheel locks"):
+        assert text in html, text
+    for heading in ("In the shop", "Out", "Archived", "History"):
+        assert heading in html, heading
+    assert count_class(html, "set") == 3
+    assert count_class(html, "change") >= 4
+    assert "Dana Whitfield" in html  # who made each change
+    assert "11/18/2026 9:14 AM" in html  # when, in the shop's time
+
+
+def test_each_set_links_to_its_page_and_can_be_checked_in_or_out(gallery):
+    html = customer_html(gallery, "active")
+    tire_sets = targets_under(html, "/mockups/pages/tire-set/")
+    assert {"checked-in", "checked-out", "archived", "check-in"} <= tire_sets
+    assert "Check out" in html and "Check in" in html
+
+
+def test_customer_with_a_set_in_the_shop_cannot_be_archived(gallery):
+    assert ">Archive<" not in customer_html(gallery, "active")
+    assert ">Archive<" in customer_html(gallery, "checked-out")
+
+
+def test_new_customer_form_asks_for_the_customer_fields(gallery):
+    html = customer_html(gallery, "new")
+    for name in ("first_name", "last_name", "phones-0", "email", "notes"):
+        assert f'name="{name}"' in html, name
+
+
+def test_customer_without_sets_offers_to_add_one(gallery):
+    html = customer_html(gallery, "no-sets")
+    assert "No tire sets yet" in html
+    assert "new" in targets_under(html, "/mockups/pages/tire-set/")
+
+
+def test_possible_duplicate_is_suggested_before_saving(gallery):
+    html = customer_html(gallery, "duplicate")
+    assert "Renata Kowalczyk" in html
+    assert 'value="Renata"' in html  # what was typed is kept
+    assert "active" in targets_under(html, "/mockups/pages/customer/")
+
+
+def test_customer_form_errors_mark_each_wrong_field_and_keep_its_value(gallery):
+    html = customer_html(gallery, "form-errors")
+    page = samples.find_state(samples.find_page("customer"), "form-errors").data()["page"]
+    assert page.form.errors
+    for name, message in page.form.errors.items():
+        assert f'aria-describedby="e-{name}"' in html, name
+        assert message in html
+    assert 'value="555-01"' in html
+
+
+def test_customer_save_conflict_names_who_and_when_and_keeps_typed_values(gallery):
+    html = customer_html(gallery, "save-conflict")
+    assert "changed by Marcus Oyelaran" in html
+    assert "11/18/2026 2:42 PM" in html
+    assert "Prefers a text the day before pickup" in html
+
+
+def test_customer_with_many_sets_lists_them_all(gallery):
+    html = customer_html(gallery, "many-sets")
+    assert count_class(html, "set") >= 7
+    assert "In too long" in html
+
+
+def test_long_names_and_notes_are_shown_in_full(gallery):
+    html = customer_html(gallery, "long-text")
+    assert "Bartholomew Alexander Vandersloot-Okonkwo" in html
+    assert "never a text" in html
+
+
+def test_archived_customer_can_only_be_restored(gallery):
+    html = customer_html(gallery, "archived")
+    assert "Restore" in html
+    assert "Add tire set" not in html
+    assert "Check in" not in html
+
+
 # --- the approved design (spec: One approved design; Light and dark mode) ---------------------
 
 

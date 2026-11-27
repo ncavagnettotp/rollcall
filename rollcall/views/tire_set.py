@@ -16,8 +16,10 @@ vehicle as text and storage location (Q9), what a PDF fills (Q7). Nothing is rec
 
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import date
 from enum import StrEnum
+
+from rollcall.views.shared import Action, Conflict, Link, Message
 
 
 class Status(StrEnum):
@@ -53,28 +55,6 @@ class Season(StrEnum):
 
 
 # --- shared pieces ----------------------------------------------------------------------------
-
-
-@dataclass(frozen=True)
-class Link:
-    label: str
-    url: str
-
-
-@dataclass(frozen=True)
-class Action:
-    """A button that does something. post: a form posting to url; otherwise a link."""
-
-    label: str
-    url: str
-    post: bool = False
-    kind: str = "primary"  # primary, secondary or quiet (see components/button.html)
-
-
-@dataclass(frozen=True)
-class Message:
-    text: str
-    kind: str = "success"  # success or error
 
 
 @dataclass(frozen=True)
@@ -186,15 +166,6 @@ class Invoice:
     filename: str
     url: str
     invoice_number: str
-
-
-@dataclass(frozen=True)
-class Conflict:
-    """Someone else saved the set while this form was open."""
-
-    changed_by: str
-    changed_at: datetime  # UTC
-    reload_url: str  # the form again, with the newly saved values
 
 
 @dataclass(frozen=True)

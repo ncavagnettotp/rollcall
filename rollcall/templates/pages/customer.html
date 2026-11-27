@@ -1,0 +1,150 @@
+{#- The customer view: the customer's details, their tire sets (in the shop, out, archived) with
+    check in / check out on each, and the history of changes; or the customer form (new customer
+    or edit), with possible duplicates and save conflicts. Data: views/customer.py CustomerPage.
+    Layout and colours: the rules at the top of static/app.css. -#}
+{% extends "base.html" %}
+{% from "components/button.html" import action_button %}
+{% from "components/card.html" import card_head %}
+{% from "components/field.html" import field %}
+{% from "components/history.html" import change %}
+{% from "components/icon.html" import icon %}
+{% from "components/message.html" import message %}
+{% from "components/pill.html" import pill %}
+{% from "components/set_list.html" import set_row %}
+
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block messages %}{% for item in page.messages %}{{ message(item) }}{% endfor %}{% endblock %}
+
+{% block content %}
+<div class="rc-topbar">
+  <div class="rc-heading">
+    <h1><span class="rc-tile rc-blue">{{ icon("user") }}</span>{{ page.title }}</h1>
+    {% if page.details and not page.form %}
+    <p>
+      {% if page.archived_on %}{{ pill("Archived", "slate") }}{% endif %}
+      {% for phone in page.details.phones %}<span class="rc-phone">{{ phone }}</span>{% endfor %}
+    </p>
+    {% endif %}
+  </div>
+  {% if page.actions %}
+  <div class="rc-actions">{% for action in page.actions %}{{ action_button(action) }}{% endfor %}</div>
+  {% endif %}
+</div>
+
+{% if page.form %}
+{#- New customer or edit. -#}
+{% set form = page.form %}
+{% set v = form.values %}
+{% set e = form.errors %}
+{% if form.conflict %}
+<div class="rc-card rc-tint-red" role="alert">
+  {{ card_head("alert", "Save conflict", "red", extra=pill("Not saved", "red")) }}
+  <p><strong>This customer was changed by {{ form.conflict.changed_by }} at {{ form.conflict.changed_at | shop_time }}</strong>
+    while you were editing. Your changes below are not saved yet. Save to replace theirs, or
+    <a href="{{ form.conflict.reload_url }}">load their version</a>.</p>
+</div>
+{% endif %}
+{% if form.duplicates %}
+<div class="rc-card rc-tint-amber" role="status">
+  {{ card_head("alert", "Already a customer?", "amber") }}
+  <p>A customer with this name or phone is already in Rollcall. Open them instead of adding the
+    same person twice.</p>
+  <ul class="rc-set-list">
+    {% for match in form.duplicates %}
+    <li>
+      <div class="rc-set-main"><span class="rc-set-title">{{ match.name }}</span>
+        <p class="rc-set-meta">{{ match.phones | join(", ") }}</p></div>
+      <div class="rc-set-action"><a href="{{ match.url }}" role="button" class="rc-button rc-secondary">{{ icon("user") }}Open {{ match.name }}</a></div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+<form method="post" action="{{ form.action_url }}" class="rc-form">
+  {% if form.heading != page.title %}<h2 class="rc-form-heading">{{ form.heading }}</h2>{% endif %}
+  <div class="rc-columns">
+    <fieldset class="rc-card">
+      <legend class="rc-sr">Customer</legend>
+      {{ card_head("user", "Customer", "blue") }}
+      <div class="rc-pair">
+        {{ field("first_name", "First name", v.first_name, required=True, error=e.get("first_name")) }}
+        {{ field("last_name", "Last name", v.last_name, required=True, error=e.get("last_name")) }}
+      </div>
+      {% for phone in v.phones + ("",) %}
+      {% set name = "phones-%d" % loop.index0 %}
+      {{ field(name, "Phone" if loop.first else "Another phone", phone, type="tel", required=loop.first, hint=None if loop.first else "Optional", error=e.get(name)) }}
+      {% endfor %}
+      {{ field("email", "Email", v.email, type="email", error=e.get("email")) }}
+    </fieldset>
+
+    <div class="rc-card rc-tint-amber">
+      {{ card_head("note", "Notes", "amber") }}
+      <label for="f-notes" class="rc-sr">Notes</label>
+      <textarea id="f-notes" name="notes" rows="6">{{ v.notes }}</textarea>
+    </div>
+  </div>
+
+  <div class="rc-submit">
+    <button type="submit" class="rc-button rc-primary">{{ icon("check") }}{{ form.submit_label }}</button>
+    <a href="{{ form.cancel_url }}" class="rc-link-button">Cancel</a>
+  </div>
+</form>
+
+{% else %}
+{#- The customer: details and history on the left; their sets on the right (first on phones). -#}
+{% set d = page.details %}
+<div class="rc-columns">
+  <div>
+    {% if page.archived_on %}
+    <section class="rc-card">
+      {{ card_head("archive", "Archived", "slate", value=page.archived_on | shop_date) }}
+      <p class="rc-muted">Hidden from search, with their tire sets. The history is kept; restore
+        the customer to use them again.</p>
+    </section>
+    {% endif %}
+    <section class="rc-card">
+      {{ card_head("user", "Customer", "blue") }}
+      <dl class="rc-facts">
+        <div class="rc-wide"><dt>Email</dt><dd>{{ d.email or "–" }}</dd></div>
+      </dl>
+      {% if d.notes %}
+      <div class="rc-note">{{ icon("note") }}<p>{{ d.notes }}</p></div>
+      {% endif %}
+    </section>
+
+    <section class="rc-card rc-tint-blue">
+      {{ card_head("clock", "History", "blue") }}
+      <ol class="rc-changes">
+        {% for item in page.history %}{{ change(item) }}{% endfor %}
+      </ol>
+    </section>
+  </div>
+
+  <div class="rc-side">
+    {% if not (page.in_shop or page.out or page.archived_sets) %}
+    <section class="rc-card">
+      {{ card_head("tire", "Tire sets", "blue") }}
+      <p>No tire sets yet.</p>
+      {% if page.add_set_url %}
+      <a href="{{ page.add_set_url }}" role="button" class="rc-button rc-primary rc-inline">{{ icon("plus") }}Add tire set</a>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    {% for sets, label, icon_name, tone in (
+      (page.in_shop, "In the shop", "pin", "green"),
+      (page.out, "Out", "out", "slate"),
+      (page.archived_sets, "Archived", "archive", "slate"),
+    ) if sets %}
+    <section class="rc-card{% if tone == 'green' %} rc-tint-green{% endif %}">
+      {{ card_head(icon_name, label, tone, extra=pill(sets | length ~ (" set" if sets | length == 1 else " sets"), tone)) }}
+      <ul class="rc-set-list">
+        {% for item in sets %}{{ set_row(item) }}{% endfor %}
+      </ul>
+    </section>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}
