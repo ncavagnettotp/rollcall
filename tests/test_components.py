@@ -52,6 +52,11 @@ def test_shop_date_filter(env):
     assert env.from_string("{{ day | shop_date }}").render(day=date(2026, 3, 2)) == "3/2/2026"
 
 
+@pytest.mark.parametrize(("number", "shown"), [(0, "0 sets"), (1, "1 set"), (38, "38 sets")])
+def test_count_filter_says_how_many(env, number, shown):
+    assert env.from_string('{{ n | count("set") }}').render(n=number) == shown
+
+
 # --- components -------------------------------------------------------------------------------
 
 

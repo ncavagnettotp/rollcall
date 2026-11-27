@@ -85,6 +85,11 @@ def format_shop_date(day: date) -> str:
     return f"{day.month}/{day.day}/{day.year}"
 
 
+def count_of(number: int, word: str) -> str:
+    """How many, with the word in the singular or plural: 1 set, 3 sets."""
+    return f"{number} {word if number == 1 else word + 's'}"
+
+
 def make_templates(shop_timezone: ZoneInfo, nav_items: list[NavItem]) -> Jinja2Templates:
     templates = Jinja2Templates(directory=TEMPLATES_DIR)
     # A value a template shows but the page data lacks is an error naming it, never a blank.
@@ -92,6 +97,7 @@ def make_templates(shop_timezone: ZoneInfo, nav_items: list[NavItem]) -> Jinja2T
     templates.env.undefined = StrictUndefined
     templates.env.filters["shop_time"] = partial(format_shop_time, shop_timezone=shop_timezone)
     templates.env.filters["shop_date"] = format_shop_date
+    templates.env.filters["count"] = count_of
     templates.env.globals["assets"] = ASSETS
     templates.env.globals["theme_of"] = theme_of
     templates.env.globals["nav_items"] = nav_items

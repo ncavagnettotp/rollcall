@@ -12,6 +12,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 
 from rollcall.mockups import customer_samples as customer
+from rollcall.mockups import search_samples as search
 from rollcall.mockups import tire_set_samples as tire_set
 from rollcall.mockups.urls import INDEX_URL, component_url, page_url
 from rollcall.views.frame import SignedInStaff
@@ -83,6 +84,7 @@ class Component:
 
 TIRE_SET_TEMPLATE = "pages/tire_set.html"
 CUSTOMER_TEMPLATE = "pages/customer.html"
+SEARCH_TEMPLATE = "pages/search.html"
 
 
 def _frame_note() -> Mapping[str, object]:
@@ -247,7 +249,57 @@ PAGES: tuple[Page, ...] = (
             )
         ),
     ),
-    Page("search", "Search"),
+    Page(
+        "search",
+        "Search",
+        tuple(
+            State(slug, title, description, SEARCH_TEMPLATE, data)
+            for slug, title, description, data in (
+                (
+                    "no-query",
+                    "Nothing typed yet",
+                    "The search box, what it can find, and the filters.",
+                    search.no_query,
+                ),
+                (
+                    "size-digits",
+                    "Size typed as digits",
+                    "2256017 finds 225/60R17: three customers, four sets.",
+                    search.size_digits,
+                ),
+                (
+                    "no-results",
+                    "No results",
+                    "Nothing matches, but archived customers or sets do.",
+                    search.no_results,
+                ),
+                (
+                    "many-results",
+                    "Many results",
+                    "38 customers with a Toyota: the first 20, and a link to the next page.",
+                    search.many_results,
+                ),
+                (
+                    "many-results-2",
+                    "Many results, page 2",
+                    "The last 18, and a link back.",
+                    search.many_results_2,
+                ),
+                (
+                    "too-long",
+                    "In too long",
+                    "Opened from the dashboard: every set in the shop longer than 6 months.",
+                    search.too_long,
+                ),
+                (
+                    "archived",
+                    "Archived",
+                    "The archived filter: archived customers and archived sets.",
+                    search.archived,
+                ),
+            )
+        ),
+    ),
     Page("dashboard", "Dashboard"),
     Page("sign-in", "Sign in"),
     Page("admin", "Admin settings"),

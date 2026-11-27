@@ -825,6 +825,120 @@ a.rc-button,
   align-items: center;
 }
 
+/* Search: the box with its button, the filters (links drawn like the segmented control),
+   and the results, one card per customer with their sets. */
+.rc-search form {
+  margin: 0 0 0.85rem;
+}
+.rc-search-box {
+  display: flex;
+  gap: 0.5rem;
+}
+.rc-search-box input[type="search"] {
+  flex: 1;
+  min-width: 0;
+  min-height: 3rem;
+  margin: 0;
+  padding-inline-start: var(--pico-form-element-spacing-horizontal);
+  background-image: none;
+  border-radius: 8px;
+}
+.rc-search-box .rc-button {
+  width: auto;
+  flex: none;
+}
+.rc-search small {
+  display: block;
+  margin-top: 0.4rem;
+}
+.rc-filters {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  padding: 3px;
+  gap: 3px;
+  background: var(--rc-slate-soft);
+  border-radius: 10px;
+  max-width: 100%;
+}
+.rc-filters a {
+  padding: 0.35rem 0.9rem;
+  border-radius: 8px;
+  font-weight: 600;
+  color: var(--rc-slate);
+  text-decoration: none;
+}
+.rc-filters a[aria-current="page"] {
+  background: var(--rc-card);
+  color: var(--rc-accent);
+  box-shadow: var(--rc-shadow-raised);
+}
+.rc-search-note {
+  margin: 0.6rem 0 0;
+  color: var(--rc-muted);
+}
+.rc-search-count {
+  margin: 0 0 0.6rem;
+  font-weight: 700;
+  color: var(--rc-ink);
+}
+.rc-results {
+  padding: 0;
+  margin: 0;
+}
+.rc-results > li {
+  list-style: none;
+}
+.rc-result-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.75rem;
+}
+.rc-result-name {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  min-width: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--rc-ink);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.rc-result-name .rc-icon {
+  flex: none;
+  color: var(--rc-link);
+}
+.rc-result-name:hover,
+.rc-result-name:focus-visible {
+  color: var(--rc-link);
+  text-decoration: underline;
+}
+.rc-result-matched {
+  margin: 0.2rem 0 0;
+  color: var(--rc-muted);
+}
+.rc-results .rc-set-list {
+  margin-top: 0.3rem;
+}
+.rc-result-more {
+  margin: 0.3rem 0 0;
+}
+.rc-paging {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+}
+.rc-paging .rc-button {
+  width: auto;
+}
+.rc-paging span {
+  color: var(--rc-muted);
+}
+
 /* Read out by screen readers, not shown. */
 .rc-sr {
   position: absolute;

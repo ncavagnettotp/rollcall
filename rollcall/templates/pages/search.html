@@ -1,0 +1,96 @@
+{#- Search: one box and the filters (all, in shop, out, too long, archived); results are
+    customers, each with their matching tire sets and check in / check out on each set.
+    Data: views/search.py SearchPage. Layout and colours: the rules at the top of static/app.css. -#}
+{% extends "base.html" %}
+{% from "components/button.html" import action_button %}
+{% from "components/icon.html" import icon %}
+{% from "components/message.html" import message %}
+{% from "components/pill.html" import pill %}
+{% from "components/set_list.html" import set_row %}
+
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block messages %}{% for item in page.messages %}{{ message(item) }}{% endfor %}{% endblock %}
+
+{% block content %}
+<div class="rc-topbar">
+  <div class="rc-heading">
+    <h1><span class="rc-tile rc-blue">{{ icon("search") }}</span>{{ page.title }}</h1>
+  </div>
+  {% if page.actions %}
+  <div class="rc-actions">{% for action in page.actions %}{{ action_button(action) }}{% endfor %}</div>
+  {% endif %}
+</div>
+
+<section class="rc-card rc-search">
+  <form method="get" action="{{ page.action_url }}" aria-label="Search">
+    <label for="f-q" class="rc-sr">Search</label>
+    <div class="rc-search-box">
+      <input id="f-q" name="q" type="search" value="{{ page.query }}" aria-describedby="h-q"
+        autocomplete="off"{% if not page.searched %} autofocus{% endif %}>
+      <input type="hidden" name="filter" value="{{ page.filter.value }}">
+      <button type="submit" class="rc-button rc-primary">{{ icon("search") }}Search</button>
+    </div>
+    <small id="h-q" class="rc-muted">Name, phone, tire size (digits are enough: 2256017), brand,
+      vehicle, VIN, plate, RO or location.</small>
+  </form>
+  <nav class="rc-filters" aria-label="Filter">
+    {% for link in page.filters -%}
+    <a href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.filter.label }}</a>
+    {%- endfor %}
+  </nav>
+  {% if page.note %}<p class="rc-search-note">{{ page.note }}</p>{% endif %}
+</section>
+
+{% if not page.searched %}
+<section class="rc-card">
+  <p>Type anything you know about the customer or their tires. To list sets without typing,
+    choose a filter: <b>In shop</b>, <b>Out</b> or <b>Too long</b>. Archived customers and sets
+    show only under <b>Archived</b>.</p>
+</section>
+
+{% elif not page.results %}
+<section class="rc-card" role="status">
+  <p><strong>No customers match “{{ page.query }}”{% if page.filter.value != "all" %} under {{ page.filter.label }}{% endif %}.</strong></p>
+  {% if page.archived_match %}
+  <p>Archived customers or sets do: <a href="{{ page.archived_match.url }}">{{ page.archived_match.label }}</a>.</p>
+  {% endif %}
+  <p class="rc-muted">Check the spelling, or type less: part of a name, the last four digits of a
+    phone or VIN. A new customer can be added with New customer.</p>
+</section>
+
+{% else %}
+<p class="rc-search-count" role="status">
+  {%- if page.paging %}{{ page.paging.first }}–{{ page.paging.last }} of {% endif -%}
+  {{ page.customers | count("customer") }}, {{ page.sets | count("set") }}</p>
+<ol class="rc-results">
+  {% for result in page.results %}
+  <li class="rc-card result">
+    <div class="rc-result-head">
+      <a href="{{ result.url }}" class="rc-result-name">{{ icon("user") }}{{ result.name }}</a>
+      {% if result.archived %}{{ pill("Archived", "slate") }}{% endif %}
+      {% for phone in result.phones %}<span class="rc-phone">{{ phone }}</span>{% endfor %}
+    </div>
+    {% if result.matched %}<p class="rc-result-matched">Matched {{ result.matched }}</p>{% endif %}
+    {% if result.sets %}
+    <ul class="rc-set-list">
+      {% for item in result.sets %}{{ set_row(item) }}{% endfor %}
+    </ul>
+    {% else %}
+    <p class="rc-muted">No tire sets yet.</p>
+    {% endif %}
+    {% if result.more_sets %}
+    <p class="rc-result-more"><a href="{{ result.url }}">{{ result.more_sets | count("more set") }} on their page</a></p>
+    {% endif %}
+  </li>
+  {% endfor %}
+</ol>
+{% if page.paging %}
+<nav class="rc-paging" aria-label="Pages">
+  {% if page.paging.previous_url %}<a href="{{ page.paging.previous_url }}" role="button" class="rc-button rc-secondary">{{ icon("left") }}Previous</a>{% endif %}
+  <span>{{ page.paging.first }}–{{ page.paging.last }} of {{ page.customers }}</span>
+  {% if page.paging.next_url %}<a href="{{ page.paging.next_url }}" role="button" class="rc-button rc-secondary">Next{{ icon("right") }}</a>{% endif %}
+</nav>
+{% endif %}
+{% endif %}
+{% endblock %}

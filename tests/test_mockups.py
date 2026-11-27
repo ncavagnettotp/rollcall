@@ -503,6 +503,120 @@ def test_archived_customer_can_only_be_restored(gallery):
     assert "Check in" not in html
 
 
+# --- search (task 3.2) ---------------------------------------------------------------------
+
+SEARCH_STATES = [
+    "no-query",
+    "size-digits",
+    "no-results",
+    "many-results",
+    "many-results-2",
+    "too-long",
+    "archived",
+]
+SEARCH_FIELDS = ("name", "phone", "size", "brand", "vehicle", "VIN", "plate", "RO", "location")
+
+
+def search_html(gallery, state: str) -> str:
+    response = gallery.get(f"/mockups/pages/search/{state}")
+    assert response.status_code == 200
+    return response.text
+
+
+def search_page(state: str):
+    return samples.find_state(samples.find_page("search"), state).data()["page"]
+
+
+def test_search_has_every_planned_state():
+    assert [state.slug for state in samples.find_page("search").states] == SEARCH_STATES
+
+
+def test_search_states_all_use_the_page_data_shape():
+    from rollcall.views.search import SearchPage
+
+    for state in samples.find_page("search").states:
+        assert isinstance(state.data()["page"], SearchPage), state.slug
+        assert state.template == "pages/search.html", state.slug
+
+
+def test_navigation_search_opens_the_empty_search(gallery):
+    response = gallery.get("/mockups/pages/search", follow_redirects=False)
+    assert response.headers["location"] == "/mockups/pages/search/no-query"
+
+
+@pytest.mark.parametrize("state", SEARCH_STATES)
+def test_search_has_one_box_and_the_five_filters(gallery, state):
+    html = search_html(gallery, state)
+    assert html.count('name="q"') == 1
+    assert 'type="search"' in html
+    for label in ("All", "In shop", "Out", "Too long", "Archived"):
+        assert f">{label}<" in html, label
+    assert html.count('aria-current="page"') >= 1  # the chosen filter (and the nav item)
+    assert "new" in targets_under(html, "/mockups/pages/customer/")  # New customer
+
+
+def test_empty_search_says_what_can_be_found(gallery):
+    html = search_html(gallery, "no-query")
+    for field in SEARCH_FIELDS:
+        assert field in html, field
+    assert count_class(html, "result") == 0
+    assert "No customers match" not in html
+
+
+def test_size_typed_as_digits_finds_the_size(gallery):
+    html = search_html(gallery, "size-digits")
+    assert 'value="2256017"' in html  # what was typed stays in the box
+    assert html.count("225/60R17") >= 4
+    assert "3 customers, 4 sets" in html
+    assert count_class(html, "result") == 3
+    assert "active" in targets_under(html, "/mockups/pages/customer/")
+    assert {"checked-in", "checked-out"} <= targets_under(html, "/mockups/pages/tire-set/")
+    assert "Check out" in html and "Check in" in html
+
+
+def test_no_results_says_so_and_points_to_archived_matches(gallery):
+    html = search_html(gallery, "no-results")
+    assert "No customers match" in html and "impreza" in html
+    assert "archived" in targets_under(html, "/mockups/pages/search/")
+    assert count_class(html, "result") == 0
+
+
+def test_many_results_come_in_pages(gallery):
+    first = search_html(gallery, "many-results")
+    assert count_class(first, "result") == 20
+    assert "1–20 of 38" in first
+    assert "many-results-2" in targets_under(first, "/mockups/pages/search/")
+    second = search_html(gallery, "many-results-2")
+    assert count_class(second, "result") == 18
+    assert "21–38 of 38" in second
+    assert "many-results" in targets_under(second, "/mockups/pages/search/")
+
+
+def test_too_long_filter_lists_only_sets_in_too_long(gallery):
+    page = search_page("too-long")
+    assert page.filter.value == "too_long" and not page.query
+    assert all(item.in_too_long for result in page.results for item in result.sets)
+    html = search_html(gallery, "too-long")
+    assert "6 months" in html
+    assert html.count(">In too long<") == page.sets == 5
+
+
+@pytest.mark.parametrize("state", [s for s in SEARCH_STATES if s != "archived"])
+def test_archived_customers_and_sets_are_hidden_by_default(state):
+    for result in search_page(state).results:
+        assert not result.archived, result.name
+        assert all(item.status.value != "archived" for item in result.sets), result.name
+
+
+def test_archived_filter_shows_archived_customers_and_sets_without_actions(gallery):
+    page = search_page("archived")
+    assert any(result.archived for result in page.results)
+    assert all(item.action is None for result in page.results for item in result.sets)
+    html = search_html(gallery, "archived")
+    assert "Check in" not in html and "Check out" not in html
+    assert 'value="impreza"' in html  # the query is kept when the filter changes
+
+
 # --- the approved design (spec: One approved design; Light and dark mode) ---------------------
 
 
