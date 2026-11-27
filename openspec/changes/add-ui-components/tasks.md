@@ -75,9 +75,10 @@ owner reviews in the gallery, revisions, sign-off. Page contents follow
 - [x] 3.1 Customer view: details and phones; sets in shop, out and archived; check in / check out
   on each set; history; states for a new customer, many sets, long notes, archived customer,
   save conflict. Verify: owner signs off. Done 2026-11-27: approved as built (11 states).
-- [ ] 3.2 Search: one box and the in shop / out / too long / archived filters; results showing
+- [x] 3.2 Search: one box and the in shop / out / too long / archived filters; results showing
   customers with their sets; states for no query, no results, many results, size typed as digits,
-  a "too long" filter from the dashboard. Verify: owner signs off.
+  a "too long" filter from the dashboard. Verify: owner signs off. Done 2026-11-27: approved as
+  built (7 states).
 - [ ] 3.3 Dashboard: the five stats, each linking to its search; states for an empty shop and a
   busy one. Verify: owner signs off.
 - [ ] 3.4 Sign-in: sign-in form, wrong password, deactivated account, first-admin setup on a fresh
