@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from rollcall.mockups import customer_samples as customer
 from rollcall.mockups import dashboard_samples as dashboard
 from rollcall.mockups import search_samples as search
+from rollcall.mockups import sign_in_samples as sign_in
 from rollcall.mockups import tire_set_samples as tire_set
 from rollcall.mockups.urls import INDEX_URL, component_url, page_url
 from rollcall.views.frame import SignedInStaff
@@ -21,8 +22,10 @@ from rollcall.web import NavItem
 
 # --- who is signed in, and the navigation they see ----------------------------------------------
 
-STAFF = SignedInStaff(name="Dana Whitfield", is_admin=False, sign_out_url=page_url("sign-in"))
-ADMIN = SignedInStaff(name="Marcus Oyelaran", is_admin=True, sign_out_url=page_url("sign-in"))
+SIGNED_OUT = page_url("sign-in", "signed-out")
+STAFF = SignedInStaff(name="Dana Whitfield", is_admin=False, sign_out_url=SIGNED_OUT)
+ADMIN = SignedInStaff(name="Marcus Oyelaran", is_admin=True, sign_out_url=SIGNED_OUT)
+JORDAN = SignedInStaff(name="Jordan Pike", is_admin=False, sign_out_url=SIGNED_OUT)
 
 
 def navigation(staff: SignedInStaff | None) -> list[NavItem]:
@@ -55,6 +58,7 @@ class State:
     template: str
     data: Callable[[], Mapping[str, object]] = dict  # the template's values, built on request
     staff: SignedInStaff | None = STAFF  # who is signed in; None for pages before sign-in
+    navigation: bool = True  # False: signed in, but nothing else may be opened yet
 
 
 @dataclass(frozen=True)
@@ -87,6 +91,7 @@ TIRE_SET_TEMPLATE = "pages/tire_set.html"
 CUSTOMER_TEMPLATE = "pages/customer.html"
 SEARCH_TEMPLATE = "pages/search.html"
 DASHBOARD_TEMPLATE = "pages/dashboard.html"
+SIGN_IN_TEMPLATE = "pages/sign_in.html"
 
 
 def _frame_note() -> Mapping[str, object]:
@@ -329,7 +334,67 @@ PAGES: tuple[Page, ...] = (
             ),
         ),
     ),
-    Page("sign-in", "Sign in"),
+    Page(
+        "sign-in",
+        "Sign in",
+        (
+            *(
+                State(slug, title, description, SIGN_IN_TEMPLATE, data, staff=None)
+                for slug, title, description, data in (
+                    ("sign-in", "Sign in", "Username and password.", sign_in.sign_in),
+                    (
+                        "signed-out",
+                        "Signed out",
+                        "Where Sign out leads, from any page.",
+                        sign_in.signed_out,
+                    ),
+                    (
+                        "wrong-password",
+                        "Wrong password",
+                        "The username is kept; the message never says which of the two was wrong.",
+                        sign_in.wrong_password,
+                    ),
+                    (
+                        "deactivated",
+                        "Deactivated account",
+                        "The right password for an account an admin turned off.",
+                        sign_in.deactivated,
+                    ),
+                    (
+                        "first-admin",
+                        "First admin",
+                        "A fresh install with no accounts: the first account is the admin.",
+                        sign_in.first_admin,
+                    ),
+                    (
+                        "first-admin-errors",
+                        "First admin, errors",
+                        "A username with a space, a short password, and two that differ.",
+                        sign_in.first_admin_errors,
+                    ),
+                )
+            ),
+            *(
+                State(
+                    slug, title, description, SIGN_IN_TEMPLATE, data, staff=JORDAN, navigation=False
+                )
+                for slug, title, description, data in (
+                    (
+                        "change-password",
+                        "Temporary password",
+                        "Signed in with the temporary password an admin gave: a new one first.",
+                        sign_in.change_password,
+                    ),
+                    (
+                        "change-password-errors",
+                        "Temporary password, errors",
+                        "A new password too short, and two that differ.",
+                        sign_in.change_password_errors,
+                    ),
+                )
+            ),
+        ),
+    ),
     Page("admin", "Admin settings"),
 )
 

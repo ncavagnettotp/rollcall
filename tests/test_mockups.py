@@ -712,6 +712,116 @@ def test_empty_shop_shows_zeros_and_says_nothing_happened(gallery):
     assert count_class(html, "change") == 0
 
 
+# --- sign-in (task 3.4) ------------------------------------------------------------------------
+
+SIGN_IN_STATES = [
+    "sign-in",
+    "signed-out",
+    "wrong-password",
+    "deactivated",
+    "first-admin",
+    "first-admin-errors",
+    "change-password",
+    "change-password-errors",
+]
+
+
+def sign_in_html(gallery, state: str) -> str:
+    response = gallery.get(f"/mockups/pages/sign-in/{state}")
+    assert response.status_code == 200
+    return response.text
+
+
+def password_values(html: str) -> list[str]:
+    """The value attributes of every password field (there should be none)."""
+    return re.findall(r'<input[^>]*type="password"[^>]*value="([^"]*)"', html)
+
+
+def test_sign_in_has_every_planned_state():
+    assert [state.slug for state in samples.find_page("sign-in").states] == SIGN_IN_STATES
+
+
+def test_sign_in_states_all_use_the_page_data_shape():
+    from rollcall.views.sign_in import SignInPage
+
+    for state in samples.find_page("sign-in").states:
+        page = state.data()["page"]
+        assert isinstance(page, SignInPage), state.slug
+        assert state.template == "pages/sign_in.html", state.slug
+        forms = [page.sign_in, page.setup, page.change_password]
+        assert sum(form is not None for form in forms) == 1, state.slug
+
+
+@pytest.mark.parametrize("state", SIGN_IN_STATES)
+def test_no_password_is_ever_shown_back(gallery, state):
+    html = sign_in_html(gallery, state)
+    assert 'type="password"' in html
+    assert all(value == "" for value in password_values(html))
+
+
+@pytest.mark.parametrize("state", ["sign-in", "signed-out", "wrong-password", "deactivated"])
+def test_before_sign_in_there_is_no_navigation_and_no_one_signed_in(gallery, state):
+    html = sign_in_html(gallery, state)
+    assert "Sign out" not in html
+    assert ">Dashboard<" not in html and ">Search<" not in html
+
+
+def test_sign_in_asks_for_username_and_password(gallery):
+    html = sign_in_html(gallery, "sign-in")
+    assert 'name="username"' in html and 'autocomplete="username"' in html
+    assert 'name="password"' in html and 'autocomplete="current-password"' in html
+    assert "busy" in targets_under(html, "/mockups/pages/dashboard/")
+
+
+def test_sign_out_leads_to_the_signed_out_state(gallery):
+    html = gallery.get("/mockups/pages/dashboard/busy").text
+    assert "signed-out" in targets_under(html, "/mockups/pages/sign-in/")
+    assert "Signed out." in sign_in_html(gallery, "signed-out")
+
+
+def test_wrong_password_keeps_the_username_and_does_not_say_which_was_wrong(gallery):
+    html = sign_in_html(gallery, "wrong-password")
+    assert 'value="dana"' in html
+    assert "username and password don&#39;t match" in html
+    assert 'role="alert"' in html
+
+
+def test_deactivated_account_is_told_to_ask_an_admin(gallery):
+    html = sign_in_html(gallery, "deactivated")
+    assert "turned off" in html and "admin" in html
+
+
+def test_first_admin_setup_asks_for_name_username_and_password_twice(gallery):
+    html = sign_in_html(gallery, "first-admin")
+    for name in ("name", "username", "password", "password_again"):
+        assert f'name="{name}"' in html, name
+    assert html.count('autocomplete="new-password"') == 2
+    assert "admin" in html
+    assert "empty" in targets_under(html, "/mockups/pages/dashboard/")
+
+
+def test_first_admin_errors_mark_each_field_and_keep_the_name(gallery):
+    html = sign_in_html(gallery, "first-admin-errors")
+    for name in ("username", "password", "password_again"):
+        assert f'aria-describedby="e-{name}"' in html, name
+    assert 'value="Marcus Oyelaran"' in html and 'value="marcus o"' in html
+
+
+@pytest.mark.parametrize("state", ["change-password", "change-password-errors"])
+def test_temporary_password_must_be_changed_before_anything_else(gallery, state):
+    html = sign_in_html(gallery, state)
+    assert "Jordan Pike" in html and "Sign out" in html  # signed in...
+    assert ">Dashboard<" not in html and ">Search<" not in html  # ...but nowhere to go yet
+    assert html.count('autocomplete="new-password"') == 2
+    assert "temporary password" in html
+
+
+def test_new_password_errors_are_marked(gallery):
+    html = sign_in_html(gallery, "change-password-errors")
+    for name in ("password", "password_again"):
+        assert f'aria-describedby="e-{name}"' in html, name
+
+
 # --- the approved design (spec: One approved design; Light and dark mode) ---------------------
 
 

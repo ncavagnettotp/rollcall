@@ -1,14 +1,17 @@
-{#- A labeled form field. Pico styles it; aria-invalid turns it red and the error shows below. -#}
-{% macro field(name, label, value="", type="text", error=None, required=False, hint=None) -%}
+{#- A labeled field. Pico styles it; aria-invalid turns it red and the error shows below in place
+    of the hint. autocomplete: what the browser may fill in (username, current-password,
+    new-password...). A password field never shows a value back. -#}
+{% macro field(name, label, value="", type="text", error=None, required=False, hint=None, autocomplete=None) -%}
 <label for="f-{{ name }}">{{ label }}
-  <input id="f-{{ name }}" name="{{ name }}" type="{{ type }}" value="{{ value if value is not none else '' }}"
+  <input id="f-{{ name }}" name="{{ name }}" type="{{ type }}" value="{{ '' if type == 'password' or value is none else value }}"
+    {%- if autocomplete %} autocomplete="{{ autocomplete }}"{% endif %}
     {%- if required %} required{% endif %}
-    {%- if error %} aria-invalid="true" aria-describedby="e-{{ name }}"{% endif %}>
+    {%- if error %} aria-invalid="true" aria-describedby="e-{{ name }}"
+    {%- elif hint %} aria-describedby="h-{{ name }}"{% endif %}>
   {%- if error %}
   <small id="e-{{ name }}">{{ error }}</small>
   {%- elif hint %}
-  <small>{{ hint }}</small>
+  <small id="h-{{ name }}">{{ hint }}</small>
   {%- endif %}
 </label>
 {%- endmacro %}
-

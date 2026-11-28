@@ -18,10 +18,10 @@ SAMPLE_INVOICE = Path(__file__).parent / "sample-invoice.pdf"
 router = APIRouter(prefix=samples.INDEX_URL)
 
 
-def _frame(title: str, staff=samples.STAFF) -> dict:
+def _frame(title: str, staff=samples.STAFF, navigation: bool = True) -> dict:
     return {
         "mockup": samples.Banner(title),
-        "nav_items": samples.navigation(staff),
+        "nav_items": samples.navigation(staff) if navigation else [],
         "signed_in": staff,
     }
 
@@ -51,7 +51,7 @@ def state(request: Request, page_slug: str, state_slug: str):
     if not shown:
         raise HTTPException(404)
     title = f"{found.title}: {shown.title}"
-    context = dict(shown.data()) | _frame(title, shown.staff)
+    context = dict(shown.data()) | _frame(title, shown.staff, shown.navigation)
     return render(request, shown.template, context)
 
 

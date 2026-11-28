@@ -993,6 +993,22 @@ a.rc-button,
   align-self: start;
 }
 
+/* Sign-in pages: one narrow card in the middle. */
+.rc-narrow {
+  max-width: 28rem;
+  margin: 0 auto;
+}
+.rc-sign-in-heading {
+  margin: 1rem 0;
+}
+.rc-narrow .rc-message {
+  margin-bottom: 1rem;
+}
+.rc-sign-in-help {
+  margin: 0.85rem 0 0;
+  font-size: 0.9rem;
+}
+
 /* Read out by screen readers, not shown. */
 .rc-sr {
   position: absolute;

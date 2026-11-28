@@ -83,8 +83,21 @@ def test_field_component_without_error_shows_the_hint(env):
         '{{ field("location", "Storage location", hint="e.g. Rack B3", required=True) }}',
     )
     assert "aria-invalid" not in html
-    assert "<small>e.g. Rack B3</small>" in html
+    assert 'aria-describedby="h-location"' in html
+    assert '<small id="h-location">e.g. Rack B3</small>' in html
     assert " required" in html
+
+
+def test_password_field_never_shows_its_value(env):
+    html = render_component(
+        env,
+        '{% from "components/field.html" import field %}'
+        '{{ field("password", "Password", value="hunter2", type="password", '
+        'autocomplete="current-password") }}',
+    )
+    assert 'type="password" value=""' in html
+    assert "hunter2" not in html
+    assert 'autocomplete="current-password"' in html
 
 
 def test_button_component(env):

@@ -1,0 +1,58 @@
+{#- Signing in, setting up the first admin on a fresh install, and choosing a new password after
+    signing in with a temporary one: one narrow card in the middle of the page.
+    Data: views/sign_in.py SignInPage. Layout and colours: the rules at the top of static/app.css. -#}
+{% extends "base.html" %}
+{% from "components/card.html" import card_head %}
+{% from "components/field.html" import field %}
+{% from "components/icon.html" import icon %}
+{% from "components/message.html" import message %}
+
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block messages %}{% if page.messages %}<div class="rc-narrow">{% for item in page.messages %}{{ message(item) }}{% endfor %}</div>{% endif %}{% endblock %}
+
+{% block content %}
+{% set hint = "At least 12 characters. A few words together is easy to remember." %}
+<div class="rc-narrow">
+  <div class="rc-heading rc-sign-in-heading">
+    <h1><span class="rc-tile rc-blue">{{ icon("lock") }}</span>{{ page.title }}</h1>
+  </div>
+
+  {% if page.sign_in %}
+  {% set form = page.sign_in %}
+  <form method="post" action="{{ form.action_url }}" class="rc-card">
+    {% if form.error %}{{ message(form.error) }}{% endif %}
+    {{ field("username", "Username", form.username, required=True, autocomplete="username") }}
+    {{ field("password", "Password", type="password", required=True, autocomplete="current-password") }}
+    <button type="submit" class="rc-button rc-primary">{{ icon("in") }}Sign in</button>
+    <p class="rc-muted rc-sign-in-help">Forgot your password? An admin can give you a new
+      temporary one.</p>
+  </form>
+
+  {% elif page.setup %}
+  {% set form = page.setup %}
+  {% set e = form.errors %}
+  <form method="post" action="{{ form.action_url }}" class="rc-card">
+    {{ card_head("user", "The first admin", "blue") }}
+    <p>Rollcall has no accounts yet. The account made here is an admin: it can add the other
+      staff accounts and change the shop's settings.</p>
+    {{ field("name", "Your name", form.values.name, required=True, autocomplete="name", hint="Shown beside every change you make.", error=e.get("name")) }}
+    {{ field("username", "Username", form.values.username, required=True, autocomplete="username", hint="For signing in, e.g. marcus.o", error=e.get("username")) }}
+    {{ field("password", "Password", type="password", required=True, autocomplete="new-password", hint=hint, error=e.get("password")) }}
+    {{ field("password_again", "Password again", type="password", required=True, autocomplete="new-password", error=e.get("password_again")) }}
+    <button type="submit" class="rc-button rc-primary">{{ icon("check") }}Set up Rollcall</button>
+  </form>
+
+  {% elif page.change_password %}
+  {% set form = page.change_password %}
+  {% set e = form.errors %}
+  <form method="post" action="{{ form.action_url }}" class="rc-card">
+    <p>You signed in, {{ form.name }}, with a temporary password from an admin. Choose your own
+      before going on; nobody else will know it.</p>
+    {{ field("password", "New password", type="password", required=True, autocomplete="new-password", hint=hint, error=e.get("password")) }}
+    {{ field("password_again", "New password again", type="password", required=True, autocomplete="new-password", error=e.get("password_again")) }}
+    <button type="submit" class="rc-button rc-primary">{{ icon("check") }}Save the new password</button>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}
