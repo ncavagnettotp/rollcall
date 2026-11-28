@@ -11,15 +11,11 @@
   {% for page in pages %}
   <article>
     <header><strong><a href="{{ page.url }}">{{ page.title }}</a></strong></header>
-    {% if page.states %}
     <ul>
       {% for state in page.states %}
       <li><a href="{{ page.state_url(state) }}">{{ state.title }}</a>: {{ state.description }}</li>
       {% endfor %}
     </ul>
-    {% else %}
-    <p><small>Mocked up later.</small></p>
-    {% endif %}
   </article>
   {% endfor %}
 </section>

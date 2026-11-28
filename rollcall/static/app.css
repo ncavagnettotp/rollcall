@@ -48,6 +48,7 @@
   --rc-indigo: #4338ca;
   --rc-on-header: #ffffff;
   --rc-accent: #4338ca;       /* the chosen segment, focus outlines */
+  --rc-check: #4338ca;        /* a ticked checkbox; its tick is white */
   --rc-orange: #cf4a0e;       /* the main action; white text reads on it */
   --rc-orange-dark: #b23c08;
   --rc-on-primary: #ffffff;
@@ -89,6 +90,7 @@
     --rc-indigo: #33299e;
     --rc-on-header: #ffffff;
     --rc-accent: #a5b4fc;
+    --rc-check: #6366f1;
     --rc-orange: #cf4a0e;
     --rc-orange-dark: #b23c08;
     --rc-on-primary: #ffffff;
@@ -125,6 +127,7 @@
   --rc-indigo: #33299e;
   --rc-on-header: #ffffff;
   --rc-accent: #a5b4fc;
+  --rc-check: #6366f1;
   --rc-orange: #cf4a0e;
   --rc-orange-dark: #b23c08;
   --rc-on-primary: #ffffff;
@@ -171,6 +174,21 @@ body {
   --pico-border-radius: 8px;
   --pico-font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
     sans-serif;
+  /* Pico's own small icons (date picker, checkbox tick, select arrow...) are data: images, which
+     the content security policy blocks; these are the same drawings as Rollcall's own files
+     (static/pico-icons/, from Pico 2.1.1, MIT). The red cross and green tick Pico puts in
+     invalid and valid fields are left out: their colour can't follow the mode from a file, and
+     an error already shows a red border and its message. */
+  --pico-icon-checkbox: url("/static/pico-icons/checkbox.svg");
+  --pico-icon-minus: url("/static/pico-icons/minus.svg");
+  --pico-icon-chevron: url("/static/pico-icons/chevron.svg");
+  --pico-icon-date: url("/static/pico-icons/date.svg");
+  --pico-icon-time: url("/static/pico-icons/time.svg");
+  --pico-icon-search: url("/static/pico-icons/search.svg");
+  --pico-icon-close: url("/static/pico-icons/close.svg");
+  --pico-icon-loading: url("/static/pico-icons/loading.svg");
+  --pico-icon-valid: none;
+  --pico-icon-invalid: none;
 }
 /* The page colour on html as well, so a short page has no seam below its content. */
 html {
@@ -681,7 +699,7 @@ a.rc-button,
   font-weight: 600;
 }
 
-/* A list of tire sets (customer view, later search results): name, status line, and check in /
+/* A list of tire sets (customer view, search results): name, status line, and check in /
    check out beside it on a desktop, under it on a phone. */
 .rc-set-list {
   padding: 0;
@@ -817,6 +835,14 @@ a.rc-button,
 .rc-option input {
   flex: none;
   margin-top: 0.2rem;
+}
+/* A checkbox is square, and indigo with a white tick when ticked, in both modes. */
+input[type="checkbox"] {
+  border-radius: 4px;
+}
+input[type="checkbox"]:checked {
+  --pico-background-color: var(--rc-check);
+  --pico-border-color: var(--rc-check);
 }
 .rc-option span {
   display: flex;

@@ -7,6 +7,7 @@
   {# htmx would otherwise inject an inline <style>, which the content security policy blocks. #}
   <meta name="htmx-config" content='{"includeIndicatorStyles": false}'>
   <title>{% block title %}{% endblock %} · Rollcall</title>
+  <link rel="icon" href="{{ assets.favicon }}" type="image/svg+xml">
   <link rel="stylesheet" href="{{ assets.pico_css }}">
   <link rel="stylesheet" href="{{ assets.app_css }}">
   <script src="{{ assets.htmx_js }}" defer></script>

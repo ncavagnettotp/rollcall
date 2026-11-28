@@ -92,9 +92,13 @@ owner reviews in the gallery, revisions, sign-off. Page contents follow
 
 ## 4. Wrap-up
 
-- [ ] 4.1 Full check: `scripts/test.sh` passes; every gallery state checked in a browser at 360
+- [x] 4.1 Full check: `scripts/test.sh` passes; every gallery state checked in a browser at 360
   px in light and dark mode; `openspec validate add-ui-components --strict` passes. Verify: all
-  commands pass.
+  commands pass. Done 2026-11-27: 656 tests pass; all 49 states at 360 and 1280 px in light,
+  dark by the switch and dark by the device (294 views) plus the index and components, with no
+  sideways scroll and no browser errors. Fixed on the way: Pico's built-in icons were data:
+  images the security policy blocked (now Rollcall's own files), a ticked checkbox had no tick
+  and a pale fill in dark mode, no tab icon; the unused "mocked up later" page is gone.
 
 ## 5. What to try (shop owner, in a browser)
 

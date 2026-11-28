@@ -9,7 +9,7 @@ from a real invoice.
 """
 
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from rollcall.mockups import admin_samples as admin
 from rollcall.mockups import customer_samples as customer
@@ -66,7 +66,7 @@ class State:
 class Page:
     slug: str
     title: str
-    states: tuple[State, ...] = field(default_factory=tuple)
+    states: tuple[State, ...]  # at least one; the page opens the first
 
     @property
     def url(self) -> str:

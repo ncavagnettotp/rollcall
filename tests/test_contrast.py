@@ -41,6 +41,8 @@ PAIRS = [
     ("field-border", "card", NON_TEXT, "input borders"),
     ("orange-ink", "orange-soft", NON_TEXT, "orange icon tiles"),
     ("accent", "card", NON_TEXT, "focus outlines"),
+    ("on-primary", "check", NON_TEXT, "the tick in a ticked checkbox"),
+    ("check", "card", NON_TEXT, "a ticked checkbox on a card"),
     ("on-banner", "banner", TEXT, "the mockup banner"),
 ]
 

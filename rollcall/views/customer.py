@@ -26,7 +26,7 @@ class CustomerDetails:
 
 @dataclass(frozen=True)
 class SetSummary:
-    """One tire set in the customer's list (also used later by search results)."""
+    """One tire set in a list: on the customer view and in search results."""
 
     title: str  # size(s) and brand, as on the tire set page
     url: str

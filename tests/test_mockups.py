@@ -104,7 +104,6 @@ def parse(html: str) -> PageParts:
 
 
 def test_registry_lists_the_frame_and_the_six_planned_pages():
-    """Pages not yet mocked up are listed too, so the index shows what is still to come."""
     assert [page.slug for page in samples.PAGES] == [
         "frame",
         "tire-set",
@@ -139,13 +138,8 @@ def test_index_lists_every_state_and_component(gallery):
         assert url in targets, url
 
 
-def test_page_without_states_says_it_comes_later(gallery):
-    empty = [page for page in samples.PAGES if not page.states]
-    if not empty:
-        pytest.skip("every page has states")
-    response = gallery.get(f"/mockups/pages/{empty[0].slug}")
-    assert response.status_code == 200
-    assert "mocked up later" in response.text
+def test_every_page_is_mocked_up():
+    assert all(page.states for page in samples.PAGES)
 
 
 def test_page_with_states_opens_its_first_state(gallery):

@@ -27,6 +27,7 @@ ASSETS = {
     "htmx_js": "/static/vendor/htmx-2.0.11.min.js",
     "app_css": "/static/app.css",
     "app_js": "/static/app.js",
+    "favicon": "/static/favicon.svg",
 }
 
 SECURITY_HEADERS = {

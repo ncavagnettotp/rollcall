@@ -35,13 +35,11 @@ def index(request: Request):
 
 @router.get("/pages/{page_slug}")
 def page(request: Request, page_slug: str):
+    """A page opens its first state (every page has at least one)."""
     found = samples.find_page(page_slug)
     if found is None:
         raise HTTPException(404)
-    if found.states:
-        return RedirectResponse(samples.page_url(found.slug, found.states[0].slug))
-    context = {"page": found} | _frame(found.title)
-    return render(request, "mockups/not_yet.html", context)
+    return RedirectResponse(samples.page_url(found.slug, found.states[0].slug))
 
 
 @router.get("/pages/{page_slug}/{state_slug}")
