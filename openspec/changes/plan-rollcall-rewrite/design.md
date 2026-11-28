@@ -55,6 +55,7 @@ migrating v1 data.
 | Admin powers | Promote to admin; user-management settings | Owner |
 | Account creation | Admin creates accounts with a temporary password; no self-signup after first admin | Assistant proposal, not objected to |
 | Deactivation | Deactivated users can't sign in, their history stays; last admin can't be removed | Assistant proposal, not objected to |
+| Sign-in | Username and password (not email: Rollcall sends no email); new passwords need at least 12 characters; a forgotten password is replaced by an admin with a temporary one | Assistant proposal, approved by the owner with the sign-in mockup 2026-11-27 |
 | PDF | Pre-fill the form; staff review and save | Owner |
 | Customer from PDF | Form suggests existing customers with similar names; staff pick or create new; never auto-merge | Assistant call |
 | Sample PDFs | Real samples kept in git-ignored `samples/private/`; committed tests use synthetic PDFs | Assistant call |
