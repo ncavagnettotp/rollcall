@@ -102,7 +102,7 @@ owner reviews in the gallery, revisions, sign-off. Page contents follow
 
 ## 5. What to try (shop owner, in a browser)
 
-- [ ] 5.1 Owner sign-off:
+- [x] 5.1 Owner sign-off (approved 2026-11-27):
   1. Add `MOCKUPS=on` to `.env` and run `docker compose up -d`.
   2. Open http://localhost:8080/mockups. Every page is listed with its states.
   3. Click through the tire set page from "checked out" to "check-in step" to "checked in".
