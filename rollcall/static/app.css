@@ -824,6 +824,9 @@ a.rc-button,
   gap: 0.25rem 0.5rem;
   align-items: center;
 }
+.rc-option small {
+  flex-basis: 100%;
+}
 
 /* Search: the box with its button, the filters (links drawn like the segmented control),
    and the results, one card per customer with their sets. */
@@ -1009,6 +1012,43 @@ a.rc-button,
   font-size: 0.9rem;
 }
 
+/* Admin settings: staff accounts, each with its actions in a row (wrapping on phones). */
+.rc-account-list .rc-set-title {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  align-items: center;
+  margin: 0;
+}
+.rc-account-list .rc-account-actions {
+  display: flex;
+  flex: 1 1 100%; /* always under the name, however wide the screen */
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.rc-account-actions form,
+.rc-account-actions > a {
+  flex: 1 1 auto;
+}
+.rc-account-note {
+  margin: 0.3rem 0 0;
+  color: var(--rc-muted);
+  font-size: 0.9rem;
+}
+.rc-subhead {
+  margin: 1rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--rc-muted);
+}
+.rc-subhead .rc-muted {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
 /* Read out by screen readers, not shown. */
 .rc-sr {
   position: absolute;
@@ -1074,6 +1114,13 @@ a.rc-button,
   }
   .rc-columns > .rc-side {
     order: 0;
+  }
+  .rc-columns.rc-admin {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+  .rc-account-actions form,
+  .rc-account-actions > a {
+    flex: none;
   }
   .rc-form .rc-columns {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

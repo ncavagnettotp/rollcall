@@ -1,0 +1,23 @@
+{% from "components/button.html" import action_button %}
+{% from "components/pill.html" import pill %}
+
+{#- One staff account in a list (views: StaffAccount): name with its pills, username and last
+    sign-in, and its actions; why an action is missing, when one is. Goes in
+    <ul class="rc-set-list rc-account-list">. -#}
+{% macro account_row(item) -%}
+<li class="account">
+  <div class="rc-set-main">
+    <p class="rc-set-title">{{ item.name }}
+      {%- if item.is_you %} {{ pill("You", "blue") }}{% endif %}
+      {%- if item.is_admin %} {{ pill("Admin", "green") }}{% endif %}
+      {%- if not item.active %} {{ pill("Turned off", "slate") }}{% endif %}
+      {%- if item.must_change_password and item.active %} {{ pill("Temporary password", "amber") }}{% endif %}</p>
+    <p class="rc-set-meta"><span><b>{{ item.username }}</b></span>
+      <span>{% if item.last_signed_in %}Last signed in {{ item.last_signed_in | shop_time }}{% else %}Never signed in{% endif %}</span></p>
+    {% if item.note %}<p class="rc-account-note">{{ item.note }}</p>{% endif %}
+  </div>
+  {% if item.actions %}
+  <div class="rc-set-action rc-account-actions">{% for action in item.actions %}{{ action_button(action) }}{% endfor %}</div>
+  {% endif %}
+</li>
+{%- endmacro %}

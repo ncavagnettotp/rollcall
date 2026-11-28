@@ -21,3 +21,11 @@
 {% macro answer(value) -%}
 {{ pill(value.label, {"yes": "green", "no": "slate", "unknown": "unknown"}[value.value]) }}
 {%- endmacro %}
+
+{#- One checkbox with its label, and an optional hint under it. -#}
+{% macro checkbox(name, label, checked=False, hint=None) -%}
+<label for="f-{{ name }}" class="rc-option">
+  <input id="f-{{ name }}" name="{{ name }}" type="checkbox" value="yes"{% if checked %} checked{% endif %}{% if hint %} aria-describedby="h-{{ name }}"{% endif %}>
+  <span>{{ label }}{% if hint %}<small id="h-{{ name }}" class="rc-muted">{{ hint }}</small>{% endif %}</span>
+</label>
+{%- endmacro %}

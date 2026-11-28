@@ -11,6 +11,7 @@ from a real invoice.
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 
+from rollcall.mockups import admin_samples as admin
 from rollcall.mockups import customer_samples as customer
 from rollcall.mockups import dashboard_samples as dashboard
 from rollcall.mockups import search_samples as search
@@ -92,6 +93,7 @@ CUSTOMER_TEMPLATE = "pages/customer.html"
 SEARCH_TEMPLATE = "pages/search.html"
 DASHBOARD_TEMPLATE = "pages/dashboard.html"
 SIGN_IN_TEMPLATE = "pages/sign_in.html"
+ADMIN_TEMPLATE = "pages/admin.html"
 
 
 def _frame_note() -> Mapping[str, object]:
@@ -395,7 +397,64 @@ PAGES: tuple[Page, ...] = (
             ),
         ),
     ),
-    Page("admin", "Admin settings"),
+    Page(
+        "admin",
+        "Admin settings",
+        tuple(
+            State(slug, title, description, ADMIN_TEMPLATE, data, staff=ADMIN)
+            for slug, title, description, data in (
+                (
+                    "many-staff",
+                    "Many staff",
+                    "Two admins, five staff (one still on a temporary password), one turned off; "
+                    "and the too-long setting.",
+                    admin.many_staff,
+                ),
+                (
+                    "one-admin",
+                    "One admin only",
+                    "The only admin can't be made staff or turned off.",
+                    admin.one_admin,
+                ),
+                (
+                    "new-account",
+                    "New staff account",
+                    "Name, username, and whether it is an admin.",
+                    admin.new_account,
+                ),
+                (
+                    "account-created",
+                    "Account made",
+                    "The temporary password Rollcall made up, shown once.",
+                    admin.account_created,
+                ),
+                (
+                    "password-reset",
+                    "Password reset",
+                    "A new temporary password for someone who forgot theirs, shown once.",
+                    admin.password_reset,
+                ),
+                (
+                    "form-errors",
+                    "Form errors",
+                    "No name, and a username already taken.",
+                    admin.form_errors,
+                ),
+                (
+                    "settings-error",
+                    "Setting error",
+                    "Too long set to 6.5 months.",
+                    admin.settings_error,
+                ),
+                (
+                    "save-conflict",
+                    "Save conflict",
+                    "Another admin changed the setting meanwhile; the typed value is kept.",
+                    admin.save_conflict,
+                ),
+            )
+        ),
+    ),
 )
 
 COMPONENTS: tuple[Component, ...] = (

@@ -1,0 +1,78 @@
+{#- Admin settings (admins only): staff accounts, with reset password, make admin / staff and turn
+    off / on on each, a new account form, and the shop's "too long" setting.
+    Data: views/admin.py AdminPage. Layout and colours: the rules at the top of static/app.css. -#}
+{% extends "base.html" %}
+{% from "components/account_list.html" import account_row %}
+{% from "components/button.html" import action_button %}
+{% from "components/card.html" import card_head %}
+{% from "components/choice.html" import checkbox %}
+{% from "components/field.html" import field %}
+{% from "components/icon.html" import icon %}
+{% from "components/message.html" import message %}
+{% from "components/pill.html" import pill %}
+
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block messages %}{% for item in page.messages %}{{ message(item) }}{% endfor %}{% endblock %}
+
+{% block content %}
+<div class="rc-topbar">
+  <div class="rc-heading">
+    <h1><span class="rc-tile rc-blue">{{ icon("settings") }}</span>{{ page.title }}</h1>
+  </div>
+  {% if page.actions %}
+  <div class="rc-actions">{% for action in page.actions %}{{ action_button(action) }}{% endfor %}</div>
+  {% endif %}
+</div>
+
+<div class="rc-columns rc-admin">
+  <div>
+    {% if page.account_form %}
+    {% set form = page.account_form %}
+    {% set e = form.errors %}
+    <form method="post" action="{{ form.action_url }}" class="rc-card rc-step">
+      {{ card_head("plus", "New staff account", "orange") }}
+      {{ field("name", "Name", form.values.name, required=True, hint="Shown beside every change they make.", error=e.get("name")) }}
+      {{ field("username", "Username", form.values.username, required=True, hint="For signing in: letters, digits, dots and dashes, e.g. jordan.p", error=e.get("username")) }}
+      {{ checkbox("is_admin", "Admin", form.values.is_admin, hint="Can manage staff accounts and change the settings. Everyone can do all the tire work.") }}
+      <p class="rc-muted">Rollcall makes up a temporary password and shows it to you once. They
+        choose their own when they first sign in.</p>
+      <div class="rc-submit">
+        <button type="submit" class="rc-button rc-primary">{{ icon("check") }}Make the account</button>
+        <a href="{{ form.cancel_url }}" class="rc-link-button">Cancel</a>
+      </div>
+    </form>
+    {% endif %}
+
+    <section class="rc-card">
+      {{ card_head("user", "Staff accounts", "blue", extra=pill(page.accounts | length | count("account"), "blue")) }}
+      <ul class="rc-set-list rc-account-list">
+        {% for item in page.accounts %}{{ account_row(item) }}{% endfor %}
+      </ul>
+      {% if page.turned_off %}
+      <h3 class="rc-subhead">Turned off <span class="rc-muted">· can't sign in; their history stays</span></h3>
+      <ul class="rc-set-list rc-account-list">
+        {% for item in page.turned_off %}{{ account_row(item) }}{% endfor %}
+      </ul>
+      {% endif %}
+    </section>
+  </div>
+
+  <div>
+    {% set s = page.settings %}
+    {% if s.conflict %}
+    <div class="rc-card rc-tint-red" role="alert">
+      {{ card_head("alert", "Save conflict", "red", extra=pill("Not saved", "red")) }}
+      <p><strong>The setting was changed by {{ s.conflict.changed_by }} at {{ s.conflict.changed_at | shop_time }}</strong>
+        while you were editing. Your value below is not saved yet. Save to replace theirs, or
+        <a href="{{ s.conflict.reload_url }}">load their version</a>.</p>
+    </div>
+    {% endif %}
+    <form method="post" action="{{ s.action_url }}" class="rc-card">
+      {{ card_head("clock", "In too long", "amber") }}
+      {{ field("too_long_months", "Months in the shop", s.too_long_months, type="number", required=True, hint="A set in the shop longer than this is \"in too long\" on the dashboard and in search. The invoices say 6 months.", error=s.errors.get("too_long_months")) }}
+      <button type="submit" class="rc-button rc-secondary rc-inline">{{ icon("check") }}Save</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

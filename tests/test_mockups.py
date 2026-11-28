@@ -822,6 +822,124 @@ def test_new_password_errors_are_marked(gallery):
         assert f'aria-describedby="e-{name}"' in html, name
 
 
+# --- admin settings (task 3.5) ----------------------------------------------------------------
+
+ADMIN_STATES = [
+    "many-staff",
+    "one-admin",
+    "new-account",
+    "account-created",
+    "password-reset",
+    "form-errors",
+    "settings-error",
+    "save-conflict",
+]
+
+
+def admin_html(gallery, state: str) -> str:
+    response = gallery.get(f"/mockups/pages/admin/{state}")
+    assert response.status_code == 200
+    return response.text
+
+
+def admin_page(state: str):
+    return samples.find_state(samples.find_page("admin"), state).data()["page"]
+
+
+def action_labels(account) -> set[str]:
+    return {action.label for action in account.actions}
+
+
+def test_admin_has_every_planned_state():
+    assert [state.slug for state in samples.find_page("admin").states] == ADMIN_STATES
+
+
+def test_admin_states_all_use_the_page_data_shape_and_an_admin_is_signed_in():
+    from rollcall.views.admin import AdminPage
+
+    for state in samples.find_page("admin").states:
+        assert isinstance(state.data()["page"], AdminPage), state.slug
+        assert state.template == "pages/admin.html", state.slug
+        assert state.staff.is_admin, state.slug
+
+
+@pytest.mark.parametrize("state", ADMIN_STATES)
+def test_admin_shows_staff_accounts_and_the_too_long_setting(gallery, state):
+    html = admin_html(gallery, state)
+    assert "Staff accounts" in html
+    assert 'name="too_long_months"' in html
+    page = admin_page(state)
+    assert count_class(html, "account") == len(page.accounts) + len(page.turned_off)
+
+
+def test_each_account_can_be_reset_promoted_and_turned_off(gallery):
+    page = admin_page("many-staff")
+    staff = next(a for a in page.accounts if a.name == "Dana Whitfield")
+    admin = next(a for a in page.accounts if a.name == "Inês Carvalho")
+    assert action_labels(staff) == {"Reset password", "Make admin", "Turn off"}
+    assert action_labels(admin) == {"Reset password", "Make staff", "Turn off"}
+    assert page.turned_off
+    assert all(action_labels(account) == {"Turn on"} for account in page.turned_off)
+    html = admin_html(gallery, "many-staff")
+    for text in ("Admin", "Turned off", "Temporary password", "Never signed in", "You"):
+        assert text in html, text
+
+
+def test_the_only_admin_cannot_be_made_staff_or_turned_off(gallery):
+    page = admin_page("one-admin")
+    admins = [a for a in page.accounts if a.is_admin]
+    assert len(admins) == 1
+    assert not action_labels(admins[0]) & {"Make staff", "Turn off"}
+    assert "The only admin" in admin_html(gallery, "one-admin")
+
+
+def test_no_admin_can_turn_off_their_own_account():
+    for state in ADMIN_STATES:
+        you = [a for a in admin_page(state).accounts if a.is_you]
+        assert len(you) == 1, state
+        assert not action_labels(you[0]) & {"Make staff", "Turn off"}, state
+
+
+def test_new_account_asks_for_name_username_and_admin(gallery):
+    html = admin_html(gallery, "new-account")
+    for name in ("name", "username", "is_admin"):
+        assert f'name="{name}"' in html, name
+    assert 'type="password"' not in html  # Rollcall makes up the temporary password
+    assert "account-created" in targets_under(html, "/mockups/pages/admin/")
+
+
+@pytest.mark.parametrize("state", ["account-created", "password-reset"])
+def test_temporary_password_is_shown_once_to_the_admin(gallery, state):
+    html = admin_html(gallery, state)
+    assert "Temporary password" in html or "temporary password" in html
+    assert "not shown again" in html
+
+
+def test_admin_form_errors_mark_each_wrong_field_and_keep_its_value(gallery):
+    html = admin_html(gallery, "form-errors")
+    for name in ("name", "username"):
+        assert f'aria-describedby="e-{name}"' in html, name
+    assert 'value="dana"' in html
+
+
+def test_setting_error_keeps_the_typed_value(gallery):
+    html = admin_html(gallery, "settings-error")
+    assert 'aria-describedby="e-too_long_months"' in html
+    assert 'value="6.5"' in html
+
+
+def test_setting_save_conflict_names_who_and_when_and_keeps_the_typed_value(gallery):
+    html = admin_html(gallery, "save-conflict")
+    assert "changed by Inês Carvalho" in html
+    assert "11/18/2026 2:42 PM" in html
+    assert 'value="8"' in html
+
+
+def test_staff_who_are_not_admins_do_not_see_admin_settings(gallery):
+    html = gallery.get("/mockups/pages/dashboard/busy").text
+    assert "Admin settings" not in html
+
+
 # --- the approved design (spec: One approved design; Light and dark mode) ---------------------
 
 
