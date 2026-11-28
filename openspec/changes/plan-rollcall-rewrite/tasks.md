@@ -78,11 +78,12 @@ specs under `openspec/specs/`. Do not start the next task until the previous one
 
 - [x] 5.1 `add-platform-foundation`: Docker Compose (app + PostgreSQL), configuration, health check,
   database migrations, base page layout, vendored htmx, styling conventions, test setup.
-- [ ] 5.2 `add-ui-components`: page and component templates shown in a `/mockups` gallery with
+- [x] 5.2 `add-ui-components`: page and component templates shown in a `/mockups` gallery with
   invented sample data, in two phases. **UI design discovery:** two or three distinct designs of
   one sample page (the tire set page); the owner picks one or has them adjusted or combined until
   happy. **Mock up the rest:** only then are the other five pages mocked up in that design and
-  signed off one at a time. Later changes wire real data into these templates.
+  signed off one at a time. Later changes wire real data into these templates. Done 2026-11-27:
+  archived as `archive/2026-11-27-add-ui-components`; spec in `openspec/specs/ui-components/`.
 - [ ] 5.3 `add-accounts`: first-admin bootstrap, sign-in/out, sessions, admin user management
   (create with temporary password, reset, promote/demote, deactivate), last-admin protection.
 - [ ] 5.4 `add-customers-and-tire-inventory`: customers as root records; tire sets under them;
