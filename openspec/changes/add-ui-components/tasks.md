@@ -79,8 +79,9 @@ owner reviews in the gallery, revisions, sign-off. Page contents follow
   customers with their sets; states for no query, no results, many results, size typed as digits,
   a "too long" filter from the dashboard. Verify: owner signs off. Done 2026-11-27: approved as
   built (7 states).
-- [ ] 3.3 Dashboard: the five stats, each linking to its search; states for an empty shop and a
-  busy one. Verify: owner signs off.
+- [x] 3.3 Dashboard: the five stats, each linking to its search; states for an empty shop and a
+  busy one. Verify: owner signs off. Done 2026-11-27: approved with centered number cards; the
+  two weekly numbers open this week's list on the dashboard (search has no date filter).
 - [ ] 3.4 Sign-in: sign-in form, wrong password, deactivated account, first-admin setup on a fresh
   install, temporary password must be changed. Verify: owner signs off.
 - [ ] 3.5 Admin settings: staff accounts (create with temporary password, reset, promote/demote,

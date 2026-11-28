@@ -70,7 +70,7 @@ migrating v1 data.
 | Not stored | Tread depth, DOT date codes, tire positions, condition grades, photos, storage pricing | Owner (Q3; first three dropped 2026-11-27) |
 | Remove | Nothing is deleted. A set can be archived only while checked out; a customer only when none of their sets are checked in; both hidden from search and restorable; history kept | Owner (Q4) |
 | Roles | Every staff account does all inventory work; admins also manage staff accounts and shop settings | Owner (Q5) |
-| Dashboard | Sets checked in now; sets in too long; checked in this week; checked out this week; customers with a set in the shop. Each links to the matching search | Owner (Q6) |
+| Dashboard | Sets checked in now; sets in too long; checked in this week; checked out this week; customers with a set in the shop. The shop-wide numbers link to the matching search; the two weekly numbers (a week starts Monday) link to the week's check-ins and check-outs listed on the dashboard, since search has no date filter | Owner (Q6; weekly links approved 2026-11-27) |
 | "Too long" | Current stay older than one shop-wide threshold, default **6 months**, changeable by admins | Owner (Q6) |
 | PDF for a returning customer | The form suggests the existing customer; staff can check one of their checked-out sets in from the PDF instead of creating a new set. Every value the new PDF provides **replaces** the stored value in the form, with no per-field choice; fields the PDF could not read keep their stored value (a blank never wipes data). Staff still review the form and save, as for any PDF; previous values stay in history. The new PDF is attached to the new stay; earlier PDFs stay with earlier stays | Owner (Q7); blank-keeps-stored is the assistant's call |
 | PDF fills | Customer name, phone, email; vehicle, VIN, plate; RO and invoice numbers; invoice date as check-in date; size(s) and brand from storage notes; accessories. Never the storage location | Owner (Q7) |
@@ -153,7 +153,9 @@ This planning change is archived with `--skip-specs` after the last change is ar
 Q3 added a DOT date code per tire. Q7 added that a new PDF replaces the stored details outright
 (no per-field choice). **Changed on 2026-11-27**, while the owner reviewed the tire set mockup:
 tread depth (Q2), DOT date codes (Q3) and per-tire positions (Q1) are not recorded at all;
-anything about one tire goes in the set's notes. The Decisions table is current; the answers
+anything about one tire goes in the set's notes. Approved with the dashboard mockup the same day:
+the two weekly numbers open the week's list on the dashboard instead of a search. The Decisions
+table is current; the answers
 below are kept as they were given. The recommendations
 below are kept as the reasoning. Evidence from the five real invoices in `samples/private/`
 (checked 2026-11-24): none contains tread depths; all contain `Bill To`, a vehicle `Description`,
